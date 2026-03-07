@@ -1,6 +1,8 @@
-[gd_scene format=3 uid="uid://c8yvxg3ulq3a"]
+[gd_scene format=3 uid="uid://gpuql15c5pei"]
 
-[ext_resource type="Script" uid="uid://c8yvxg3ulq3a" path="res://src/ui/hud.gd" id="1_hud"]
+[ext_resource type="Script" uid="uid://cvce64526l8q" path="res://src/ui/hud.gd" id="1_hud"]
+[ext_resource type="Script" uid="uid://bcgiyqa5vgs6r" path="res://src/ui/color_circle.gd" id="2_colorcircle"]
+[ext_resource type="Script" uid="uid://dm0ey80amxuy2" path="res://src/ui/shape_icon.gd" id="3_shapeicon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.1, 0.1, 0.15, 0.9)
@@ -14,10 +16,10 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="HUD" type="CanvasLayer"]
+[node name="HUD" type="CanvasLayer" unique_id=555382904]
 script = ExtResource("1_hud")
 
-[node name="SelectionPanel" type="Control" parent="."]
+[node name="SelectionPanel" type="Control" parent="." unique_id=441387721]
 layout_mode = 3
 anchors_preset = 7
 anchor_left = 0.5
@@ -31,7 +33,7 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="Background" type="Panel" parent="SelectionPanel"]
+[node name="Background" type="Panel" parent="SelectionPanel" unique_id=1955450989]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,3 +41,48 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="IconsContainer" type="HBoxContainer" parent="SelectionPanel" unique_id=546135117]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -32.0
+offset_right = 250.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="RedCircle" type="Control" parent="SelectionPanel/IconsContainer" unique_id=563539740]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_colorcircle")
+circle_color = Color(1, 0.27, 0.27, 1)
+
+[node name="BlueCircle" type="Control" parent="SelectionPanel/IconsContainer" unique_id=969974474]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_colorcircle")
+circle_color = Color(0.27, 0.53, 1, 1)
+
+[node name="YellowCircle" type="Control" parent="SelectionPanel/IconsContainer" unique_id=20661991]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("2_colorcircle")
+circle_color = Color(1, 0.87, 0.27, 1)
+
+[node name="RectangleIcon" type="Control" parent="SelectionPanel/IconsContainer" unique_id=1371359649]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("3_shapeicon")
+
+[node name="TriangleIcon" type="Control" parent="SelectionPanel/IconsContainer" unique_id=787823645]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+script = ExtResource("3_shapeicon")
+shape_type = 1

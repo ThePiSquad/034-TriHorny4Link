@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://shapeicon01"]
+
+[ext_resource type="Script" uid="uid://shapeicon01" path="res://src/ui/shape_icon.gd" id="1_shapeicon"]
+
+[node name="ShapeIcon" type="Control"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 64.0
+offset_bottom = 64.0
+script = ExtResource("1_shapeicon")
+shape_type = 0
