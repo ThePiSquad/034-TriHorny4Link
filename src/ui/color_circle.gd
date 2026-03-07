@@ -16,6 +16,8 @@ class_name ColorCircle
 
 const PADDING: float = 4.0
 
+@onready var hud: CanvasLayer = $"../../.."
+
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(64, 64)
@@ -26,15 +28,12 @@ func _draw() -> void:
 	var center = size / 2
 	var radius = min(size.x, size.y) / 2 - PADDING
 	
-	# 绘制填充部分
 	if fill_ratio > 0.001:
 		_draw_fill(center, radius, fill_ratio)
 	
-	# 绘制圆形描边
 	var outline_width = 2.0
 	draw_arc(center, radius, 0, TAU, 64, circle_color, outline_width, true)
 	
-	# 绘制选中状态的高亮圆环
 	if is_selected:
 		var selection_radius = radius + PADDING / 2
 		draw_arc(center, selection_radius, 0, TAU, 64, selection_ring_color, 3.0, true)
@@ -76,10 +75,16 @@ func _draw_fill(center: Vector2, radius: float, ratio: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if _is_selection_trigger(event):
+		if hud and hud.has_method("select_icon"):
+			hud.select_icon(self)
+		else:
+			is_selected = !is_selected
+
+
+func _is_selection_trigger(event: InputEvent) -> bool:
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			var hud = get_parent().get_parent().get_parent()
-			if hud and hud.has_method("select_icon"):
-				hud.select_icon(self)
-			else:
-				is_selected = !is_selected
+		return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	elif event is InputEventScreenTouch:
+		return event.pressed
+	return false

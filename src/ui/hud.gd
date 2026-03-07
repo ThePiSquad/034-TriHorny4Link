@@ -23,6 +23,8 @@ func select_icon(selected_icon) -> void:
 			selected_icon.is_selected = true
 
 
+## 用法示例  设置单个资源
+#   set_resource_ratio("red", 0.75)
 func set_resource_ratio(color_name: String, ratio: float) -> void:
 	var icons_container = $SelectionPanel/IconsContainer
 	if not icons_container:

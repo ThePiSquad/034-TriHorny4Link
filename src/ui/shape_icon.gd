@@ -20,9 +20,10 @@ enum ShapeType { RECTANGLE, TRIANGLE }
 @export var inactive_color: Color = Color(0.4, 0.4, 0.45, 0.6)
 @export var selection_ring_color: Color = Color.WHITE
 
-const OUTLINE_WIDTH: float = 2.0
 const SELECTION_RING_WIDTH: float = 3.0
 const PADDING: float = 4.0
+
+@onready var hud: CanvasLayer = $"../../.."
 
 
 func _ready() -> void:
@@ -83,10 +84,16 @@ func _draw_selection_triangle(center: Vector2, shape_size: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if _is_selection_trigger(event):
+		if hud and hud.has_method("select_icon"):
+			hud.select_icon(self)
+		else:
+			is_selected = !is_selected
+
+
+func _is_selection_trigger(event: InputEvent) -> bool:
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			var hud = get_parent().get_parent().get_parent()
-			if hud and hud.has_method("select_icon"):
-				hud.select_icon(self)
-			else:
-				is_selected = !is_selected
+		return event.button_index == MOUSE_BUTTON_LEFT and event.pressed
+	elif event is InputEventScreenTouch:
+		return event.pressed
+	return false
