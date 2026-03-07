@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dcacm68t453ne"]
+
+[ext_resource type="Script" uid="uid://cm0fimddlguo1" path="res://src/shapes/triangle_shape.gd" id="1_a0gb4"]
+
+[node name="TriangleShape" type="Node2D" unique_id=546677538]
+script = ExtResource("1_a0gb4")
