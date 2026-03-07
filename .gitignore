@@ -2,3 +2,10 @@
 .godot/
 /android/
 addons/godot-git-plugin
+
+build/*
+#!build/.gitkeep
+#!build/linux/.gitkeep
+#!build/web/.gitkeep
+#!build/windows/.gitkeep
+
