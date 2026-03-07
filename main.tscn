@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://ekoukkmxla1m"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_7dm0k"]
+font_size = 65
+
+[node name="Main" type="Node2D" unique_id=797017076]
+
+[node name="Label" type="Label" parent="." unique_id=1087334970]
+offset_right = 1152.0
+offset_bottom = 648.0
+text = "HELLO, WORLD!"
+label_settings = SubResource("LabelSettings_7dm0k")
+horizontal_alignment = 1
+vertical_alignment = 1

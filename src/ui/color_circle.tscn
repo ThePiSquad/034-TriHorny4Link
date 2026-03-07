@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://colorcircle01"]
+
+[ext_resource type="Script" uid="uid://colorcircle01" path="res://src/ui/color_circle.gd" id="1_colorcircle"]
+
+[node name="ColorCircle" type="Control"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 64.0
+offset_bottom = 64.0
+script = ExtResource("1_colorcircle")
+circle_color = Color(1, 0.2, 0.2, 1)
