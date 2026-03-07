@@ -1,6 +1,17 @@
 [gd_scene format=3 uid="uid://b56p44rn05jrx"]
 
 [ext_resource type="Script" uid="uid://c7ubh2nlwj8d8" path="res://src/world.gd" id="1_tp5op"]
+[ext_resource type="Script" uid="uid://dgi2i5s2f2xtb" path="res://src/state.gd" id="2_xlegt"]
+[ext_resource type="Script" uid="uid://cckyf835is82y" path="res://src/state_manager.gd" id="3_0qwtu"]
+
+[sub_resource type="Resource" id="Resource_0qwtu"]
+script = ExtResource("2_xlegt")
+metadata/_custom_type_script = "uid://dgi2i5s2f2xtb"
 
 [node name="World" type="Node2D" unique_id=92352676]
 script = ExtResource("1_tp5op")
+state = SubResource("Resource_0qwtu")
+
+[node name="StateManager" type="Node" parent="." unique_id=1854887110]
+unique_name_in_owner = true
+script = ExtResource("3_0qwtu")

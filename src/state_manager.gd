@@ -1,11 +1,11 @@
-extends Node2D
+extends Node
 
-@export var state:GameState = GameState.new()
+var state:GameState
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	state = GameState.new()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
