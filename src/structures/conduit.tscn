@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://5dfvmylkuvm6"]
+
+[ext_resource type="Script" uid="uid://sb1hat62qpx" path="res://src/structures/conduit.gd" id="1_om8kb"]
+
+[node name="Conduit" type="Node2D" unique_id=554312713]
+script = ExtResource("1_om8kb")
