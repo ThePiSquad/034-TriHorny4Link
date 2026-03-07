@@ -1,16 +1,8 @@
 extends Resource
 
-class_name GameState
+class_name Constants
 
-var difficulty:int = 1.0
-var upgrade:UpgradableState = UpgradableState.new()
-
-
-class UpgradableState:
-	var turret_range:int = 0
-	var resource_generation:int = 0
-	var crystal_energy:int = 0
-
+static var mono_crystal_base_energy_level:int = 2
 
 
 # Called when the node enters the scene tree for the first time.
