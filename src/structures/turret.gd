@@ -1,8 +1,6 @@
-extends Node
-
-var state:GameState
+extends Structure
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	state = GameState.new()
+	pass # Replace with function body.
