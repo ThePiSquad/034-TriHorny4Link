@@ -1,5 +1,5 @@
 @abstract
-extends Node
+extends Damageable
 
 class_name Structure
 
