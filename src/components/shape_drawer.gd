@@ -4,7 +4,7 @@ extends Node2D
 
 @export_group("Shape")
 @export var shape_type: Enums.ShapeType = Enums.ShapeType.CIRCLE
-@export var shape_size: Vector2 = Vector2(64, 64)
+@export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
 
 @export_group("Fill")
 @export var fill_color: Color = Color.RED

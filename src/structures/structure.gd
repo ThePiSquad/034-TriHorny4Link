@@ -41,11 +41,12 @@ func initialize(
 	p_south: Structure = null,
 	p_west: Structure = null,
 	p_east: Structure = null,
-) -> void:
+) -> Structure:
 	north = p_north
 	south = p_south
 	west = p_west
 	east = p_east
+	return self
 
 
 func on_health_depleted() -> void:
