@@ -42,3 +42,9 @@ enum ComponentState {
 	INACTIVE,
 	OVERLOADED,
 }
+
+enum EnemyType {
+	RECTANGLE,
+	TRIANGLE,
+	CIRCLE,
+}

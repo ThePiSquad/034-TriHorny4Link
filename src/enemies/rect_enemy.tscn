@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://ctq4hb8eu3wcc"]
+
+[ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_83whr"]
+[ext_resource type="Script" uid="uid://bbw215wmyvg32" path="res://src/enemies/rect_enemy.gd" id="2_gf85d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_83whr"]
+size = Vector2(64, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gf85d"]
+size = Vector2(64, 64)
+
+[node name="RectEnemy" unique_id=531630275 instance=ExtResource("1_83whr")]
+script = ExtResource("2_gf85d")
+enemy_size = Vector2(64, 64)
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=1569216735]
+position = Vector2(-32, -32)
+shape_type = 2
+fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
+stroke_color = Color(0.68235296, 0, 0, 1)
+stroke_enabled = true
+
+[node name="HurtCollisionShape2D" type="CollisionShape2D" parent="HurtArea2D" parent_id_path=PackedInt32Array(979339801) index="0" unique_id=226742642]
+shape = SubResource("RectangleShape2D_83whr")
+
+[node name="HitCollisionShape2D" type="CollisionShape2D" parent="HitArea2D" parent_id_path=PackedInt32Array(85137004) index="0" unique_id=556750574]
+shape = SubResource("RectangleShape2D_gf85d")
+debug_color = Color(0.56360173, 0.5518493, 0.26331213, 0.41960785)

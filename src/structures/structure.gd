@@ -8,6 +8,8 @@ signal destroyed
 
 var energy_level: EnergyLevel
 
+@export var structure_type:Enums.StructureType
+
 var color: Enums.ColorType:
 	get():
 		return energy_level.get_color()
@@ -50,6 +52,13 @@ func connect_neighbor(s:Structure)->void:
 	else:
 		s.update.connect(self.on_neighbor_update)
 		s.destroyed.connect(self.on_neighbor_destroyed)
+
+func on_health_depleted() -> void:
+	pass
+
+func get_structure_type() -> Enums.StructureType:
+	return structure_type
+
 
 func on_neighbor_update() -> void:
 	print("on_neighbor_update")
