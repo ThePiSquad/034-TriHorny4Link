@@ -17,11 +17,8 @@ var _color: Enums.ColorType = Enums.ColorType.WHITE
 	get():
 		return _color
 	set(s):
-		# 存储颜色值
 		_color = s
-		# 同步到 energy_level
 		_sync_color_to_energy_level(s)
-		# 只有当 shape_drawer 存在且节点已经进入场景树时才更新外观
 		if is_node_ready() and shape_drawer:
 			shape_drawer.fill_color = Constants.COLOR_MAP[s]
 
@@ -96,18 +93,12 @@ func _exit_tree() -> void:
 	update.emit()
 
 func _ready() -> void:
-	# 初始化时应用编辑器中设置的颜色
 	_sync_color_to_energy_level(_color)
 	update.emit()
-	_update_appearance()
-
-func _update_appearance() -> void:
 	if shape_drawer:
-		# 直接使用_color变量，而不是从energy_level获取
 		shape_drawer.fill_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
 
 func _sync_color_to_energy_level(color_type: Enums.ColorType) -> void:
-	# 根据颜色类型设置 energy_level 的值
 	match color_type:
 		Enums.ColorType.RED:
 			energy_level.red = 3

@@ -15,7 +15,7 @@ func north() -> GridCoord:
 
 
 func south() -> GridCoord:
-	return GridCoord.new(x, y - 1)
+	return GridCoord.new(x, y + 1)
 
 
 func west() -> GridCoord:

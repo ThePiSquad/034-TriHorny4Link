@@ -15,6 +15,7 @@ signal mode_changed(mode: InputMode)
 
 var current_mode: InputMode = InputMode.PLACEMENT
 var selected_structure_type: Enums.StructureType = Enums.StructureType.TURRET
+var selected_color_type: Enums.ColorType = Enums.ColorType.WHITE
 
 var _is_placing: bool = false
 var _is_removing: bool = false
@@ -102,15 +103,10 @@ func _handle_placement_input(event: InputEvent) -> void:
 			_is_placing = event.pressed
 			if event.pressed and _is_selection_active():
 				_try_place()
-		else:
-			_is_placing = false
-		
-		if event.button_index == MOUSE_BUTTON_RIGHT:
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_is_removing = event.pressed
 			if event.pressed:
 				_try_remove()
-		else:
-			_is_removing = false
 
 func _update_placement_preview() -> void:
 	if not placement_preview or not _is_selection_active():
@@ -138,7 +134,7 @@ func _try_place() -> void:
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
 	
-	structure_manager.spawn(selected_structure_type, grid_coord)
+	structure_manager.spawn(selected_structure_type, grid_coord, selected_color_type)
 
 func _try_remove() -> void:
 	if not structure_manager:
@@ -160,23 +156,20 @@ func _is_selection_active() -> bool:
 	return hud.is_icon_selected()
 
 func _on_icon_selected(icon) -> void:
-	# 根据选中的图标类型设置结构类型
 	if icon is ShapeIcon:
 		if icon.shape_type == ShapeIcon.ShapeType.RECTANGLE:
 			set_selected_structure_type(Enums.StructureType.CONDUIT)
 		elif icon.shape_type == ShapeIcon.ShapeType.TRIANGLE:
 			set_selected_structure_type(Enums.StructureType.TURRET)
 	elif icon is ColorCircle:
-		# 根据圆形颜色设置结构类型
-		match icon.circle_color:
-			Color.RED:
-				set_selected_structure_type(Enums.StructureType.CRYSTAL)
-			Color.BLUE:
-				set_selected_structure_type(Enums.StructureType.MONO_CRYSTAL)
-			_:
-				set_selected_structure_type(Enums.StructureType.CRYSTAL)
+		set_selected_structure_type(Enums.StructureType.MONO_CRYSTAL)
+		var index = icon.get_index()
+		match index:
+			0: selected_color_type = Enums.ColorType.RED
+			1: selected_color_type = Enums.ColorType.BLUE
+			2: selected_color_type = Enums.ColorType.YELLOW
+			_: selected_color_type = Enums.ColorType.WHITE
 	
-	# 显示预览
 	if placement_preview:
 		placement_preview.show_preview()
 
