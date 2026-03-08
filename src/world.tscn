@@ -41,7 +41,11 @@ script = ExtResource("7_jvefd")
 [node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
 
-[node name="InputManager" type="Node2D" parent="." unique_id=1749754244]
+[node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera")]
 script = ExtResource("9_input")
+structure_manager = NodePath("../WorldPainter/StructureManager")
+placement_preview = NodePath("../PlacementPreview")
+hud = NodePath("../HUD")
+camera = NodePath("../Camera2D")
 
 [node name="PlacementPreview" parent="." unique_id=111222333 instance=ExtResource("10_preview")]
