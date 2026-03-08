@@ -4,6 +4,8 @@ signal update
 
 var energy_level: EnergyLevel
 
+@export var structure_type:Enums.StructureType
+
 var color: Enums.ColorType:
 	get():
 		return energy_level.get_color()
@@ -47,6 +49,8 @@ func initialize(
 	west = p_west
 	east = p_east
 
+func get_structure_type() -> Enums.StructureType:
+	return structure_type
 
 func on_health_depleted() -> void:
 	pass
