@@ -1,5 +1,7 @@
 class_name Structure
 
+extends Node2D
+
 signal update
 
 var energy_level: EnergyLevel
@@ -43,11 +45,12 @@ func initialize(
 	p_south: Structure = null,
 	p_west: Structure = null,
 	p_east: Structure = null,
-) -> void:
+) -> Structure:
 	north = p_north
 	south = p_south
 	west = p_west
 	east = p_east
+	return self
 
 func get_structure_type() -> Enums.StructureType:
 	return structure_type

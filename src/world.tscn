@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://gpuql15c5pei" path="res://src/ui/hud.tscn" id="4_hud"]
 [ext_resource type="Texture2D" uid="uid://1t0emgcfw53c" path="res://icon.svg" id="5_36ipd"]
 [ext_resource type="Script" uid="uid://dredsd26xrygd" path="res://src/world_painter.gd" id="6_usxdn"]
+[ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="7_jvefd"]
+[ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enermy_manager.gd" id="8_53egh"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
 script = ExtResource("2_xlegt")
@@ -27,3 +29,9 @@ texture = ExtResource("5_36ipd")
 
 [node name="WorldPainter" type="Node2D" parent="." unique_id=997360994]
 script = ExtResource("6_usxdn")
+
+[node name="StructureManager" type="Node2D" parent="WorldPainter" unique_id=671697620]
+script = ExtResource("7_jvefd")
+
+[node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
+script = ExtResource("8_53egh")
