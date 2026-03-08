@@ -6,5 +6,8 @@
 [node name="Turret" unique_id=102321888 instance=ExtResource("1_drymu")]
 script = ExtResource("1_hitdn")
 
-[node name="ShapeDrawer" parent="." index="1" unique_id=778239937]
+[node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
 shape_type = 1
+corner_radius = 0.0
+
+[editable path="Damageable"]

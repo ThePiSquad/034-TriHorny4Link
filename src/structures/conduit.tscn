@@ -5,3 +5,8 @@
 
 [node name="Conduit" unique_id=102321888 instance=ExtResource("1_om8kb")]
 script = ExtResource("2_q8vcm")
+
+[node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
+shape_type = 2
+
+[editable path="Damageable"]

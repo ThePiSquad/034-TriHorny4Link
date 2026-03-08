@@ -13,6 +13,7 @@ script = ExtResource("2_gf85d")
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=1569216735]
 shape_type = 2
+corner_radius = 0.0
 fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
 stroke_color = Color(0.68235296, 0, 0, 1)
 stroke_enabled = true

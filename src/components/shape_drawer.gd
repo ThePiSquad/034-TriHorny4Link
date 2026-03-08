@@ -5,6 +5,7 @@ extends Node2D
 @export_group("Shape")
 @export var shape_type: Enums.ShapeType = Enums.ShapeType.CIRCLE
 @export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
+@export var corner_radius: float = 8.0
 
 @export_group("Fill")
 @export var fill_color: Color = Color.RED
@@ -47,8 +48,98 @@ func _draw_triangle() -> void:
 		draw_polyline(closed_points, stroke_color, stroke_width, true)
 
 func _draw_rectangle() -> void:
-	var rect = Rect2(-shape_size / 2, shape_size)
 	if fill_enabled:
-		draw_rect(rect, fill_color, true)
+		_draw_rounded_rectangle_fill()
 	if stroke_enabled:
-		draw_rect(rect, stroke_color, false, stroke_width)
+		_draw_rounded_rectangle_stroke()
+
+func _draw_rounded_rectangle_fill() -> void:
+	var half_width = shape_size.x / 2
+	var half_height = shape_size.y / 2
+	var temp_r = min(half_width, half_height)
+	var r = min(corner_radius, temp_r)
+	
+	var points = PackedVector2Array()
+	var colors = PackedColorArray()
+	
+	# 左上角圆弧
+	for i in range(8):
+		var angle = PI + i * PI / 16
+		points.append(Vector2(
+			-half_width + r + cos(angle) * r,
+			-half_height + r + sin(angle) * r
+		))
+		colors.append(fill_color)
+	
+	# 右上角圆弧
+	for i in range(8):
+		var angle = -PI / 2 + i * PI / 16
+		points.append(Vector2(
+			half_width - r + cos(angle) * r,
+			-half_height + r + sin(angle) * r
+		))
+		colors.append(fill_color)
+	
+	# 右下角圆弧
+	for i in range(8):
+		var angle = 0 + i * PI / 16
+		points.append(Vector2(
+			half_width - r + cos(angle) * r,
+			half_height - r + sin(angle) * r
+		))
+		colors.append(fill_color)
+	
+	# 左下角圆弧
+	for i in range(8):
+		var angle = PI / 2 + i * PI / 16
+		points.append(Vector2(
+			-half_width + r + cos(angle) * r,
+			half_height - r + sin(angle) * r
+		))
+		colors.append(fill_color)
+	
+	draw_polygon(points, colors)
+
+func _draw_rounded_rectangle_stroke() -> void:
+	var half_width = shape_size.x / 2
+	var half_height = shape_size.y / 2
+	var r = min(corner_radius, min(half_width, half_height))
+	
+	var points = PackedVector2Array()
+	
+	# 左上角圆弧
+	for i in range(8):
+		var angle = PI + i * PI / 16
+		points.append(Vector2(
+			-half_width + r + cos(angle) * r,
+			-half_height + r + sin(angle) * r
+		))
+	
+	# 右上角圆弧
+	for i in range(8):
+		var angle = -PI / 2 + i * PI / 16
+		points.append(Vector2(
+			half_width - r + cos(angle) * r,
+			-half_height + r + sin(angle) * r
+		))
+	
+	# 右下角圆弧
+	for i in range(8):
+		var angle = 0 + i * PI / 16
+		points.append(Vector2(
+			half_width - r + cos(angle) * r,
+			half_height - r + sin(angle) * r
+		))
+	
+	# 左下角圆弧
+	for i in range(8):
+		var angle = PI / 2 + i * PI / 16
+		points.append(Vector2(
+			-half_width + r + cos(angle) * r,
+			half_height - r + sin(angle) * r
+		))
+	
+	# 闭合路径
+	points.append(points[0])
+	
+	draw_polyline(points, stroke_color, stroke_width, true)
