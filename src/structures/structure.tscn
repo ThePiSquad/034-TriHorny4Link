@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dfli78g3x0kpv"]
+
+[ext_resource type="Script" uid="uid://dwoc7tply6dqw" path="res://src/structures/structure.gd" id="1_xw0ke"]
+[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/damageable.gd" id="2_xh6pj"]
+
+[node name="Structure" type="Node2D" unique_id=102321888]
+script = ExtResource("1_xw0ke")
+
+[node name="Damageable" type="Node2D" parent="." unique_id=1880452733]
+script = ExtResource("2_xh6pj")
+metadata/_custom_type_script = "uid://imt5d4ftglee"

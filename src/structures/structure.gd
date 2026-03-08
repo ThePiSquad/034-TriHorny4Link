@@ -1,5 +1,4 @@
-@abstract class_name Structure
-extends Damageable
+class_name Structure
 
 signal update
 
