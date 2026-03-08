@@ -6,12 +6,11 @@ extends Node2D
 
 @export var move_speed: float = 100.0
 @export var attack_damage: float = 10.0
-@export var enemy_size: Vector2 
+@export var enemy_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
 
 var direction: Vector2
 var base_position: Vector2 = Vector2.ZERO
 
-# "Enemy subclass need implement _initialize_shape()"
 func _initialize_shape() -> void:
 	shape_drawer.shape_size = enemy_size
 

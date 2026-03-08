@@ -34,9 +34,9 @@ func _draw_circle() -> void:
 
 func _draw_triangle() -> void:
 	var points = PackedVector2Array([
-		Vector2(shape_size.x / 2, 0),
-		Vector2(shape_size.x, shape_size.y),
-		Vector2(0, shape_size.y)
+		Vector2(-shape_size.x / 2, shape_size.y / 2),
+		Vector2(0, -shape_size.y / 2),
+		Vector2(shape_size.x / 2, shape_size.y / 2)
 	])
 	if fill_enabled:
 		var colors = PackedColorArray([fill_color, fill_color, fill_color])
@@ -47,7 +47,7 @@ func _draw_triangle() -> void:
 		draw_polyline(closed_points, stroke_color, stroke_width, true)
 
 func _draw_rectangle() -> void:
-	var rect = Rect2(Vector2.ZERO, shape_size)
+	var rect = Rect2(-shape_size / 2, shape_size)
 	if fill_enabled:
 		draw_rect(rect, fill_color, true)
 	if stroke_enabled:

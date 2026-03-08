@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b1f2q7q2oax5c"]
+
+[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/components/damageable.gd" id="1_4g4bq"]
+
+[node name="Damageable" type="Node2D" unique_id=265451698]
+script = ExtResource("1_4g4bq")
+
+[node name="HitboxArea" type="Area2D" parent="." unique_id=1114372282]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxArea" unique_id=910591284]
+
+[node name="HurtboxArea" type="Area2D" parent="." unique_id=1565689982]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxArea" unique_id=1064559139]

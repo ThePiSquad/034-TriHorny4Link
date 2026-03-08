@@ -4,6 +4,11 @@ extends Node2D
 signal health_changed(current: float, max: float)
 signal died(source: Node)
 
+@onready var hit_area: Area2D = $HitArea2D
+@onready var hurt_area: Area2D = $HurtArea2D
+@onready var hitbox_shape: CollisionShape2D = $HitboxArea/CollisionShape2D
+@onready var hurtbox_shape: CollisionShape2D = $HurtboxArea/CollisionShape2D
+
 @export var max_health: float = 100.0:
 	set(value):
 		max_health = max(1.0, value)
@@ -35,6 +40,12 @@ func take_damage(amount: float, source: Node = null) -> void:
 	
 	if current_health <= 0.0:
 		_on_death()
+
+func get_health() -> float:
+	return current_health
+
+func get_max_health() -> float:
+	return max_health
 
 func get_health_percentage() -> float:
 	return current_health / max_health

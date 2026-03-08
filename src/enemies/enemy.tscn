@@ -1,23 +1,18 @@
 [gd_scene format=3 uid="uid://baprtpmei8ko8"]
 
 [ext_resource type="Script" uid="uid://b8rvgajsbmod6" path="res://src/enemies/enemy.gd" id="1_a8hw6"]
-[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/components/damageable.gd" id="2_yvjb1"]
+[ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
 
 [node name="Enemy" type="Node2D" unique_id=531630275]
 script = ExtResource("1_a8hw6")
-
-[node name="Damageable" type="Node2D" parent="." unique_id=1527894237]
-script = ExtResource("2_yvjb1")
-metadata/_custom_type_script = "uid://imt5d4ftglee"
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=1569216735]
 script = ExtResource("3_abny1")
 stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
 
-[node name="HurtArea2D" type="Area2D" parent="." unique_id=979339801]
+[node name="Damageable" parent="." unique_id=203901778 instance=ExtResource("2_yvjb1")]
+metadata/_custom_type_script = "uid://imt5d4ftglee"
 
-[node name="HitArea2D" type="Area2D" parent="." unique_id=85137004]
-
-[connection signal="body_entered" from="HitArea2D" to="." method="_on_hit_area_2d_body_entered"]
+[editable path="Damageable"]
