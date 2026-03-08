@@ -1,4 +1,4 @@
-extends CanvasLayer
+class_name HUD extends CanvasLayer
 
 const ColorCircle = preload("res://src/ui/color_circle.gd")
 const ShapeIcon = preload("res://src/ui/shape_icon.gd")

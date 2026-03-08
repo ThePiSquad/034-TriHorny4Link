@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://dredsd26xrygd" path="res://src/world_painter.gd" id="6_usxdn"]
 [ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="7_jvefd"]
 [ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enermy_manager.gd" id="8_53egh"]
+[ext_resource type="Script" uid="uid://b226ukyquly1l" path="res://src/input_manager.gd" id="9_input"]
+[ext_resource type="PackedScene" path="res://src/placement_preview.tscn" id="10_preview"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
 script = ExtResource("2_xlegt")
@@ -20,6 +22,9 @@ state = SubResource("Resource_0qwtu")
 [node name="StateManager" type="Node" parent="." unique_id=1854887110]
 unique_name_in_owner = true
 script = ExtResource("3_0qwtu")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=123456789]
+position = Vector2(576, 324)
 
 [node name="HUD" parent="." unique_id=387383325 instance=ExtResource("4_hud")]
 
@@ -35,3 +40,8 @@ script = ExtResource("7_jvefd")
 
 [node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
+
+[node name="InputManager" type="Node2D" parent="." unique_id=1749754244]
+script = ExtResource("9_input")
+
+[node name="PlacementPreview" parent="." unique_id=111222333 instance=ExtResource("10_preview")]

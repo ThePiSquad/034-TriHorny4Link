@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://c8m2q3r4n5x6p"]
+
+[ext_resource type="Script" uid="uid://preview_script" path="res://src/placement_preview.gd" id="1_preview"]
+[ext_resource type="Script" uid="uid://shape_drawer" path="res://src/components/shape_drawer.gd" id="2_shape_drawer"]
+
+[node name="PlacementPreview" type="Node2D"]
+script = ExtResource("1_preview")
+
+[node name="ShapeDrawer" type="Node2D" parent="."]
+script = ExtResource("2_shape_drawer")
+shape_type = 0
+shape_size = Vector2(64, 64)
+fill_color = Color(0.5, 0.5, 0.5, 0.5)
+stroke_color = Color(1, 1, 1, 0.8)
