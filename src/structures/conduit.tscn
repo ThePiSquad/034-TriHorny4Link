@@ -5,9 +5,10 @@
 
 [node name="Conduit" unique_id=102321888 instance=ExtResource("1_om8kb")]
 script = ExtResource("2_q8vcm")
+structure_type = 3
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
 shape_type = 2
-fill_color = Color(1, 0.27058825, 0.27058825, 1)
+fill_color = Color(1, 1, 1, 1)
 
 [editable path="Damageable"]

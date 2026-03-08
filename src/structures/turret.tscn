@@ -9,5 +9,6 @@ script = ExtResource("1_hitdn")
 [node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
 shape_type = 1
 corner_radius = 0.0
+fill_color = Color(1, 1, 1, 1)
 
 [editable path="Damageable"]

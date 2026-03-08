@@ -3,7 +3,24 @@
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_bh81t"]
 [ext_resource type="Script" uid="uid://6k1rt52tj2i2" path="res://src/structures/crystal.gd" id="2_a7xd5"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_a7xd5"]
+radius = 64.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qpxc7"]
+radius = 64.0
+
 [node name="Crystal" unique_id=102321888 instance=ExtResource("1_bh81t")]
 script = ExtResource("2_a7xd5")
+structure_type = 2
+
+[node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
+shape_size = Vector2(128, 128)
+fill_color = Color(1, 1, 1, 1)
+
+[node name="CollisionShape2D" parent="Damageable/HitboxArea" parent_id_path=PackedInt32Array(265451698, 1114372282) index="0" unique_id=910591284]
+shape = SubResource("CircleShape2D_a7xd5")
+
+[node name="CollisionShape2D" parent="Damageable/HurtboxArea" parent_id_path=PackedInt32Array(265451698, 1565689982) index="0" unique_id=1064559139]
+shape = SubResource("CircleShape2D_qpxc7")
 
 [editable path="Damageable"]

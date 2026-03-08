@@ -7,7 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://1t0emgcfw53c" path="res://icon.svg" id="5_36ipd"]
 [ext_resource type="Script" uid="uid://dredsd26xrygd" path="res://src/world_painter.gd" id="6_usxdn"]
 [ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="7_jvefd"]
-[ext_resource type="Script" path="res://src/enermy_manager.gd" id="8_53egh"]
+[ext_resource type="PackedScene" uid="uid://vpbn24xyocc2" path="res://src/structures/crystal.tscn" id="8_8e6n3"]
+[ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enemy_manager.gd" id="8_53egh"]
 [ext_resource type="Script" uid="uid://b226ukyquly1l" path="res://src/input_manager.gd" id="9_input"]
 [ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="10_preview"]
 
@@ -37,6 +38,9 @@ script = ExtResource("6_usxdn")
 
 [node name="StructureManager" type="Node2D" parent="WorldPainter" unique_id=671697620]
 script = ExtResource("7_jvefd")
+
+[node name="Crystal" parent="WorldPainter/StructureManager" unique_id=102321888 instance=ExtResource("8_8e6n3")]
+position = Vector2(256, 384)
 
 [node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")

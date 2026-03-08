@@ -8,7 +8,12 @@ extends Node2D
 @export var corner_radius: float = 8.0
 
 @export_group("Fill")
-@export var fill_color: Color = Color.RED
+@export var fill_color: Color = Color.RED:
+	set(s):
+		fill_color = s
+		if is_inside_tree():
+			queue_redraw()
+
 @export var fill_enabled: bool = true
 
 @export_group("Stroke")
