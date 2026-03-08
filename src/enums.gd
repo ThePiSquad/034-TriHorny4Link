@@ -1,7 +1,7 @@
 class_name Enums
 extends Resource
 
-enum Direciton {
+enum Direction {
 	NORTH,
 	SOUTH,
 	WEST,
@@ -22,5 +22,23 @@ enum ColorType {
 enum BulletAttributes {
 	KINETIC,
 	MAGIC,
-	# todo
+}
+
+enum ShapeType {
+	CIRCLE,
+	TRIANGLE,
+	RECTANGLE,
+}
+
+enum StructureType {
+	TURRET,
+	MONO_CRYSTAL,
+	CRYSTAL,
+	CONDUIT,
+}
+
+enum ComponentState {
+	ACTIVE,
+	INACTIVE,
+	OVERLOADED,
 }
