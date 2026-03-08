@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://b105um8got3cl"]
+
+[ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_ef7xj"]
+
+[node name="TriangleEnemy" unique_id=531630275 instance=ExtResource("1_ef7xj")]
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=1569216735]
+shape_type = 1
+fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
+stroke_color = Color(0.68235296, 0, 0, 1)
+stroke_enabled = true

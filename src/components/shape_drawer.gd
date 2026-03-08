@@ -42,7 +42,9 @@ func _draw_triangle() -> void:
 		var colors = PackedColorArray([fill_color, fill_color, fill_color])
 		draw_polygon(points, colors)
 	if stroke_enabled:
-		draw_polyline(points, stroke_color, stroke_width, true)
+		var closed_points = PackedVector2Array(points)
+		closed_points.append(points[0])
+		draw_polyline(closed_points, stroke_color, stroke_width, true)
 
 func _draw_rectangle() -> void:
 	var rect = Rect2(Vector2.ZERO, shape_size)
