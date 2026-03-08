@@ -1,5 +1,7 @@
 extends Node
 
+class_name StateManager
+
 var state:GameState
 
 

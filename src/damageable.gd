@@ -1,5 +1,6 @@
+@abstract class_name Damageable
 extends Node2D
 
-class_name Damageable
+@export var health: float
 
-@export var health:float
+@abstract func on_health_depleted() -> void

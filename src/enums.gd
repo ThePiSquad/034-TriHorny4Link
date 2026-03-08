@@ -1,27 +1,26 @@
+class_name Enums
 extends Resource
 
-class_name Enums
-
-enum Direciton{
+enum Direciton {
 	NORTH,
 	SOUTH,
 	WEST,
 	EAST,
 }
 
-enum ColorType{
+enum ColorType {
+	WHITE,  # non-active
+	BLACK,  # overloaded
 	RED,
 	BLUE,
 	YELLOW,
-	
 	GREEN,
 	ORANGE,
 	PURPLE,
 }
 
-enum BulletAttributes{
+enum BulletAttributes {
 	KINETIC,
 	MAGIC,
-	
 	# todo
 }
