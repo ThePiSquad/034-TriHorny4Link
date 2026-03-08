@@ -39,7 +39,7 @@ func _update_movement(delta: float) -> void:
 func _avoid_conduits(direction: Vector2) -> void:
 	pass
 
-func _on_hit_area_2d_body_entered(body: Node2D) -> void:
+func _on_hitbox_area_body_entered(body: Node2D) -> void:
 	if body and body.has_method("get_structure_type"):
 		if body.get_structure_type() == Enums.StructureType.CRYSTAL:
 			if body.has_method("take_damage"):

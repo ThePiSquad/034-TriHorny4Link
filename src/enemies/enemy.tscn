@@ -15,4 +15,6 @@ metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
 [node name="Damageable" parent="." unique_id=203901778 instance=ExtResource("2_yvjb1")]
 metadata/_custom_type_script = "uid://imt5d4ftglee"
 
+[connection signal="body_entered" from="Damageable/HitboxArea" to="." method="_on_hitbox_area_body_entered"]
+
 [editable path="Damageable"]
