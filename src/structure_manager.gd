@@ -7,17 +7,29 @@ func _ready() -> void:
 	structures = {}
 
 
-func add_structure(type: Enums.StructureType, pos: GridCoord) -> Structure:
+func spawn(type: Enums.StructureType, pos: GridCoord) -> bool:
+	if pos in Constants.generator_reserved_coords:
+		return false
+	if structures.get(pos)!=null:
+		return false
+	
 	var north = structures.get(pos.north())
 	var south = structures.get(pos.south())
 	var west = structures.get(pos.west())
 	var east = structures.get(pos.east())
+	
+	var structure:Structure
 
 	if type == Enums.StructureType.CRYSTAL:
-		return Crystal.new().initialize(north, south, west, east)
+		structure = Crystal.new().initialize(north, south, west, east)
 	if type == Enums.StructureType.CONDUIT:
-		return Conduit.new().initialize(north, south, west, east)
+		structure = Conduit.new().initialize(north, south, west, east)
 	if type == Enums.StructureType.TURRET:
-		return Turret.new().initialize(north, south, west, east)
-
-	return null
+		structure = Turret.new().initialize(north, south, west, east)
+	
+	if structure!=null:
+		structures.set(pos,structure)
+		add_child(structure)
+		return true
+	else:
+		return false

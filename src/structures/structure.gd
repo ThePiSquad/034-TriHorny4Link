@@ -1,5 +1,7 @@
 class_name Structure
 
+extends Node2D
+
 signal update
 
 var energy_level: EnergyLevel
