@@ -15,3 +15,5 @@ metadata/_custom_type_script = "uid://imt5d4ftglee"
 script = ExtResource("3_pinwr")
 stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
+
+[connection signal="health_depleted" from="Damageable" to="." method="_on_damageable_health_depleted"]

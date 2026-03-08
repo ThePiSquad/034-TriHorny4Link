@@ -3,6 +3,8 @@ class_name Structure
 extends Node2D
 
 signal update
+signal destroyed
+
 
 var energy_level: EnergyLevel
 
@@ -13,28 +15,20 @@ var color: Enums.ColorType:
 # Neighbors, can be null indicating there is no structure connecting to it
 var north: Structure = null:
 	set(s):
-		if s != null:
-			s.update.connect(self.on_neighbor_update)
-		on_neighbor_update()
+		connect_neighbor(s)
 		north = s
 
 var south: Structure = null:
 	set(s):
-		if s != null:
-			s.update.connect(self.on_neighbor_update)
-		on_neighbor_update()
+		connect_neighbor(s)
 		south = s
 var west: Structure = null:
 	set(s):
-		if s != null:
-			s.update.connect(self.on_neighbor_update)
-		on_neighbor_update()
+		connect_neighbor(s)	
 		west = s
 var east: Structure = null:
 	set(s):
-		if s != null:
-			s.update.connect(self.on_neighbor_update)
-		on_neighbor_update()
+		connect_neighbor(s)	
 		east = s
 
 
@@ -50,14 +44,18 @@ func initialize(
 	east = p_east
 	return self
 
-
-func on_health_depleted() -> void:
-	pass
-
+func connect_neighbor(s:Structure)->void:
+	if s==null:
+		return
+	else:
+		s.update.connect(self.on_neighbor_update)
+		s.destroyed.connect(self.on_neighbor_destroyed)
 
 func on_neighbor_update() -> void:
 	print("on_neighbor_update")
 
+func on_neighbor_destroyed()->void:
+	print("on_neighbor_destroyed")
 
 func update_energy_level() -> void:
 	var new_level: EnergyLevel = EnergyLevel.new()
@@ -82,3 +80,7 @@ func _exit_tree() -> void:
 
 func _ready() -> void:
 	update.emit()
+
+
+func _on_damageable_health_depleted() -> void:
+	destroyed.emit()
