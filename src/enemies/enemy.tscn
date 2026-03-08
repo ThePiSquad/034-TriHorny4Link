@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://baprtpmei8ko8"]
 
 [ext_resource type="Script" uid="uid://b8rvgajsbmod6" path="res://src/enemies/enemy.gd" id="1_a8hw6"]
-[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/damageable.gd" id="2_yvjb1"]
+[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/components/damageable.gd" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
 
 [node name="Enemy" type="Node2D" unique_id=531630275]
