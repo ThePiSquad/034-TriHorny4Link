@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://vpbn24xyocc2"]
 
-[ext_resource type="Script" uid="uid://6k1rt52tj2i2" path="res://src/structures/crystal.gd" id="1_bh81t"]
-[ext_resource type="PackedScene" uid="uid://c2bof5d5rte4" path="res://src/shapes/CircleShape.tscn" id="2_a7xd5"]
+[ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_bh81t"]
+[ext_resource type="Script" uid="uid://6k1rt52tj2i2" path="res://src/structures/crystal.gd" id="2_a7xd5"]
 
-[node name="Crystal" type="Node2D" unique_id=1573883008]
-script = ExtResource("1_bh81t")
+[node name="Crystal" unique_id=102321888 instance=ExtResource("1_bh81t")]
+script = ExtResource("2_a7xd5")
 
-[node name="CircleShape" parent="." unique_id=653433839 instance=ExtResource("2_a7xd5")]
+[editable path="Damageable"]

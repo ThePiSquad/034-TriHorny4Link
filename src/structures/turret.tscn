@@ -2,12 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_drymu"]
 [ext_resource type="Script" uid="uid://bt3yerjxlij6q" path="res://src/structures/turret.gd" id="1_hitdn"]
-[ext_resource type="PackedScene" uid="uid://dcacm68t453ne" path="res://src/shapes/TriangleShape.tscn" id="3_2wdy2"]
 
 [node name="Turret" unique_id=102321888 instance=ExtResource("1_drymu")]
 script = ExtResource("1_hitdn")
 
-[node name="TriangleShape" parent="." index="1" unique_id=546677538 instance=ExtResource("3_2wdy2")]
-
-[node name="ShapeDrawer" parent="." index="2" unique_id=778239937]
+[node name="ShapeDrawer" parent="." index="1" unique_id=778239937]
 shape_type = 1

@@ -25,7 +25,7 @@ func _draw() -> void:
 			_draw_rectangle()
 
 func _draw_circle() -> void:
-	var center = shape_size / 2
+	var center = Vector2.ZERO
 	var radius = min(shape_size.x, shape_size.y) / 2
 	if fill_enabled:
 		draw_circle(center, radius, fill_color)

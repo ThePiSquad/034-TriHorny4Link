@@ -1,19 +1,17 @@
 [gd_scene format=3 uid="uid://dfli78g3x0kpv"]
 
 [ext_resource type="Script" uid="uid://dwoc7tply6dqw" path="res://src/structures/structure.gd" id="1_xw0ke"]
-[ext_resource type="Script" uid="uid://imt5d4ftglee" path="res://src/components/damageable.gd" id="2_xh6pj"]
+[ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="3_eqofk"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_pinwr"]
 
 [node name="Structure" type="Node2D" unique_id=102321888]
 script = ExtResource("1_xw0ke")
-
-[node name="Damageable" type="Node2D" parent="." unique_id=1880452733]
-script = ExtResource("2_xh6pj")
-metadata/_custom_type_script = "uid://imt5d4ftglee"
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=778239937]
 script = ExtResource("3_pinwr")
 stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
 
-[connection signal="health_depleted" from="Damageable" to="." method="_on_damageable_health_depleted"]
+[node name="Damageable" parent="." unique_id=265451698 instance=ExtResource("3_eqofk")]
+
+[editable path="Damageable"]

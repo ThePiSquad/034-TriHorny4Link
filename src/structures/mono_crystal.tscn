@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b6noo6xuc14ka"]
+
+[ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_1wqi0"]
+[ext_resource type="Script" uid="uid://d4nwdvct5o3md" path="res://src/structures/mono_crystal.gd" id="2_6fcnd"]
+
+[node name="MonoCrystal" unique_id=102321888 instance=ExtResource("1_1wqi0")]
+script = ExtResource("2_6fcnd")
+
+[editable path="Damageable"]

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://5dfvmylkuvm6"]
 
-[ext_resource type="Script" uid="uid://sb1hat62qpx" path="res://src/structures/conduit.gd" id="1_om8kb"]
+[ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_om8kb"]
+[ext_resource type="Script" uid="uid://sb1hat62qpx" path="res://src/structures/conduit.gd" id="2_q8vcm"]
 
-[node name="Conduit" type="Node2D" unique_id=554312713]
-script = ExtResource("1_om8kb")
+[node name="Conduit" unique_id=102321888 instance=ExtResource("1_om8kb")]
+script = ExtResource("2_q8vcm")
