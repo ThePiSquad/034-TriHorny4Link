@@ -1,5 +1,4 @@
 class_name Structure
-
 extends Node2D
 
 signal update
@@ -9,7 +8,7 @@ var energy_level: EnergyLevel = EnergyLevel.new()
 
 @onready var shape_drawer: ShapeDrawer = $ShapeDrawer
 
-@export var structure_type:Enums.StructureType
+@export var structure_type: Enums.StructureType
 
 var _color: Enums.ColorType = Enums.ColorType.WHITE
 
@@ -22,7 +21,6 @@ var _color: Enums.ColorType = Enums.ColorType.WHITE
 		if is_node_ready() and shape_drawer:
 			shape_drawer.fill_color = Constants.COLOR_MAP[s]
 
-# Neighbors, can be null indicating there is no structure connecting to it
 var north: Structure = null:
 	set(s):
 		connect_neighbor(s)
@@ -32,20 +30,22 @@ var south: Structure = null:
 	set(s):
 		connect_neighbor(s)
 		south = s
+
 var west: Structure = null:
 	set(s):
-		connect_neighbor(s)	
+		connect_neighbor(s)
 		west = s
+
 var east: Structure = null:
 	set(s):
-		connect_neighbor(s)	
+		connect_neighbor(s)
 		east = s
 
 func initialize(
 	p_north: Structure = null,
 	p_south: Structure = null,
 	p_west: Structure = null,
-	p_east: Structure = null,
+	p_east: Structure = null
 ) -> Structure:
 	north = p_north
 	south = p_south
@@ -53,12 +53,11 @@ func initialize(
 	east = p_east
 	return self
 
-func connect_neighbor(s:Structure)->void:
-	if s==null:
+func connect_neighbor(s: Structure) -> void:
+	if s == null:
 		return
-	else:
-		s.update.connect(self.on_neighbor_update)
-		s.destroyed.connect(self.on_neighbor_destroyed)
+	s.update.connect(self.on_neighbor_update)
+	s.destroyed.connect(self.on_neighbor_destroyed)
 
 func on_health_depleted() -> void:
 	pass
@@ -66,12 +65,11 @@ func on_health_depleted() -> void:
 func get_structure_type() -> Enums.StructureType:
 	return structure_type
 
-
 func on_neighbor_update() -> void:
-	print("on_neighbor_update")
+	pass
 
-func on_neighbor_destroyed()->void:
-	print("on_neighbor_destroyed")
+func on_neighbor_destroyed() -> void:
+	pass
 
 func update_energy_level() -> void:
 	var new_level: EnergyLevel = EnergyLevel.new()
@@ -97,6 +95,35 @@ func _ready() -> void:
 	update.emit()
 	if shape_drawer:
 		shape_drawer.fill_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
+	call_deferred("_setup_input_handling")
+
+func _setup_input_handling() -> void:
+	if not shape_drawer:
+		return
+	
+	await get_tree().process_frame
+	
+	var input_area = shape_drawer.get_node_or_null("InputArea")
+	if input_area and input_area is Area2D:
+		input_area.input_event.connect(_on_input_event)
+
+func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			_request_deletion()
+
+func _request_deletion() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	
+	var manager = get_parent()
+	if manager is StructureManager:
+		var pos = GridCoord.from_world_coord(Vector2i(global_position))
+		if not manager.remove(pos):
+			push_warning("Failed to remove structure at position: " + str(pos))
+	else:
+		destroyed.emit()
+		queue_free()
 
 func _sync_color_to_energy_level(color_type: Enums.ColorType) -> void:
 	match color_type:

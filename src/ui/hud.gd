@@ -1,25 +1,22 @@
 class_name HUD extends CanvasLayer
 
-const ColorCircle = preload("res://src/ui/color_circle.gd")
-const ShapeIcon = preload("res://src/ui/shape_icon.gd")
-
 signal icon_selected(icon)
 signal selection_cleared
 
 var icons = []
 var selected_icon = null
 
+@onready var icons_container: HBoxContainer = $SelectionPanel/IconsContainer
 
 func _ready() -> void:
-	var icons_container = $SelectionPanel/IconsContainer
 	if icons_container:
 		for child in icons_container.get_children():
 			icons.append(child)
 
 
-func select_icon(selected_icon) -> void:
+func select_icon(_selected_icon) -> void:
 	# 检查是否点击了已选中的图标
-	if self.selected_icon == selected_icon:
+	if self.selected_icon == _selected_icon:
 		# 取消选择
 		_clear_selection()
 		return
@@ -30,11 +27,11 @@ func select_icon(selected_icon) -> void:
 			icon.is_selected = false
 	
 	# 选择新图标
-	if selected_icon:
-		if selected_icon is ColorCircle or selected_icon is ShapeIcon:
-			selected_icon.is_selected = true
-			self.selected_icon = selected_icon
-			icon_selected.emit(selected_icon)
+	if _selected_icon:
+		if _selected_icon is ColorCircle or _selected_icon is ShapeIcon:
+			_selected_icon.is_selected = true
+			self.selected_icon = _selected_icon
+			icon_selected.emit(_selected_icon)
 	else:
 		_clear_selection()
 
@@ -58,7 +55,6 @@ func is_icon_selected() -> bool:
 ## 用法示例  设置单个资源
 #   set_resource_ratio("red", 0.75)
 func set_resource_ratio(color_name: String, ratio: float) -> void:
-	var icons_container = $SelectionPanel/IconsContainer
 	if not icons_container:
 		return
 	

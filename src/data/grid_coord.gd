@@ -35,3 +35,19 @@ static func from_world_coord(pos: Vector2i) -> GridCoord:
 		pos.x / Constants.grid_size, 
 		pos.y / Constants.grid_size
 	)
+
+
+func _hash() -> int:
+	"""为Dictionary键值比较提供哈希值"""
+	return hash(Vector2i(x, y))
+
+
+func _equals(other: Variant) -> bool:
+	"""为Dictionary键值比较提供相等性判断"""
+	if other is GridCoord:
+		return x == other.x and y == other.y
+	return false
+
+
+func _to_string() -> String:
+	return "GridCoord(%d, %d)" % [x, y]

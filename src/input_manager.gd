@@ -24,11 +24,10 @@ const PLACE_INTERVAL: float = 0.1
 
 var _camera_dragging: bool = false
 var _last_mouse_position: Vector2
+var _preview_should_be_visible: bool = false
 
 func _ready() -> void:
 	_update_mode()
-	
-	# 连接 HUD 信号
 	if hud:
 		hud.icon_selected.connect(_on_icon_selected)
 		hud.selection_cleared.connect(_on_selection_cleared)
@@ -84,11 +83,9 @@ func _update_mode() -> void:
 func _handle_camera_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			_camera_dragging = event.pressed
 			if event.pressed:
-				_camera_dragging = true
 				_last_mouse_position = event.position
-			else:
-				_camera_dragging = false
 
 func _update_camera_drag() -> void:
 	if _camera_dragging and camera:
@@ -98,6 +95,10 @@ func _update_camera_drag() -> void:
 		_last_mouse_position = current_mouse_position
 
 func _handle_placement_input(event: InputEvent) -> void:
+	var hovered_control = get_viewport().gui_get_hovered_control()
+	if hovered_control != null:
+		return
+	
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			_is_placing = event.pressed
@@ -109,8 +110,19 @@ func _handle_placement_input(event: InputEvent) -> void:
 				_try_remove()
 
 func _update_placement_preview() -> void:
+	var hovered_control = get_viewport().gui_get_hovered_control()
+	
+	if hovered_control != null:
+		_preview_should_be_visible = true
+		placement_preview.hide_preview()
+		return
+	
 	if not placement_preview or not _is_selection_active():
 		return
+	
+	if _preview_should_be_visible:
+		placement_preview.show_preview()
+		_preview_should_be_visible = false
 	
 	var mouse_pos = get_global_mouse_position()
 	placement_preview.update_position(mouse_pos)
@@ -133,7 +145,6 @@ func _try_place() -> void:
 	
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
-	
 	structure_manager.spawn(selected_structure_type, grid_coord, selected_color_type)
 
 func _try_remove() -> void:
@@ -142,7 +153,6 @@ func _try_remove() -> void:
 	
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
-	
 	structure_manager.remove(grid_coord)
 
 func set_selected_structure_type(type: Enums.StructureType) -> void:
@@ -174,6 +184,5 @@ func _on_icon_selected(icon) -> void:
 		placement_preview.show_preview()
 
 func _on_selection_cleared() -> void:
-	# 隐藏预览
 	if placement_preview:
 		placement_preview.hide_preview()

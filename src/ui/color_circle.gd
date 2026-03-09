@@ -80,7 +80,7 @@ func _gui_input(event: InputEvent) -> void:
 			hud.select_icon(self)
 		else:
 			is_selected = !is_selected
-
+		accept_event()
 
 func _is_selection_trigger(event: InputEvent) -> bool:
 	if event is InputEventMouseButton:

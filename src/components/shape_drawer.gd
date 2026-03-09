@@ -2,24 +2,70 @@
 class_name ShapeDrawer
 extends Node2D
 
+# 形状配置
 @export_group("Shape")
-@export var shape_type: Enums.ShapeType = Enums.ShapeType.CIRCLE
-@export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
+@export var shape_type: Enums.ShapeType = Enums.ShapeType.CIRCLE:
+	set(s):
+		shape_type = s
+		_update_collision_shape()
+@export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size):
+	set(s):
+		shape_size = s
+		_update_collision_shape()
 @export var corner_radius: float = 8.0
 
+# 填充配置
 @export_group("Fill")
 @export var fill_color: Color = Color.RED:
 	set(s):
 		fill_color = s
 		if is_inside_tree():
 			queue_redraw()
-
 @export var fill_enabled: bool = true
 
+# 描边配置
 @export_group("Stroke")
 @export var stroke_color: Color = Color.WHITE
 @export var stroke_width: float = 2.0
 @export var stroke_enabled: bool = true
+
+var _input_area: Area2D
+
+func _ready() -> void:
+	_setup_input_area()
+
+func _setup_input_area() -> void:
+	_input_area = Area2D.new()
+	_input_area.name = "InputArea"
+	_input_area.input_pickable = true
+	add_child(_input_area)
+	_update_collision_shape()
+
+func _update_collision_shape() -> void:
+	if not _input_area:
+		return
+	
+	for child in _input_area.get_children():
+		child.queue_free()
+	
+	var shape: Shape2D
+	match shape_type:
+		Enums.ShapeType.CIRCLE:
+			var circle = CircleShape2D.new()
+			circle.radius = min(shape_size.x, shape_size.y) / 2
+			shape = circle
+		Enums.ShapeType.TRIANGLE, Enums.ShapeType.RECTANGLE:
+			var rect = RectangleShape2D.new()
+			rect.size = shape_size
+			shape = rect
+		_:
+			var rect = RectangleShape2D.new()
+			rect.size = shape_size
+			shape = rect
+	
+	var collision = CollisionShape2D.new()
+	collision.shape = shape
+	_input_area.add_child(collision)
 
 func _draw() -> void:
 	match shape_type:
@@ -61,8 +107,7 @@ func _draw_rectangle() -> void:
 func _draw_rounded_rectangle_fill() -> void:
 	var half_width = shape_size.x / 2
 	var half_height = shape_size.y / 2
-	var temp_r = min(half_width, half_height)
-	var r = min(corner_radius, temp_r)
+	var r = min(corner_radius, min(half_width, half_height))
 	
 	var points = PackedVector2Array()
 	var colors = PackedColorArray()
@@ -144,7 +189,5 @@ func _draw_rounded_rectangle_stroke() -> void:
 			half_height - r + sin(angle) * r
 		))
 	
-	# 闭合路径
 	points.append(points[0])
-	
 	draw_polyline(points, stroke_color, stroke_width, true)
