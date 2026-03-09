@@ -56,7 +56,11 @@ func initialize(
 func connect_neighbor(s: Structure) -> void:
 	if s == null:
 		return
-	s.update.connect(self.on_neighbor_update)
+	# 双向连接：互相监听对方的update信号
+	if not s.update.is_connected(self.on_neighbor_update):
+		s.update.connect(self.on_neighbor_update)
+	if not self.update.is_connected(s.on_neighbor_update):
+		self.update.connect(s.on_neighbor_update)
 	s.destroyed.connect(self.on_neighbor_destroyed)
 
 func on_health_depleted() -> void:

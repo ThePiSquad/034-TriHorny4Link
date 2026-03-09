@@ -11,6 +11,15 @@ static var generator_reserved_coords:Array[GridCoord]=[
 
 const default_crystal_energy_level: int = 2
 
+# MonoCrystal基础能量值
+const MONO_CRYSTAL_BASE_ENERGY: int = 10
+
+# 能量每格衰减值
+const ENERGY_DECAY_PER_TILE: int = 1
+
+# 最大能量传播距离
+const MAX_ENERGY_RANGE: int = 10
+
 class EnemyConstants:
 	const default_size: float = 1.0
 	const default_color: Color = Color.CYAN

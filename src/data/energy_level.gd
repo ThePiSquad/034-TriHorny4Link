@@ -5,6 +5,9 @@ var red: int = 0
 var blue: int = 0
 var yellow: int = 0
 
+# 能量来源距离（用于计算衰减）
+var source_distance: int = 0
+
 
 func add(other: EnergyLevel) -> void:
 	red += other.red
@@ -12,11 +15,14 @@ func add(other: EnergyLevel) -> void:
 	yellow += other.yellow
 
 
-func decay() -> EnergyLevel:
+func decay(distance: int = 1) -> EnergyLevel:
+	"""计算经过distance距离后的衰减能量"""
 	var result: EnergyLevel = EnergyLevel.new()
-	result.red = max(red - 1, 0)
-	result.blue = max(blue - 1, 0)
-	result.yellow = max(yellow - 1, 0)
+	var decay_amount = distance * Constants.ENERGY_DECAY_PER_TILE
+	result.red = max(red - decay_amount, 0)
+	result.blue = max(blue - decay_amount, 0)
+	result.yellow = max(yellow - decay_amount, 0)
+	result.source_distance = source_distance + distance
 	return result
 
 
@@ -46,3 +52,25 @@ func get_color() -> Enums.ColorType:
 		return Enums.ColorType.BLUE
 
 	return Enums.ColorType.WHITE
+
+
+func get_intensity() -> float:
+	"""获取能量强度（0.0 - 1.0）"""
+	var total = red + blue + yellow
+	var max_energy = Constants.MONO_CRYSTAL_BASE_ENERGY * 3
+	return clamp(float(total) / float(max_energy), 0.0, 1.0)
+
+
+func is_empty() -> bool:
+	"""检查能量是否为空"""
+	return red == 0 and blue == 0 and yellow == 0
+
+
+func copy() -> EnergyLevel:
+	"""创建能量副本"""
+	var result = EnergyLevel.new()
+	result.red = red
+	result.blue = blue
+	result.yellow = yellow
+	result.source_distance = source_distance
+	return result
