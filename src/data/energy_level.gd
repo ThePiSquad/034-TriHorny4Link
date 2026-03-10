@@ -45,10 +45,9 @@ func get_color() -> Enums.ColorType:
 
 	if blue + yellow == 0:
 		return Enums.ColorType.RED
-
 	if red + blue == 0:
 		return Enums.ColorType.YELLOW
-	if yellow + blue == 0:
+	if yellow + red == 0:
 		return Enums.ColorType.BLUE
 
 	return Enums.ColorType.WHITE
@@ -60,6 +59,13 @@ func get_intensity() -> float:
 	var max_energy = Constants.MONO_CRYSTAL_BASE_ENERGY * 3
 	return clamp(float(total) / float(max_energy), 0.0, 1.0)
 
+func get_energy_level() -> EnergyLevel:
+	"""获取具体颜色数值"""
+	var temp_el : EnergyLevel = EnergyLevel.new()
+	temp_el.red = self.red
+	temp_el.blue = self.blue
+	temp_el.yellow = self.yellow
+	return temp_el
 
 func is_empty() -> bool:
 	"""检查能量是否为空"""

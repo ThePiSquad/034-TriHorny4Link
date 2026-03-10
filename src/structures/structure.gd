@@ -61,7 +61,9 @@ func connect_neighbor(s: Structure) -> void:
 		s.update.connect(self.on_neighbor_update)
 	if not self.update.is_connected(s.on_neighbor_update):
 		self.update.connect(s.on_neighbor_update)
-	s.destroyed.connect(self.on_neighbor_destroyed)
+	# 检查destroyed信号是否已连接，避免重复连接
+	if not s.destroyed.is_connected(self.on_neighbor_destroyed):
+		s.destroyed.connect(self.on_neighbor_destroyed)
 
 func on_health_depleted() -> void:
 	pass
