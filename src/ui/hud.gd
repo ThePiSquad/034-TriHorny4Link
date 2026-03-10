@@ -68,3 +68,32 @@ func set_resource_ratios(red: float, blue: float, yellow: float) -> void:
 	set_resource_ratio("red", red)
 	set_resource_ratio("blue", blue)
 	set_resource_ratio("yellow", yellow)
+
+# 动画相关函数
+func show_hud() -> void:
+	if not visible:
+		visible = true
+	
+	# 动画显示HUD
+	if $SelectionPanel:
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_QUAD)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property($SelectionPanel, "offset_top", -100.0, 0.3)
+
+func hide_hud() -> void:
+	if not visible:
+		return
+	
+	# 动画隐藏HUD
+	if $SelectionPanel:
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_QUAD)
+		tween.set_ease(Tween.EASE_IN)
+		tween.tween_property($SelectionPanel, "offset_top", 0.0, 0.3)
+		tween.tween_callback(func():
+			visible = false
+		)
+
+func is_hud_visible() -> bool:
+	return visible

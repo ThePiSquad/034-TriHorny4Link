@@ -26,6 +26,22 @@ var _camera_dragging: bool = false
 var _last_mouse_position: Vector2
 var _preview_should_be_visible: bool = false
 
+# 相机缩放相关变量
+var _zoom_speed: float = 0.1
+var _min_zoom: float = 0.5
+var _max_zoom: float = 2.0
+
+# 相机移动相关变量
+var _camera_move_speed: float = 200.0
+var _camera_acceleration: float = 5.0
+var _camera_velocity: Vector2 = Vector2.ZERO
+
+# 相机边界限制
+var _camera_min_x: float = -1000.0
+var _camera_max_x: float = 1000.0
+var _camera_min_y: float = -1000.0
+var _camera_max_y: float = 1000.0
+
 func _ready() -> void:
 	_update_mode()
 	if hud:
@@ -46,11 +62,45 @@ func _input(event: InputEvent) -> void:
 		_handle_placement_input(event)
 
 func _process(delta: float) -> void:
+	# 处理相机移动
+	_handle_camera_movement(delta)
+	
 	if current_mode == InputMode.CAMERA:
 		_update_camera_drag()
 	else:
 		_update_placement_preview()
 		_handle_continuous_placement(delta)
+
+func _handle_camera_movement(delta: float) -> void:
+	if not camera:
+		return
+	
+	# 计算移动方向
+	var move_dir = Vector2.ZERO
+	
+	if Input.is_action_pressed("ui_up"):
+		move_dir.y -= 1
+	if Input.is_action_pressed("ui_down"):
+		move_dir.y += 1
+	if Input.is_action_pressed("ui_left"):
+		move_dir.x -= 1
+	if Input.is_action_pressed("ui_right"):
+		move_dir.x += 1
+	
+	# 归一化方向向量
+	if move_dir.length() > 0:
+		move_dir = move_dir.normalized()
+	
+	# 应用加速度
+	var target_velocity = move_dir * _camera_move_speed
+	_camera_velocity = _camera_velocity.lerp(target_velocity, _camera_acceleration * delta)
+	
+	# 应用相机移动
+	camera.position += _camera_velocity * delta
+	
+	# 限制相机边界
+	camera.position.x = clamp(camera.position.x, _camera_min_x, _camera_max_x)
+	camera.position.y = clamp(camera.position.y, _camera_min_y, _camera_max_y)
 
 func _toggle_mode() -> void:
 	if current_mode == InputMode.PLACEMENT:
@@ -66,13 +116,13 @@ func _set_mode(mode: InputMode) -> void:
 func _update_mode() -> void:
 	if current_mode == InputMode.CAMERA:
 		if hud:
-			hud.visible = false
+			hud.hide_hud()
 		if placement_preview:
 			placement_preview.hide_preview()
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		if hud:
-			hud.visible = true
+			hud.show_hud()
 		if placement_preview:
 			if _is_selection_active():
 				placement_preview.show_preview()
@@ -86,6 +136,10 @@ func _handle_camera_input(event: InputEvent) -> void:
 			_camera_dragging = event.pressed
 			if event.pressed:
 				_last_mouse_position = event.position
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_zoom_camera(1.0 - _zoom_speed)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_zoom_camera(1.0 + _zoom_speed)
 
 func _update_camera_drag() -> void:
 	if _camera_dragging and camera:
@@ -93,6 +147,22 @@ func _update_camera_drag() -> void:
 		var delta = _last_mouse_position - current_mouse_position
 		camera.position += delta
 		_last_mouse_position = current_mouse_position
+
+func _zoom_camera(zoom_factor: float) -> void:
+	if not camera:
+		return
+	
+	# 计算新的缩放值
+	var new_zoom = camera.zoom * zoom_factor
+	
+	# 限制缩放范围
+	new_zoom = Vector2(
+		clamp(new_zoom.x, _min_zoom, _max_zoom),
+		clamp(new_zoom.y, _min_zoom, _max_zoom)
+	)
+	
+	# 平滑过渡到新的缩放值
+	camera.zoom = new_zoom
 
 func _handle_placement_input(event: InputEvent) -> void:
 	var hovered_control = get_viewport().gui_get_hovered_control()
