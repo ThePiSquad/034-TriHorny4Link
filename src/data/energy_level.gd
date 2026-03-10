@@ -49,31 +49,47 @@ func equal(other: EnergyLevel) -> bool:
 
 func get_color() -> Enums.ColorType:
 	print("【EnergyLevel】当前色彩分布：Red:{red} Blue:{blue} Yellow:{yellow}".format({
-	"red": red, 
-	"blue": blue, 
+	"red": red,
+	"blue": blue,
 	"yellow": yellow
-}))
+	}))
+
+	# 所有颜色都为0，返回白色
 	if blue == 0 and red == 0 and yellow == 0:
 		return Enums.ColorType.WHITE
-	if blue == red and blue == yellow:
+
+	# 三个颜色数值相同，返回黑色
+	if blue == red and blue == yellow and blue > 0:
 		return Enums.ColorType.BLACK
 
-	if blue < red and blue < yellow:
-		return Enums.ColorType.ORANGE
-	if red < blue and red < yellow:
-		return Enums.ColorType.GREEN
-	if yellow < blue and yellow < red:
+	# 混色逻辑：两个颜色数值相同且都大于第三个颜色时进行混色
+	# 红色 + 蓝色 = 紫色（红色和蓝色数值相同且都大于黄色）
+	if red == blue and red > yellow and red > 0:
 		return Enums.ColorType.PURPLE
 
-	if blue + yellow == 0:
+	# 红色 + 黄色 = 橙色（红色和黄色数值相同且都大于蓝色）
+	if red == yellow and red > blue and red > 0:
+		return Enums.ColorType.ORANGE
+
+	# 蓝色 + 黄色 = 绿色（蓝色和黄色数值相同且都大于红色）
+	if blue == yellow and blue > red and blue > 0:
+		return Enums.ColorType.GREEN
+
+	# 单一颜色判断
+	# 只有红色最大
+	if red > max(blue, yellow):
 		return Enums.ColorType.RED
-	if red + blue == 0:
-		return Enums.ColorType.YELLOW
-	if yellow + red == 0:
+
+	# 只有蓝色最大
+	if blue > max(red, yellow):
 		return Enums.ColorType.BLUE
 
-	return Enums.ColorType.WHITE
+	# 只有黄色最大
+	if yellow > max(blue, red):
+		return Enums.ColorType.YELLOW
 
+	# 默认返回白色
+	return Enums.ColorType.WHITE
 
 func get_intensity() -> float:
 	"""获取能量强度（0.0 - 1.0）"""

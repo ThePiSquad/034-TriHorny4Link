@@ -13,6 +13,72 @@ func on_neighbor_update() -> void:
 	# 当邻居更新时，重新计算自身能量
 	update_energy_level()
 
+func _process_color_energy(neighbor_energy: EnergyLevel, color_name: String, current_max: int, current_min_distance: int) -> Dictionary:
+	"""处理单个颜色的能量计算
+	
+	参数:
+	- neighbor_energy: 邻居的能量等级
+	- color_name: 颜色名称 ("red", "blue", "yellow")
+	- current_max: 当前最大能量值
+	- current_min_distance: 当前最小距离
+	
+	返回:
+	- 包含更新后的最大值和最小距离的字典
+	"""
+	var energy_value = 0
+	var source_distance = 0
+	
+	# 获取对应颜色的能量值和距离
+	if color_name == "red":
+		energy_value = neighbor_energy.red
+		source_distance = neighbor_energy.red_source_distance
+	elif color_name == "blue":
+		energy_value = neighbor_energy.blue
+		source_distance = neighbor_energy.blue_source_distance
+	elif color_name == "yellow":
+		energy_value = neighbor_energy.yellow
+		source_distance = neighbor_energy.yellow_source_distance
+	
+	# 更新最大值和最小距离
+	if energy_value > 0:
+		if energy_value > current_max:
+			current_max = energy_value
+			current_min_distance = source_distance + 1
+		elif energy_value == current_max and source_distance + 1 < current_min_distance:
+			current_min_distance = source_distance + 1
+	
+	return {"max": current_max, "min_distance": current_min_distance}
+
+func _create_color_energy(color_name: String, max_energy: int, min_distance: int) -> EnergyLevel:
+	"""创建单个颜色的能量等级对象
+	
+	参数:
+	- color_name: 颜色名称 ("red", "blue", "yellow")
+	- max_energy: 最大能量值
+	- min_distance: 最小距离
+	
+	返回:
+	- 对应的EnergyLevel对象
+	"""
+	var energy = EnergyLevel.new()
+	
+	if max_energy > 0:
+		# 计算衰减后的能量值
+		var decayed_energy = max(max_energy - Constants.ENERGY_DECAY_PER_TILE, 0)
+		
+		# 设置对应颜色的能量值和距离
+		if color_name == "red":
+			energy.red = decayed_energy
+			energy.red_source_distance = min_distance
+		elif color_name == "blue":
+			energy.blue = decayed_energy
+			energy.blue_source_distance = min_distance
+		elif color_name == "yellow":
+			energy.yellow = decayed_energy
+			energy.yellow_source_distance = min_distance
+	
+	return energy
+
 func update_energy_level() -> void:
 	# 从邻居获取最大能量值，并进行距离衰减
 	var new_level: EnergyLevel = EnergyLevel.new()
@@ -32,53 +98,26 @@ func update_energy_level() -> void:
 			var neighbor_energy = neighbor.energy_level
 			
 			# 处理红色能量
-			if neighbor_energy.red > 0:
-				if neighbor_energy.red > red_max:
-					red_max = neighbor_energy.red
-					red_min_distance = neighbor_energy.red_source_distance + 1
-				elif neighbor_energy.red == red_max and neighbor_energy.red_source_distance + 1 < red_min_distance:
-					red_min_distance = neighbor_energy.red_source_distance + 1
+			var red_result = _process_color_energy(neighbor_energy, "red", red_max, red_min_distance)
+			red_max = red_result["max"]
+			red_min_distance = red_result["min_distance"]
 			
 			# 处理蓝色能量
-			if neighbor_energy.blue > 0:
-				if neighbor_energy.blue > blue_max:
-					blue_max = neighbor_energy.blue
-					blue_min_distance = neighbor_energy.blue_source_distance + 1
-				elif neighbor_energy.blue == blue_max and neighbor_energy.blue_source_distance + 1 < blue_min_distance:
-					blue_min_distance = neighbor_energy.blue_source_distance + 1
+			var blue_result = _process_color_energy(neighbor_energy, "blue", blue_max, blue_min_distance)
+			blue_max = blue_result["max"]
+			blue_min_distance = blue_result["min_distance"]
 			
 			# 处理黄色能量
-			if neighbor_energy.yellow > 0:
-				if neighbor_energy.yellow > yellow_max:
-					yellow_max = neighbor_energy.yellow
-					yellow_min_distance = neighbor_energy.yellow_source_distance + 1
-				elif neighbor_energy.yellow == yellow_max and neighbor_energy.yellow_source_distance + 1 < yellow_min_distance:
-					yellow_min_distance = neighbor_energy.yellow_source_distance + 1
+			var yellow_result = _process_color_energy(neighbor_energy, "yellow", yellow_max, yellow_min_distance)
+			yellow_max = yellow_result["max"]
+			yellow_min_distance = yellow_result["min_distance"]
 	
 	# 如果有能量源，则进行距离衰减
 	if red_max > 0 or blue_max > 0 or yellow_max > 0:
 		# 分别创建每个颜色的能量源
-		var red_energy = EnergyLevel.new()
-		var blue_energy = EnergyLevel.new()
-		var yellow_energy = EnergyLevel.new()
-		
-		# 设置红色能量
-		if red_max > 0:
-			red_energy.red = red_max
-			red_energy.red_source_distance = red_min_distance
-			red_energy = red_energy.decay(0)  # 已经计算过距离，不再衰减
-		
-		# 设置蓝色能量
-		if blue_max > 0:
-			blue_energy.blue = blue_max
-			blue_energy.blue_source_distance = blue_min_distance
-			blue_energy = blue_energy.decay(0)
-		
-		# 设置黄色能量
-		if yellow_max > 0:
-			yellow_energy.yellow = yellow_max
-			yellow_energy.yellow_source_distance = yellow_min_distance
-			yellow_energy = yellow_energy.decay(0)
+		var red_energy = _create_color_energy("red", red_max, red_min_distance)
+		var blue_energy = _create_color_energy("blue", blue_max, blue_min_distance)
+		var yellow_energy = _create_color_energy("yellow", yellow_max, yellow_min_distance)
 		
 		# 合并三个颜色的能量
 		new_level.add(red_energy)
