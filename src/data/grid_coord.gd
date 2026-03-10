@@ -32,8 +32,8 @@ func to_world_coord() -> Vector2i:
 
 static func from_world_coord(pos: Vector2i) -> GridCoord:
 	return GridCoord.new(
-		pos.x / Constants.grid_size, 
-		pos.y / Constants.grid_size
+		int(floor(float(pos.x) / float(Constants.grid_size))), 
+		int(floor(float(pos.y) / float(Constants.grid_size)))
 	)
 
 

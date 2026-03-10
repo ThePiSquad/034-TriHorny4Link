@@ -13,8 +13,10 @@ func _ready() -> void:
 func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorType = Enums.ColorType.WHITE) -> bool:
 	var pos_key = Vector2i(pos.x, pos.y)
 	
-	if pos in Constants.generator_reserved_coords:
-		return false
+	# 检查是否在保留坐标中
+	for reserved in Constants.generator_reserved_coords:
+		if reserved.x == pos.x and reserved.y == pos.y:
+			return false
 	
 	if structures.get(pos_key) != null:
 		return false
@@ -61,9 +63,11 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 func remove(pos: GridCoord) -> bool:
 	var pos_key = Vector2i(pos.x, pos.y)
 	
-	if pos in Constants.generator_reserved_coords:
-		push_warning("Cannot remove structure at reserved position: " + str(pos))
-		return false
+	# 检查是否在保留坐标中
+	for reserved in Constants.generator_reserved_coords:
+		if reserved.x == pos.x and reserved.y == pos.y:
+			push_warning("Cannot remove structure at reserved position: " + str(pos))
+			return false
 	
 	var structure: Structure = structures.get(pos_key)
 	if structure == null:

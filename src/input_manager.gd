@@ -136,9 +136,9 @@ func _handle_camera_input(event: InputEvent) -> void:
 			if event.pressed:
 				_last_mouse_position = event.position
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_zoom_camera(1.0 - _zoom_speed)
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_zoom_camera(1.0 + _zoom_speed)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_zoom_camera(1.0 - _zoom_speed)
 
 func _update_camera_drag() -> void:
 	if _camera_dragging and camera:
