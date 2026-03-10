@@ -15,7 +15,9 @@ func update_energy_level() -> void:
 	energy_level.red = 0
 	energy_level.blue = 0
 	energy_level.yellow = 0
-	energy_level.source_distance = 0
+	energy_level.red_source_distance = 0
+	energy_level.blue_source_distance = 0
+	energy_level.yellow_source_distance = 0
 	
 	# 根据颜色设置对应的能量值
 	match _color:

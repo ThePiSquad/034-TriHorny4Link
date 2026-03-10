@@ -5,24 +5,41 @@ var red: int = 0
 var blue: int = 0
 var yellow: int = 0
 
-# 能量来源距离（用于计算衰减）
-var source_distance: int = 0
+# 能量来源距离（分别记录三个颜色的能量来源距离）
+var red_source_distance: int = 0
+var blue_source_distance: int = 0
+var yellow_source_distance: int = 0
 
 
 func add(other: EnergyLevel) -> void:
 	red += other.red
 	blue += other.blue
 	yellow += other.yellow
+	# 添加能量时，保留较近的距离
+	if other.red > 0 and (red_source_distance == 0 or other.red_source_distance < red_source_distance):
+		red_source_distance = other.red_source_distance
+	if other.blue > 0 and (blue_source_distance == 0 or other.blue_source_distance < blue_source_distance):
+		blue_source_distance = other.blue_source_distance
+	if other.yellow > 0 and (yellow_source_distance == 0 or other.yellow_source_distance < yellow_source_distance):
+		yellow_source_distance = other.yellow_source_distance
+
 
 
 func decay(distance: int = 1) -> EnergyLevel:
-	"""计算经过distance距离后的衰减能量"""
+	"""计算经过distance距离后的衰减能量，每个颜色独立计算衰减"""
 	var result: EnergyLevel = EnergyLevel.new()
 	var decay_amount = distance * Constants.ENERGY_DECAY_PER_TILE
+	
+	# 分别计算每个颜色的衰减
 	result.red = max(red - decay_amount, 0)
 	result.blue = max(blue - decay_amount, 0)
 	result.yellow = max(yellow - decay_amount, 0)
-	result.source_distance = source_distance + distance
+	
+	# 分别更新每个颜色的来源距离
+	result.red_source_distance = red_source_distance + distance
+	result.blue_source_distance = blue_source_distance + distance
+	result.yellow_source_distance = yellow_source_distance + distance
+	
 	return result
 
 
@@ -31,6 +48,11 @@ func equal(other: EnergyLevel) -> bool:
 
 
 func get_color() -> Enums.ColorType:
+	print("【EnergyLevel】当前色彩分布：Red:{red} Blue:{blue} Yellow:{yellow}".format({
+	"red": red, 
+	"blue": blue, 
+	"yellow": yellow
+}))
 	if blue == 0 and red == 0 and yellow == 0:
 		return Enums.ColorType.WHITE
 	if blue == red and blue == yellow:
@@ -78,5 +100,7 @@ func copy() -> EnergyLevel:
 	result.red = red
 	result.blue = blue
 	result.yellow = yellow
-	result.source_distance = source_distance
+	result.red_source_distance = red_source_distance
+	result.blue_source_distance = blue_source_distance
+	result.yellow_source_distance = yellow_source_distance
 	return result
