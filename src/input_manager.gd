@@ -20,27 +20,26 @@ var selected_color_type: Enums.ColorType = Enums.ColorType.WHITE
 var _is_placing: bool = false
 var _is_removing: bool = false
 var _place_timer: float = 0.0
-const PLACE_INTERVAL: float = 0.1
 
 var _camera_dragging: bool = false
 var _last_mouse_position: Vector2
 var _preview_should_be_visible: bool = false
 
 # 相机缩放相关变量
-var _zoom_speed: float = 0.1
-var _min_zoom: float = 0.5
-var _max_zoom: float = 2.0
+var _zoom_speed: float = Constants.CameraConstants.ZOOM_SPEED
+var _min_zoom: float = Constants.CameraConstants.MIN_ZOOM
+var _max_zoom: float = Constants.CameraConstants.MAX_ZOOM
 
 # 相机移动相关变量
-var _camera_move_speed: float = 200.0
-var _camera_acceleration: float = 5.0
+var _camera_move_speed: float = Constants.CameraConstants.MOVE_SPEED
+var _camera_acceleration: float = Constants.CameraConstants.ACCELERATION
 var _camera_velocity: Vector2 = Vector2.ZERO
 
 # 相机边界限制
-var _camera_min_x: float = -1000.0
-var _camera_max_x: float = 1000.0
-var _camera_min_y: float = -1000.0
-var _camera_max_y: float = 1000.0
+var _camera_min_x: float = Constants.CameraConstants.MIN_X
+var _camera_max_x: float = Constants.CameraConstants.MAX_X
+var _camera_min_y: float = Constants.CameraConstants.MIN_Y
+var _camera_max_y: float = Constants.CameraConstants.MAX_Y
 
 func _ready() -> void:
 	_update_mode()
@@ -200,7 +199,7 @@ func _update_placement_preview() -> void:
 func _handle_continuous_placement(delta: float) -> void:
 	if _is_placing and _is_selection_active():
 		_place_timer += delta
-		if _place_timer >= PLACE_INTERVAL:
+		if _place_timer >= Constants.InputConstants.PLACE_INTERVAL:
 			_place_timer = 0.0
 			_try_place()
 	else:

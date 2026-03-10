@@ -20,6 +20,22 @@ const ENERGY_DECAY_PER_TILE: int = 1
 # 最大能量传播距离
 const MAX_ENERGY_RANGE: int = 10
 
+# 相机相关常量
+class CameraConstants:
+	const ZOOM_SPEED: float = 0.1
+	const MIN_ZOOM: float = 0.5
+	const MAX_ZOOM: float = 2.0
+	const MOVE_SPEED: float = 500.0
+	const ACCELERATION: float = 5.0
+	const MIN_X: float = -1000.0
+	const MAX_X: float = 1000.0
+	const MIN_Y: float = -1000.0
+	const MAX_Y: float = 1000.0
+
+# 输入相关常量
+class InputConstants:
+	const PLACE_INTERVAL: float = 0.1
+
 class EnemyConstants:
 	const default_size: float = 1.0
 	const default_color: Color = Color.CYAN
