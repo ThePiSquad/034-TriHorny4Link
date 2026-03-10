@@ -33,13 +33,13 @@ func _ready() -> void:
 
 func take_damage(amount: float, source: Node = null) -> void:
 	if current_health <= 0.0:
+		_on_death()
 		return
 	
 	_last_damage_source = source
 	current_health -= amount
-	
-	if current_health <= 0.0:
-		_on_death()
+	if current_health <= 0.0:	_on_death()
+
 
 func get_health() -> float:
 	return current_health
@@ -57,4 +57,5 @@ func is_alive() -> bool:
 	return current_health > 0.0
 
 func _on_death() -> void:
+	queue_free()
 	pass

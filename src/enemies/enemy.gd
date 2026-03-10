@@ -16,9 +16,6 @@ func _initialize_shape() -> void:
 func set_base_position(dest_position: Vector2) -> void:
 	base_position = dest_position
 
-func take_damage(amount: float, source: Node = null) -> void:
-	take_damage(amount, source)
-
 func _ready() -> void:
 	_initialize_shape()
 	died.connect(_on_damageable_died)
@@ -38,10 +35,10 @@ func _update_movement(delta: float) -> void:
 func _avoid_conduits(direction: Vector2) -> void:
 	pass
 
-func _on_hitbox_area_body_entered(body: Node2D) -> void:
-	print("hit!!")
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	# 获取Area2D的父节点（实际的Structure对象）
+	var body = area.get_parent()
 	if body and body.has_method("get_structure_type"):
 		if body.get_structure_type() == Enums.StructureType.CRYSTAL:
-			if body.has_method("take_damage"):
-				body.take_damage(attack_damage, self)
+			body.take_damage(attack_damage, self)
 			take_damage(max_health, self) # 自毁
