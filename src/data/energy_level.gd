@@ -48,12 +48,6 @@ func equal(other: EnergyLevel) -> bool:
 
 
 func get_color() -> Enums.ColorType:
-	print("【EnergyLevel】当前色彩分布：Red:{red} Blue:{blue} Yellow:{yellow}".format({
-	"red": red,
-	"blue": blue,
-	"yellow": yellow
-	}))
-
 	# 所有颜色都为0，返回白色
 	if blue == 0 and red == 0 and yellow == 0:
 		return Enums.ColorType.WHITE

@@ -123,20 +123,14 @@ func update_energy_level() -> void:
 		new_level.add(red_energy)
 		new_level.add(blue_energy)
 		new_level.add(yellow_energy)
-		
-		print("【EnergyTransmitter】获取邻居最大能量: Red=" + str(red_max) + "(dist=" + str(red_min_distance) + "), Blue=" + str(blue_max) + "(dist=" + str(blue_min_distance) + "), Yellow=" + str(yellow_max) + "(dist=" + str(yellow_min_distance) + ")")
-		print("【EnergyTransmitter】合并后能量: Red=" + str(new_level.red) + ", Blue=" + str(new_level.blue) + ", Yellow=" + str(new_level.yellow))
 	
 	# 更新能量等级
 	if !new_level.equal(energy_level):
-		print("【EnergyTransmitter】能量变化，更新显示")
 		energy_level = new_level
 		_energy_intensity = energy_level.get_intensity()
 		update.emit()
 		# 更新颜色显示
 		_update_appearance_from_energy_level()
-	else:
-		print("【EnergyTransmitter】能量未变化，跳过")
 
 func _update_color_from_neighbors() -> void:
 	# 检查周围是否存在能量源
