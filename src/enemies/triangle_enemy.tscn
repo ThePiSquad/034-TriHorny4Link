@@ -1,41 +1,25 @@
 [gd_scene format=3 uid="uid://b105um8got3cl"]
 
 [ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_ef7xj"]
-
-[sub_resource type="GDScript" id="GDScript_ef7xj"]
-script/source = "extends Enemy
-
-func _initialize_shape() -> void:
-	super._initialize_shape()
-	if damageable.hitbox_shape:
-		damageable.hitbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
-		damageable.hitbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
-		damageable.hitbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
-	if damageable.hurtbox_shape:
-		damageable.hurtbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
-		damageable.hurtbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
-		damageable.hurtbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
-"
+[ext_resource type="Script" uid="uid://53xfbs7cn8c4" path="res://src/enemies/triangle_enemy.gd" id="2_drdgn"]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_drdgn"]
 points = PackedVector2Array(0, -32, -32, 32, 32, 32)
 
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_ef7xj"]
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_56tku"]
 points = PackedVector2Array(0, -32, -32, 32, 32, 32)
 
 [node name="TriangleEnemy" unique_id=531630275 instance=ExtResource("1_ef7xj")]
-script = SubResource("GDScript_ef7xj")
+script = ExtResource("2_drdgn")
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=1569216735]
+[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 shape_type = 1
 fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
 stroke_color = Color(0.68235296, 0, 0, 1)
 stroke_enabled = true
 
-[node name="CollisionShape2D" parent="Damageable/HitboxArea" parent_id_path=PackedInt32Array(203901778, 1114372282) index="0" unique_id=910591284]
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
 shape = SubResource("ConvexPolygonShape2D_drdgn")
 
-[node name="CollisionShape2D" parent="Damageable/HurtboxArea" parent_id_path=PackedInt32Array(203901778, 1565689982) index="0" unique_id=1064559139]
-shape = SubResource("ConvexPolygonShape2D_ef7xj")
-
-[editable path="Damageable"]
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("ConvexPolygonShape2D_56tku")

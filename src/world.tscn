@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="7_jvefd"]
 [ext_resource type="PackedScene" uid="uid://vpbn24xyocc2" path="res://src/structures/crystal.tscn" id="7_tnjnu"]
 [ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enemy_manager.gd" id="8_53egh"]
+[ext_resource type="PackedScene" uid="uid://ctq4hb8eu3wcc" path="res://src/enemies/rect_enemy.tscn" id="9_eemcn"]
 [ext_resource type="Script" uid="uid://b226ukyquly1l" path="res://src/input_manager.gd" id="9_input"]
 [ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="10_preview"]
 
@@ -39,6 +40,9 @@ script = ExtResource("7_jvefd")
 
 [node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
+
+[node name="RectEnemy" parent="WorldPainter/EnermyManager" unique_id=531630275 instance=ExtResource("9_eemcn")]
+position = Vector2(50, 202)
 
 [node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera")]
 script = ExtResource("9_input")

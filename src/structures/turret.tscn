@@ -3,12 +3,22 @@
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_drymu"]
 [ext_resource type="Script" uid="uid://bt3yerjxlij6q" path="res://src/structures/turret.gd" id="1_hitdn"]
 
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_hitdn"]
+points = PackedVector2Array(0, -32, -32, 32, 32, 32)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_2wdy2"]
+points = PackedVector2Array(0, -32, -32, 32, 32, 32)
+
 [node name="Turret" unique_id=102321888 instance=ExtResource("1_drymu")]
 script = ExtResource("1_hitdn")
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
+[node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
 shape_type = 1
 corner_radius = 0.0
 fill_color = Color(1, 1, 1, 1)
 
-[editable path="Damageable"]
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
+shape = SubResource("ConvexPolygonShape2D_hitdn")
+
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("ConvexPolygonShape2D_2wdy2")

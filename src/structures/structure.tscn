@@ -4,14 +4,20 @@
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="3_eqofk"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_pinwr"]
 
-[node name="Structure" type="Node2D" unique_id=102321888]
+[node name="Structure" unique_id=265451698 instance=ExtResource("3_eqofk")]
 script = ExtResource("1_xw0ke")
+structure_type = 0
+color = 0
 
-[node name="ShapeDrawer" type="Node2D" parent="." unique_id=778239937]
+[node name="ShapeDrawer" type="Node2D" parent="." index="0" unique_id=701557668]
 script = ExtResource("3_pinwr")
 stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
 
-[node name="Damageable" parent="." unique_id=265451698 instance=ExtResource("3_eqofk")]
+[node name="HitboxArea" parent="." index="1" unique_id=1114372282]
+collision_layer = 0
+collision_mask = 4
 
-[editable path="Damageable"]
+[node name="HurtboxArea" parent="." index="2" unique_id=1565689982]
+collision_layer = 2
+collision_mask = 4

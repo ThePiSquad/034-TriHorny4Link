@@ -1,8 +1,7 @@
 class_name Enemy
-extends Node2D
+extends Damageable
 
 @onready var shape_drawer: ShapeDrawer = $ShapeDrawer
-@onready var damageable: Damageable = $Damageable
 
 @export var move_speed: float = 100.0
 @export var attack_damage: float = 10.0
@@ -18,11 +17,11 @@ func set_base_position(dest_position: Vector2) -> void:
 	base_position = dest_position
 
 func take_damage(amount: float, source: Node = null) -> void:
-	damageable.take_damage(amount, source)
+	take_damage(amount, source)
 
 func _ready() -> void:
 	_initialize_shape()
-	damageable.died.connect(_on_damageable_died)
+	died.connect(_on_damageable_died)
 
 func _on_damageable_died(source: Node) -> void:
 	queue_free()
@@ -40,8 +39,9 @@ func _avoid_conduits(direction: Vector2) -> void:
 	pass
 
 func _on_hitbox_area_body_entered(body: Node2D) -> void:
+	print("hit!!")
 	if body and body.has_method("get_structure_type"):
 		if body.get_structure_type() == Enums.StructureType.CRYSTAL:
 			if body.has_method("take_damage"):
 				body.take_damage(attack_damage, self)
-			take_damage(damageable.max_health, self) # 自毁
+			take_damage(max_health, self) # 自毁

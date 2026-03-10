@@ -6,22 +6,19 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gf85d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8e5cw"]
-size = Vector2(64, 64)
 
 [node name="RectEnemy" unique_id=531630275 instance=ExtResource("1_83whr")]
 script = ExtResource("2_gf85d")
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=1569216735]
+[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 shape_type = 2
 corner_radius = 0.0
 fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
 stroke_color = Color(0.68235296, 0, 0, 1)
 stroke_enabled = true
 
-[node name="CollisionShape2D" parent="Damageable/HitboxArea" parent_id_path=PackedInt32Array(203901778, 1114372282) index="0" unique_id=910591284]
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
 shape = SubResource("RectangleShape2D_gf85d")
 
-[node name="CollisionShape2D" parent="Damageable/HurtboxArea" parent_id_path=PackedInt32Array(203901778, 1565689982) index="0" unique_id=1064559139]
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
 shape = SubResource("RectangleShape2D_8e5cw")
-
-[editable path="Damageable"]

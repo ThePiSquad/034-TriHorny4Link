@@ -3,12 +3,22 @@
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_om8kb"]
 [ext_resource type="Script" uid="uid://sb1hat62qpx" path="res://src/structures/conduit.gd" id="2_q8vcm"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q8vcm"]
+size = Vector2(64, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4nig3"]
+size = Vector2(64, 64)
+
 [node name="Conduit" unique_id=102321888 instance=ExtResource("1_om8kb")]
 script = ExtResource("2_q8vcm")
 structure_type = 3
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=778239937]
+[node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
 shape_type = 2
 fill_color = Color(1, 1, 1, 1)
 
-[editable path="Damageable"]
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
+shape = SubResource("RectangleShape2D_q8vcm")
+
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("RectangleShape2D_4nig3")

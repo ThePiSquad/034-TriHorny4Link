@@ -1,5 +1,5 @@
 class_name Structure
-extends Node2D
+extends Damageable
 
 signal update
 signal destroyed
