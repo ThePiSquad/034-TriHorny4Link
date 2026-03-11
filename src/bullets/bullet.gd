@@ -56,10 +56,10 @@ func _process(delta: float) -> void:
 		destroy()
 
 func _on_hit_area_2d_area_entered(area: Area2D) -> void:
-	# 获取Area2D的父节点（实际的Structure对象）
 	var body = area.get_parent()
-	if body and body.get_class() == "Enemy":
-		body.take_damage(_attack_damage, self)
+	if body and body.is_in_group("enemy"):
+		if body.has_method("take_damage"):
+			body.take_damage(_attack_damage, self)
 		destroy()
 
 func destroy() -> void:
