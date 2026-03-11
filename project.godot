@@ -76,7 +76,7 @@ toggle_camera_mode={
 
 [layer_names]
 
-2d_physics/layer_1="世界环境"
+2d_physics/layer_1="世界"
 2d_physics/layer_2="建筑"
 2d_physics/layer_3="敌人"
 

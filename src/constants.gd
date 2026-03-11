@@ -65,3 +65,55 @@ static func get_color(type: Enums.ColorType) -> Color:
 	if COLOR_MAP.has(type):
 		return COLOR_MAP[type]
 	return Color.MAGENTA # 如果找不到，返回一个显眼的紫色提醒出错了
+
+static var TURRET_CONFIG = {
+	Enums.ColorType.RED: {
+		"fire_rate": 0.75,
+		"bullet_speed": 300.0,
+		"bullet_damage": 30.0,
+		"detection_range": 5 * grid_size,
+		"bullet_lifetime": 1.5
+	},
+	Enums.ColorType.BLUE: {
+		"fire_rate": 2.0,
+		"bullet_speed": 500.0,
+		"bullet_damage": 20.0,
+		"detection_range": 7 * grid_size,
+		"bullet_lifetime": 2.0
+	},
+	Enums.ColorType.YELLOW: {
+		"fire_rate": 1.0,
+		"bullet_speed": 800.0,
+		"bullet_damage": 10.0,
+		"detection_range": 9 * grid_size,
+		"bullet_lifetime": 0.8
+	},
+	Enums.ColorType.GREEN: {
+		"fire_rate": 1.0,
+		"bullet_speed": 550.0,
+		"bullet_damage": 25.0,
+		"detection_range": 8 * grid_size,
+		"bullet_lifetime": 2.0
+	},
+	Enums.ColorType.ORANGE: {
+		"fire_rate": 0.5,
+		"bullet_speed": 550.0,
+		"bullet_damage": 22.0,
+		"detection_range": 6 * grid_size,
+		"bullet_lifetime": 1.0
+	},
+	Enums.ColorType.PURPLE: {
+		"fire_rate": 0.5,
+		"bullet_speed": 380.0,
+		"bullet_damage": 40.0,
+		"detection_range": 4 * grid_size,
+		"bullet_lifetime": 3.8
+	},
+	Enums.ColorType.BLACK: {
+		"fire_rate": 0.25,
+		"bullet_speed": 400.0,
+		"bullet_damage": 10.0,
+		"detection_range": 4 * grid_size,
+		"bullet_lifetime": 3.0
+	}
+}

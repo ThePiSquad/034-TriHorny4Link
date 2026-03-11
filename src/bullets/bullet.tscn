@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bdppmknohvybk"]
+
+[ext_resource type="Script" uid="uid://b1abs7t6yu82u" path="res://src/bullets/bullet.gd" id="1_1ojd5"]
+[ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="1_4342n"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4342n"]
+size = Vector2(16, 16)
+
+[node name="Bullet" type="Node2D" unique_id=1846070966]
+script = ExtResource("1_1ojd5")
+
+[node name="ShapeDrawer" type="Node2D" parent="." unique_id=698014297]
+script = ExtResource("1_4342n")
+shape_size = Vector2(16, 16)
+fill_color = Color(1, 1, 1, 1)
+stroke_enabled = false
+metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
+
+[node name="HitArea2D" type="Area2D" parent="." unique_id=710907739]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea2D" unique_id=846831070]
+shape = SubResource("RectangleShape2D_4342n")
+
+[connection signal="area_entered" from="HitArea2D" to="." method="_on_hit_area_2d_area_entered"]
