@@ -58,5 +58,7 @@ func is_alive() -> bool:
 	return current_health > 0.0
 
 func _on_death() -> void:
+	if has_method("on_health_depleted"):
+		call("on_health_depleted")
 	queue_free()
 	pass

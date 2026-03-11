@@ -21,10 +21,24 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 	if structures.get(pos_key) != null:
 		return false
 	
+	# 检查是否有敌人在目标位置附近
+	if _has_enemy_nearby(pos):
+		return false
+	
 	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
 	var south = structures.get(Vector2i(pos.south().x, pos.south().y))
 	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
 	var east = structures.get(Vector2i(pos.east().x, pos.east().y))
+	
+	# 验证邻居的有效性
+	if north != null and not is_instance_valid(north):
+		north = null
+	if south != null and not is_instance_valid(south):
+		south = null
+	if west != null and not is_instance_valid(west):
+		west = null
+	if east != null and not is_instance_valid(east):
+		east = null
 	
 	var structure: Structure
 
@@ -89,13 +103,13 @@ func _update_neighbors(pos: GridCoord) -> void:
 	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
 	var east = structures.get(Vector2i(pos.east().x, pos.east().y))
 	
-	if north != null:
+	if north != null and is_instance_valid(north):
 		north.south = null
-	if south != null:
+	if south != null and is_instance_valid(south):
 		south.north = null
-	if west != null:
+	if west != null and is_instance_valid(west):
 		west.east = null
-	if east != null:
+	if east != null and is_instance_valid(east):
 		east.west = null
 
 func _update_neighbors_and_notify(pos: GridCoord) -> void:
@@ -104,16 +118,16 @@ func _update_neighbors_and_notify(pos: GridCoord) -> void:
 	var west: Structure = structures.get(Vector2i(pos.west().x, pos.west().y))
 	var east: Structure = structures.get(Vector2i(pos.east().x, pos.east().y))
 	
-	if north != null:
+	if north != null and is_instance_valid(north):
 		north.south = null
 		north.update_energy_level()
-	if south != null:
+	if south != null and is_instance_valid(south):
 		south.north = null
 		south.update_energy_level()
-	if west != null:
+	if west != null and is_instance_valid(west):
 		west.east = null
 		west.update_energy_level()
-	if east != null:
+	if east != null and is_instance_valid(east):
 		east.west = null
 		east.update_energy_level()
 
@@ -123,19 +137,19 @@ func _update_neighbor_connections(pos: GridCoord, structure: Structure) -> void:
 	var west: Structure = structures.get(Vector2i(pos.west().x, pos.west().y))
 	var east: Structure = structures.get(Vector2i(pos.east().x, pos.east().y))
 	
-	if north != null:
+	if north != null and is_instance_valid(north):
 		structure.north = north
 		north.south = structure
 		north.update_energy_level()
-	if south != null:
+	if south != null and is_instance_valid(south):
 		structure.south = south
 		south.north = structure
 		south.update_energy_level()
-	if west != null:
+	if west != null and is_instance_valid(west):
 		structure.west = west
 		west.east = structure
 		west.update_energy_level()
-	if east != null:
+	if east != null and is_instance_valid(east):
 		structure.east = east
 		east.west = structure
 		east.update_energy_level()
@@ -147,3 +161,18 @@ func has_structure(pos: GridCoord) -> bool:
 func get_structure(pos: GridCoord) -> Structure:
 	var pos_key = Vector2i(pos.x, pos.y)
 	return structures.get(pos_key)
+
+func _has_enemy_nearby(pos: GridCoord) -> bool:
+	"""检查是否有敌人在目标位置附近"""
+	var world_pos = pos.to_world_coord()
+	var check_radius = Constants.grid_size * 1.5  # 检查半径为1.5个格子
+	
+	# 获取场景中的所有敌人
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	for enemy in enemies:
+		if enemy and is_instance_valid(enemy):
+			var distance = enemy.global_position.distance_to(world_pos)
+			if distance < check_radius:
+				return true
+	
+	return false

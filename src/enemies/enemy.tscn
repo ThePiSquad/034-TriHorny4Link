@@ -10,6 +10,9 @@ move_speed = 100.0
 attack_damage = 10.0
 enemy_size = Vector2(64, 64)
 random_initial_rotation = false
+check_distance = 256.0
+max_avoid_attempts = 3
+show_path_visualization = true
 
 [node name="ShapeDrawer" type="Node2D" parent="." index="0" unique_id=590652366]
 script = ExtResource("3_abny1")

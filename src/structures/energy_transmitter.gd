@@ -94,7 +94,7 @@ func update_energy_level() -> void:
 	# 遍历所有邻居，分别记录每个颜色的最大值和最近距离
 	var neighbors = [north, south, west, east]
 	for neighbor in neighbors:
-		if neighbor != null and neighbor.energy_level != null:
+		if neighbor != null and is_instance_valid(neighbor) and neighbor.energy_level != null:
 			var neighbor_energy = neighbor.energy_level
 			
 			# 处理红色能量
@@ -148,7 +148,7 @@ func _has_energy_source_neighbor() -> bool:
 	# 检查四个方向是否存在能量源
 	var neighbors = [north, south, west, east]
 	for neighbor in neighbors:
-		if neighbor != null:
+		if neighbor != null and is_instance_valid(neighbor):
 			if neighbor is MonoCrystal:
 				return true
 			if neighbor is EnergyTransmitter and not neighbor.energy_level.is_empty():
@@ -164,7 +164,7 @@ func get_max_neighbor_resource_values() -> Dictionary:
 	# 遍历四个方向的邻居
 	var neighbors = [north, south, west, east]
 	for neighbor in neighbors:
-		if neighbor != null:
+		if neighbor != null and is_instance_valid(neighbor):
 			# 安全获取邻居的能量等级
 			if neighbor.has_method("get") and neighbor.has("energy_level"):
 				var neighbor_energy = neighbor.energy_level

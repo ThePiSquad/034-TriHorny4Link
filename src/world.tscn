@@ -43,6 +43,11 @@ script = ExtResource("7_jvefd")
 script = ExtResource("8_53egh")
 enemy_list = Array[PackedScene]([ExtResource("9_eemcn"), ExtResource("10_eemcn")])
 
+[node name="RectEnemy" parent="WorldPainter/EnemyManager" unique_id=531630275 instance=ExtResource("9_eemcn")]
+position = Vector2(881, 311)
+check_distance = 128.0
+max_avoid_attempts = 3
+
 [node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera")]
 script = ExtResource("9_input")
 structure_manager = NodePath("../WorldPainter/StructureManager")

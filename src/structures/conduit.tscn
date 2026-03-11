@@ -16,6 +16,7 @@ size = Vector2(64, 64)
 script = ExtResource("2_q8vcm")
 is_barrier = true
 structure_type = 3
+max_health = 30.0
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
 shape_type = 2

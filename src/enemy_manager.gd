@@ -1,12 +1,14 @@
 class_name EnemyManager extends Node2D
 
-# 敌人预制体列表
+## 敌人预制体列表
 @export var enemy_list: Array[PackedScene] = []
 
 # 刷新相关参数
 @export var spawn_interval: float = Constants.EnemyConstants.DEFAULT_SPAWN_INTERVAL
 @export var current_difficulty: int = Constants.EnemyConstants.DEFAULT_DIFFICULTY
 @export var min_spawn_distance: float = Constants.EnemyConstants.MIN_SPAWN_DISTANCE
+
+@export var is_start_spwn : bool = true
 
 # 内部变量
 var _spawn_timer: float = 0.0
@@ -35,7 +37,8 @@ func _process(delta: float) -> void:
 	# 检查是否达到刷新间隔
 	if _spawn_timer >= spawn_interval:
 		_spawn_timer = 0.0
-		_try_spawn_enemy()
+		if is_start_spwn:
+			_try_spawn_enemy()
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""

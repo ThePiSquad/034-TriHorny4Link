@@ -46,6 +46,10 @@ class EnemyConstants:
 	const MIN_SPAWN_DISTANCE: float = 300.0  # 距离水晶的最小生成距离
 	const DEFAULT_SPAWN_INTERVAL: float = 5.0  # 默认刷新间隔（秒）
 
+# 碰撞层常量
+const STRUCTURE_LAYER: int = 2  # 结构层
+const ENEMY_LAYER: int = 4      # 敌人层
+
 static var COLOR_MAP = {
 	Enums.ColorType.WHITE: Color.WHITE,
 	Enums.ColorType.BLACK: Color.BLACK,

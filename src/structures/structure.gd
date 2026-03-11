@@ -23,23 +23,23 @@ var _color: Enums.ColorType = Enums.ColorType.WHITE
 
 var north: Structure = null:
 	set(s):
-		connect_neighbor(s)
-		north = s
+		if s == null or is_instance_valid(s):
+			north = s
 
 var south: Structure = null:
 	set(s):
-		connect_neighbor(s)
-		south = s
+		if s == null or is_instance_valid(s):
+			south = s
 
 var west: Structure = null:
 	set(s):
-		connect_neighbor(s)
-		west = s
+		if s == null or is_instance_valid(s):
+			west = s
 
 var east: Structure = null:
 	set(s):
-		connect_neighbor(s)
-		east = s
+		if s == null or is_instance_valid(s):
+			east = s
 
 func initialize(
 	p_north: Structure = null,
@@ -47,14 +47,22 @@ func initialize(
 	p_west: Structure = null,
 	p_east: Structure = null
 ) -> Structure:
-	north = p_north
-	south = p_south
-	west = p_west
-	east = p_east
+	if is_instance_valid(p_north):
+		north = p_north
+		connect_neighbor(p_north)
+	if is_instance_valid(p_south):
+		south = p_south
+		connect_neighbor(p_south)
+	if is_instance_valid(p_west):
+		west = p_west
+		connect_neighbor(p_west)
+	if is_instance_valid(p_east):
+		east = p_east
+		connect_neighbor(p_east)
 	return self
 
 func connect_neighbor(s: Structure) -> void:
-	if s == null:
+	if s == null or not is_instance_valid(s):
 		return
 	# 双向连接：互相监听对方的update信号
 	if not s.update.is_connected(self.on_neighbor_update):
@@ -66,7 +74,10 @@ func connect_neighbor(s: Structure) -> void:
 		s.destroyed.connect(self.on_neighbor_destroyed)
 
 func on_health_depleted() -> void:
-	pass
+	var manager = get_parent()
+	if manager is StructureManager:
+		var pos = GridCoord.from_world_coord(Vector2i(global_position))
+		manager.remove(pos)
 
 func get_structure_type() -> Enums.StructureType:
 	return structure_type
