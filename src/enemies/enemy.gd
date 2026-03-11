@@ -17,6 +17,7 @@ func set_base_position(dest_position: Vector2) -> void:
 	base_position = dest_position
 
 func _ready() -> void:
+	super._ready()
 	_initialize_shape()
 	died.connect(_on_damageable_died)
 

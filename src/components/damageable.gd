@@ -30,6 +30,7 @@ var _last_damage_source: Node = null
 
 func _ready() -> void:
 	current_health = max_health
+	
 
 func take_damage(amount: float, source: Node = null) -> void:
 	if current_health <= 0.0:

@@ -97,6 +97,7 @@ func _exit_tree() -> void:
 	update.emit()
 
 func _ready() -> void:
+	super._ready()
 	_sync_color_to_energy_level(_color)
 	update.emit()
 	if shape_drawer:
