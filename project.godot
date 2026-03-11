@@ -35,6 +35,12 @@ folder_colors={
 "res://src/ui/": "blue"
 }
 
+[global_group]
+
+crystal=""
+structure=""
+enemy=""
+
 [input]
 
 ui_cancel={

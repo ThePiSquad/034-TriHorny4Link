@@ -9,4 +9,4 @@ func _initialize_shape() -> void:
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	super._on_hitbox_area_entered(area)
-	print("hit!!rect")
+	

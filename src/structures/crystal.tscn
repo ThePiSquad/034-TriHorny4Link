@@ -9,7 +9,7 @@ radius = 64.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_qpxc7"]
 radius = 64.0
 
-[node name="Crystal" unique_id=102321888 instance=ExtResource("1_bh81t")]
+[node name="Crystal" unique_id=102321888 groups=["crystal"] instance=ExtResource("1_bh81t")]
 script = ExtResource("2_a7xd5")
 structure_type = 2
 max_health = 1000.0

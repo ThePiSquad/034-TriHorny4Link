@@ -23,7 +23,7 @@ const MAX_ENERGY_RANGE: int = 10
 # 相机相关常量
 class CameraConstants:
 	const ZOOM_SPEED: float = 0.1
-	const MIN_ZOOM: float = 0.5
+	const MIN_ZOOM: float = 0.2
 	const MAX_ZOOM: float = 2.0
 	const MOVE_SPEED: float = 500.0
 	const ACCELERATION: float = 5.0
@@ -36,9 +36,15 @@ class CameraConstants:
 class InputConstants:
 	const PLACE_INTERVAL: float = 0.1
 
+# 敌人相关常量
 class EnemyConstants:
 	const default_size: float = 1.0
 	const default_color: Color = Color.CYAN
+	const MIN_DIFFICULTY: int = 1
+	const MAX_DIFFICULTY: int = 5
+	const DEFAULT_DIFFICULTY: int = 2
+	const MIN_SPAWN_DISTANCE: float = 300.0  # 距离水晶的最小生成距离
+	const DEFAULT_SPAWN_INTERVAL: float = 5.0  # 默认刷新间隔（秒）
 
 static var COLOR_MAP = {
 	Enums.ColorType.WHITE: Color.WHITE,

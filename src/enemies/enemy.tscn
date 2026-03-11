@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
 
-[node name="Enemy" unique_id=265451698 instance=ExtResource("2_yvjb1")]
+[node name="Enemy" unique_id=265451698 groups=["enemy"] instance=ExtResource("2_yvjb1")]
 script = ExtResource("1_a8hw6")
 move_speed = 100.0
 attack_damage = 10.0

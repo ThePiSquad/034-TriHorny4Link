@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="3_eqofk"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_pinwr"]
 
-[node name="Structure" unique_id=265451698 instance=ExtResource("3_eqofk")]
+[node name="Structure" unique_id=265451698 groups=["structure"] instance=ExtResource("3_eqofk")]
 script = ExtResource("1_xw0ke")
 structure_type = 0
 color = 0

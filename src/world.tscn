@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enemy_manager.gd" id="8_53egh"]
 [ext_resource type="PackedScene" uid="uid://ctq4hb8eu3wcc" path="res://src/enemies/rect_enemy.tscn" id="9_eemcn"]
 [ext_resource type="Script" uid="uid://b226ukyquly1l" path="res://src/input_manager.gd" id="9_input"]
+[ext_resource type="PackedScene" uid="uid://b105um8got3cl" path="res://src/enemies/triangle_enemy.tscn" id="10_eemcn"]
 [ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="10_preview"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
@@ -38,11 +39,12 @@ script = ExtResource("7_jvefd")
 
 [node name="Crystal" parent="WorldPainter/StructureManager" unique_id=102321888 instance=ExtResource("7_tnjnu")]
 
-[node name="EnermyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
+[node name="EnemyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
+enemy_list = Array[PackedScene]([ExtResource("9_eemcn"), ExtResource("10_eemcn")])
 
-[node name="RectEnemy" parent="WorldPainter/EnermyManager" unique_id=531630275 instance=ExtResource("9_eemcn")]
-position = Vector2(50, 202)
+[node name="RectEnemy" parent="WorldPainter/EnemyManager" unique_id=531630275 instance=ExtResource("9_eemcn")]
+position = Vector2(339, 353)
 
 [node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera")]
 script = ExtResource("9_input")
