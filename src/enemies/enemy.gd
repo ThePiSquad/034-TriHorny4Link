@@ -7,6 +7,14 @@ extends Damageable
 @export var attack_damage: float = 10.0
 @export var enemy_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
 
+# 随机旋转功能
+@export var random_initial_rotation: bool = false
+"""
+是否在敌人初始生成时对绘制的图形应用随机旋转效果
+- true: 启用随机旋转，范围为0-360度
+- false: 保持原始旋转角度不变
+"""
+
 var direction: Vector2
 var base_position: Vector2 = Vector2.ZERO
 
@@ -19,6 +27,13 @@ func set_base_position(dest_position: Vector2) -> void:
 func _ready() -> void:
 	super._ready()
 	_initialize_shape()
+	
+	# 应用随机旋转效果（如果启用）
+	if random_initial_rotation and shape_drawer:
+		var random_angle = randf_range(0.0, 360.0)
+		shape_drawer.rotation_degrees = random_angle
+		print("敌人随机旋转角度: ", random_angle, " 度")
+	
 	died.connect(_on_damageable_died)
 
 func _on_damageable_died(source: Node) -> void:

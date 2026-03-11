@@ -9,6 +9,7 @@
 
 [node name="RectEnemy" unique_id=531630275 instance=ExtResource("1_83whr")]
 script = ExtResource("2_gf85d")
+random_initial_rotation = true
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 shape_type = 2
