@@ -52,9 +52,9 @@ static var COLOR_MAP = {
 	Enums.ColorType.RED: Color("ff4545ff"),
 	Enums.ColorType.BLUE: Color("4587ffff"),
 	Enums.ColorType.YELLOW: Color("ffde45ff"),
-	Enums.ColorType.GREEN: Color.GREEN,
-	Enums.ColorType.ORANGE: Color.ORANGE,
-	Enums.ColorType.PURPLE: Color.PURPLE,
+	Enums.ColorType.GREEN: Color("#62B245ff"),
+	Enums.ColorType.ORANGE: Color("FF9225ff"),
+	Enums.ColorType.PURPLE: Color("#A245A2"),
 }
 
 static func get_color(type: Enums.ColorType) -> Color:
