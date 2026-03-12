@@ -44,6 +44,9 @@ var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
 var can_fire: bool = true
 
+# 失活状态
+var is_active: bool = false
+
 @onready var detection_area: Area2D = $DetectionArea
 @onready var detection_shape: CollisionShape2D = $DetectionArea/CollisionShape2D
 
@@ -58,11 +61,43 @@ func _init() -> void:
 
 func _process(delta: float) -> void:
 	_update_fire_timer(delta)
+	_check_activation_status()
+	
+	if not is_active:
+		return
+	
 	_update_target()
 	_rotate_towards_target(delta)
 	
 	if target and can_fire:
 		shot()
+
+func _check_activation_status() -> void:
+	"""检查炮台是否处于激活状态"""
+	var was_active = is_active
+	
+	if energy_level == null or energy_level.is_empty():
+		is_active = false
+	elif color == Enums.ColorType.WHITE:
+		is_active = false
+	else:
+		is_active = true
+	
+	if was_active != is_active:
+		_update_activation_visual()
+
+func _update_activation_visual() -> void:
+	"""更新激活/失活状态的视觉效果"""
+	if not shape_drawer:
+		return
+	
+	# 失活时不修改颜色，保持当前颜色（白色或黑色）
+	if is_active:
+		var base_color = Constants.COLOR_MAP.get(color, Color.WHITE)
+		shape_drawer.fill_color = base_color
+		shape_drawer.stroke_color = Color.WHITE
+	
+	shape_drawer.queue_redraw()
 
 func _update_fire_timer(delta: float) -> void:
 	if fire_timer > 0:
@@ -170,7 +205,6 @@ func _fire_magic_bullet() -> void:
 	bullet.set_target(target, start_pos, target_pos)
 	bullet.init(Vector2.ZERO, int(bullet_damage), magic_beam_duration, color)
 	
-	# 魔法子弹不需要位置，它会根据start_pos和target_pos绘制光束
 	bullet.global_position = Vector2.ZERO
 	get_parent().add_child(bullet)
 
@@ -190,7 +224,6 @@ func _fire_lightning_bullet() -> void:
 	bullet.set_target(target, start_pos, target_pos)
 	bullet.init(Vector2.ZERO, int(bullet_damage), 0.5, color)
 	
-	# 闪电子弹不需要位置，它会根据start_pos和target_pos绘制光束
 	bullet.global_position = Vector2.ZERO
 	get_parent().add_child(bullet)
 
@@ -217,27 +250,22 @@ func _update_turret_attributes() -> void:
 	detection_range = config.get("detection_range", 200.0)
 	bullet_lifetime = config.get("bullet_lifetime", 1.5)
 	
-	# 霰弹枪配置
 	shotgun_enabled = config.get("shotgun_enabled", false)
 	shotgun_count = config.get("shotgun_count", 1)
 	shotgun_angle_spread = config.get("shotgun_angle_spread", 15.0)
 	
-	# 追踪子弹配置
 	homing_enabled = config.get("homing_enabled", false)
 	homing_detection_range = config.get("homing_detection_range", 150.0)
 	homing_turn_speed = config.get("homing_turn_speed", 5.0)
 	
-	# 魔法子弹配置
 	magic_enabled = config.get("magic_enabled", false)
 	magic_beam_width = config.get("magic_beam_width", 8.0)
 	magic_beam_duration = config.get("magic_beam_duration", 0.2)
 	
-	# 闪电子弹配置
 	lightning_enabled = config.get("lightning_enabled", false)
 	lightning_chain_range = config.get("lightning_chain_range", 384.0)
 	lightning_max_chain = config.get("lightning_max_chain", 3)
 	
-	# 爆炸子弹配置
 	explosive_enabled = config.get("explosive_enabled", false)
 	explosion_radius = config.get("explosion_radius", 200.0)
 	explosion_particle_duration = config.get("explosion_particle_duration", 1.0)
@@ -251,6 +279,7 @@ func _update_detection_range() -> void:
 func update_energy_level() -> void:
 	super.update_energy_level()
 	_update_turret_attributes()
+	_check_activation_status()
 
 func _on_detection_area_area_entered(area: Area2D) -> void:
 	var enemy = area.get_parent()
