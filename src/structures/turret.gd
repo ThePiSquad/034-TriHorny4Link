@@ -5,6 +5,7 @@ var bullet_scene: PackedScene = preload("res://src/bullets/bullet.tscn")
 var homing_bullet_scene: PackedScene = preload("res://src/bullets/homing_bullet.tscn")
 var magic_bullet_scene: PackedScene = preload("res://src/bullets/magic_bullet.tscn")
 var lightning_bullet_scene: PackedScene = preload("res://src/bullets/lightning_bullet.tscn")
+var explosive_bullet_scene: PackedScene = preload("res://src/bullets/explosive_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -31,8 +32,13 @@ var magic_beam_duration: float = 0.2
 
 # 闪电子弹配置
 var lightning_enabled: bool = false
-var lightning_chain_range: float = 768.0
+var lightning_chain_range: float = 384.0
 var lightning_max_chain: int = 3
+
+# 爆炸子弹配置
+var explosive_enabled: bool = false
+var explosion_radius: float = 200.0
+var explosion_particle_duration: float = 1.0
 
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
@@ -106,6 +112,8 @@ func shot() -> void:
 		_fire_magic_bullet()
 	elif lightning_enabled and target:
 		_fire_lightning_bullet()
+	elif explosive_enabled:
+		_fire_explosive_bullet(base_angle)
 	elif shotgun_enabled and shotgun_count > 1:
 		_fire_shotgun(base_angle)
 	else:
@@ -186,6 +194,21 @@ func _fire_lightning_bullet() -> void:
 	bullet.global_position = Vector2.ZERO
 	get_parent().add_child(bullet)
 
+func _fire_explosive_bullet(angle: float) -> void:
+	if not explosive_bullet_scene:
+		return
+	
+	var bullet = explosive_bullet_scene.instantiate()
+	if not bullet or not bullet is ExplosiveBullet:
+		return
+	
+	var direction = Vector2(cos(angle), sin(angle))
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	get_parent().add_child(bullet)
+
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
 	fire_rate = config.get("fire_rate", 1.0)
@@ -211,8 +234,13 @@ func _update_turret_attributes() -> void:
 	
 	# 闪电子弹配置
 	lightning_enabled = config.get("lightning_enabled", false)
-	lightning_chain_range = config.get("lightning_chain_range", 768.0)
+	lightning_chain_range = config.get("lightning_chain_range", 384.0)
 	lightning_max_chain = config.get("lightning_max_chain", 3)
+	
+	# 爆炸子弹配置
+	explosive_enabled = config.get("explosive_enabled", false)
+	explosion_radius = config.get("explosion_radius", 200.0)
+	explosion_particle_duration = config.get("explosion_particle_duration", 1.0)
 	
 	_update_detection_range()
 

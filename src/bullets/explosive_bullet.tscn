@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bb7vqmqya348g"]
+
+[ext_resource type="Script" uid="uid://d3ao8wmuabd4t" path="res://src/bullets/explosive_bullet.gd" id="1_explosive"]
+[ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="2_drawer"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_explosive"]
+radius = 12.0
+
+[node name="ExplosiveBullet" type="Node2D" unique_id=1267136871]
+script = ExtResource("1_explosive")
+
+[node name="ShapeDrawer" type="Node2D" parent="." unique_id=1117489534]
+script = ExtResource("2_drawer")
+shape_size = Vector2(24, 24)
+fill_color = Color(1, 0.5, 1, 1)
+stroke_enabled = false
+
+[node name="HitArea2D" type="Area2D" parent="." unique_id=1018160908]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea2D" unique_id=942953674]
+shape = SubResource("CircleShape2D_explosive")
+
+[connection signal="area_entered" from="HitArea2D" to="." method="_on_hit_area_2d_area_entered"]
