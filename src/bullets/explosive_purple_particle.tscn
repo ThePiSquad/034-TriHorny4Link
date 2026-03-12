@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://d2eva3dcx7uki"]
+
+[sub_resource type="Curve" id="Curve_n0fxo"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.13207543), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_55kp8"]
+curve = SubResource("Curve_n0fxo")
+
+[sub_resource type="Curve" id="Curve_58hct"]
+_data = [Vector2(0.018018007, 0.38867927), 0.0, 0.0, 0, 0, Vector2(0.9729729, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_mt2r4"]
+curve = SubResource("Curve_58hct")
+
+[sub_resource type="Curve" id="Curve_xok3j"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_8ms0f"]
+curve = SubResource("Curve_xok3j")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_85vue"]
+particle_flag_disable_z = true
+angle_min = 90.000015
+angle_max = 270.0
+spread = 180.0
+flatness = 1.0
+initial_velocity_min = 175.0
+initial_velocity_max = 225.0
+gravity = Vector3(0, 0, 0)
+scale_min = 4.0
+scale_max = 12.0
+scale_curve = SubResource("CurveTexture_8ms0f")
+color = Color(0.83061194, 0.02807274, 0.9045787, 1)
+alpha_curve = SubResource("CurveTexture_55kp8")
+emission_curve = SubResource("CurveTexture_mt2r4")
+sub_emitter_mode = 4
+sub_emitter_amount_at_start = 32
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0lnf3"]
+particle_flag_disable_z = true
+angle_min = 90.000015
+angle_max = 270.0
+spread = 180.0
+flatness = 1.0
+initial_velocity_min = 20.0
+initial_velocity_max = 80.0
+gravity = Vector3(0, 0, 0)
+scale_min = 4.0
+scale_max = 8.0
+scale_curve = SubResource("CurveTexture_8ms0f")
+color = Color(0.71850306, 0.2316458, 0.95664316, 1)
+emission_curve = SubResource("CurveTexture_mt2r4")
+
+[node name="ExplosivePurple" type="GPUParticles2D" unique_id=1147285789]
+amount = 32
+sub_emitter = NodePath("GPUParticles2D")
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_85vue")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=1895031107]
+emitting = false
+amount = 32
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_0lnf3")

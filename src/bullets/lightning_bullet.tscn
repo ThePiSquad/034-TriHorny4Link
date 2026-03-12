@@ -9,4 +9,5 @@ script = ExtResource("1_lightning")
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=741123525]
 script = ExtResource("2_drawer")
 fill_enabled = false
+stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"

@@ -14,6 +14,7 @@ script = ExtResource("2_6fcnd")
 structure_type = 1
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
+shape_size = Vector2(56, 56)
 fill_color = Color(1, 1, 1, 1)
 
 [node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]

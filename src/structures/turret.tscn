@@ -17,6 +17,7 @@ script = ExtResource("1_hitdn")
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
 shape_type = 1
+shape_size = Vector2(56, 56)
 corner_radius = 0.0
 fill_color = Color(1, 1, 1, 1)
 

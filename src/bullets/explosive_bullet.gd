@@ -8,6 +8,8 @@ var explosion_particle_duration: float = 1.0
 
 var _exploded: bool = false
 
+var particle_scene: PackedScene = preload("res://src/bullets/explosive_purple_particle.tscn")
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
 	explosion_damage = damage
@@ -59,26 +61,8 @@ func _trigger_area_damage() -> void:
 
 func _create_explosion_effect() -> void:
 	# 生成爆炸粒子效果
-	var particle_system = GPUParticles2D.new()
-	particle_system.name = "ExplosionParticles"
+	var particle_system = particle_scene.instantiate()
 	particle_system.position = global_position
-	
-	# 配置粒子系统
-	var particle_process_material = ParticleProcessMaterial.new()
-	particle_process_material.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	particle_process_material.emission_sphere_radius = 10.0
-	particle_process_material.initial_velocity_min = 100.0
-	particle_process_material.initial_velocity_max = 300.0
-	particle_process_material.damping_min = 2.0
-	particle_process_material.damping_max = 2.0
-	particle_process_material.gravity = Vector3(0, 0, 0)
-	particle_process_material.color = Color(1, 0.5, 1, 1)
-	particle_process_material.scale_min = 8.0
-	particle_process_material.scale_max = 15.0
-	
-	particle_system.process_material = particle_process_material
-	particle_system.amount = 50
-	particle_system.lifetime = explosion_particle_duration
 	particle_system.one_shot = true
 	
 	# 添加到场景
