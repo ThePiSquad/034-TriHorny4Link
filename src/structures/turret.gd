@@ -11,6 +11,11 @@ var bullet_lifetime: float = 1.5
 var detection_range: float = 200.0
 var rotation_speed: float = 5.0
 
+# 霰弹枪配置
+var shotgun_enabled: bool = false
+var shotgun_count: int = 1
+var shotgun_angle_spread: float = 15.0
+
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
 var can_fire: bool = true
@@ -80,20 +85,35 @@ func shot() -> void:
 	if not bullet_scene:
 		return
 	
-	var bullet :Bullet= bullet_scene.instantiate()
+	var base_angle = _get_angle_to_target(target.global_position) - PI / 2
+	
+	if shotgun_enabled and shotgun_count > 1:
+		_fire_shotgun(base_angle)
+	else:
+		_fire_single_bullet(base_angle)
+	
+	can_fire = false
+	fire_timer = 1.0 / fire_rate
+
+func _fire_single_bullet(angle: float) -> void:
+	var bullet: Bullet = bullet_scene.instantiate()
 	if not bullet:
 		return
 	
-	var angle = _get_angle_to_target(target.global_position) - PI / 2
 	var direction = Vector2(cos(angle), sin(angle))
 	var bullet_velocity = direction * bullet_speed
 	
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
 	get_parent().add_child(bullet)
+
+func _fire_shotgun(base_angle: float) -> void:
+	var angle_spread_rad = deg_to_rad(shotgun_angle_spread)
+	var start_angle = base_angle - angle_spread_rad * (shotgun_count - 1) / 2.0
 	
-	can_fire = false
-	fire_timer = 1.0 / fire_rate
+	for i in range(shotgun_count):
+		var angle = start_angle + angle_spread_rad * i
+		_fire_single_bullet(angle)
 
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
@@ -102,6 +122,11 @@ func _update_turret_attributes() -> void:
 	bullet_damage = config.get("bullet_damage", 20.0)
 	detection_range = config.get("detection_range", 200.0)
 	bullet_lifetime = config.get("bullet_lifetime", 1.5)
+	
+	# 霰弹枪配置
+	shotgun_enabled = config.get("shotgun_enabled", false)
+	shotgun_count = config.get("shotgun_count", 1)
+	shotgun_angle_spread = config.get("shotgun_angle_spread", 15.0)
 	
 	_update_detection_range()
 
