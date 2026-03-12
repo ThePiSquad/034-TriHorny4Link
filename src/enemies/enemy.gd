@@ -6,6 +6,7 @@ extends Damageable
 @export var move_speed: float = 100.0
 @export var attack_damage: float = 10.0
 @export var enemy_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
+@export var size_level: int = Constants.EnemyConstants.SIZE_LEVEL_1
 
 # 随机旋转功能
 @export var random_initial_rotation: bool = false
@@ -55,14 +56,48 @@ var _path_finding_enabled: bool = true  # 是否启用寻路
 var _path_visualization: Line2D = null  # 路径可视化
 
 func _initialize_shape() -> void:
-	shape_drawer.shape_size = enemy_size
+	if shape_drawer:
+		shape_drawer.shape_size = enemy_size
 
 func set_base_position(dest_position: Vector2) -> void:
 	base_position = dest_position
 
+func set_size_level(level: int) -> void:
+	"""设置敌人体型等级并调整属性"""
+	size_level = clamp(level, Constants.EnemyConstants.SIZE_LEVEL_1, Constants.EnemyConstants.MAX_SIZE_LEVEL)
+	
+	# 获取体型尺寸
+	if Constants.EnemyConstants.SIZE_MAP.has(size_level):
+		enemy_size = Constants.EnemyConstants.SIZE_MAP[size_level]
+	
+	# 获取属性调整系数
+	if Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS.has(size_level):
+		var multipliers = Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS[size_level]
+		
+		# 调整血量
+		if max_health > 0:
+			var new_health = int(max_health * multipliers.health)
+			max_health = new_health
+			current_health = new_health
+		
+		# 调整移动速度
+		var base_speed = 100.0
+		move_speed = base_speed * multipliers.speed
+	
+	# 更新形状（只在shape_drawer可用时）
+	if shape_drawer:
+		_initialize_shape()
+	
+	print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed)
+
 func _ready() -> void:
 	super._ready()
-	_initialize_shape()
+	
+	# 应用体型设置
+	if size_level != Constants.EnemyConstants.SIZE_LEVEL_1:
+		set_size_level(size_level)
+	else:
+		_initialize_shape()
 	
 	# 添加到enemy组，让结构管理器能够找到
 	add_to_group("enemy")

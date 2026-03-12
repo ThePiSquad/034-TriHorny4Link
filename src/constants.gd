@@ -53,6 +53,44 @@ class EnemyConstants:
 	const DEFAULT_DIFFICULTY: int = 2
 	const MIN_SPAWN_DISTANCE: float = 300.0  # 距离水晶的最小生成距离
 	const DEFAULT_SPAWN_INTERVAL: float = 5.0  # 默认刷新间隔（秒）
+	
+	# 体型系统
+	const SIZE_LEVEL_1: int = 1
+	const SIZE_LEVEL_2: int = 2
+	const SIZE_LEVEL_3: int = 3
+	const SIZE_LEVEL_4: int = 4
+	const SIZE_LEVEL_5: int = 5
+	const SIZE_LEVEL_6: int = 6
+	const SIZE_LEVEL_7: int = 7
+	const MAX_SIZE_LEVEL: int = 7
+	
+	# 体型尺寸映射表（像素）
+	static var SIZE_MAP = {
+		SIZE_LEVEL_1: Vector2(32, 32),   # 32×32
+		SIZE_LEVEL_2: Vector2(48, 48),   # 48×48
+		SIZE_LEVEL_3: Vector2(64, 64),   # 64×64
+		SIZE_LEVEL_4: Vector2(80, 80),   # 80×80
+		SIZE_LEVEL_5: Vector2(96, 96),   # 96×96
+		SIZE_LEVEL_6: Vector2(112, 112), # 112×112
+		SIZE_LEVEL_7: Vector2(128, 128)  # 128×128
+	}
+	
+	# 体型属性调整系数
+	static var SIZE_ATTRIBUTE_MULTIPLIERS = {
+		SIZE_LEVEL_1: {"health": 1.0, "speed": 1.0},
+		SIZE_LEVEL_2: {"health": 1.5, "speed": 0.9},
+		SIZE_LEVEL_3: {"health": 2.0, "speed": 0.8},
+		SIZE_LEVEL_4: {"health": 2.5, "speed": 0.7},
+		SIZE_LEVEL_5: {"health": 3.0, "speed": 0.6},
+		SIZE_LEVEL_6: {"health": 3.5, "speed": 0.5},
+		SIZE_LEVEL_7: {"health": 4.0, "speed": 0.4}
+	}
+	
+	# 时间相关生成配置
+	const TIME_SCALE_FACTOR: float = 0.1  # 时间缩放因子（每秒增加的概率）
+	const MAX_SIZE_UNLOCK_TIME: float = 300.0  # 完全解锁所有体型所需时间（秒）
+	const SPAWN_INTERVAL_MIN: float = 1.0  # 最小刷新间隔（秒）
+	const SPAWN_INTERVAL_MAX: float = 5.0  # 最大刷新间隔（秒）
 
 # 碰撞层常量
 const STRUCTURE_LAYER: int = 2  # 结构层

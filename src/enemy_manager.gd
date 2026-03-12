@@ -15,6 +15,11 @@ var _spawn_timer: float = 0.0
 var _crystal_position: Vector2 = Vector2.ZERO
 var _max_spawn_attempts: int = 10  # 最大位置生成尝试次数
 
+# 时间相关变量
+var _game_time: float = 0.0  # 游戏运行时间（秒）
+var _max_unlock_time: float = Constants.EnemyConstants.MAX_SIZE_UNLOCK_TIME  # 完全解锁所有体型所需时间
+var _time_scale_factor: float = Constants.EnemyConstants.TIME_SCALE_FACTOR  # 时间缩放因子
+
 func _ready() -> void:
 	# 查找水晶位置
 	_find_crystal_position()
@@ -31,6 +36,12 @@ func _ready() -> void:
 	print("EnemyManager 初始化完成 - 难度等级: ", current_difficulty, " 刷新间隔: ", spawn_interval)
 
 func _process(delta: float) -> void:
+	# 更新游戏时间
+	_game_time += delta
+	
+	# 动态调整刷新间隔
+	_update_spawn_interval()
+	
 	# 更新刷新计时器
 	_spawn_timer += delta
 	
@@ -39,6 +50,18 @@ func _process(delta: float) -> void:
 		_spawn_timer = 0.0
 		if is_start_spwn:
 			_try_spawn_enemy()
+
+func _update_spawn_interval() -> void:
+	"""根据游戏时间动态调整刷新间隔"""
+	# 计算时间进度（0.0 - 1.0）
+	var time_progress = min(_game_time / _max_unlock_time, 1.0)
+	
+	# 根据时间进度调整刷新间隔（时间越长，刷新越快）
+	var interval_range = Constants.EnemyConstants.SPAWN_INTERVAL_MAX - Constants.EnemyConstants.SPAWN_INTERVAL_MIN
+	var new_interval = Constants.EnemyConstants.SPAWN_INTERVAL_MAX - (interval_range * time_progress)
+	
+	# 平滑过渡到新的刷新间隔
+	spawn_interval = lerp(spawn_interval, new_interval, 0.1)
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
@@ -80,10 +103,53 @@ func _try_spawn_enemy() -> void:
 	var enemy = enemy_scene.instantiate()
 	if enemy:
 		enemy.global_position = spawn_position
+		
+		# 根据游戏时间设置敌人体型
+		var size_level = _select_size_level()
+		if enemy.has_method("set_size_level"):
+			enemy.set_size_level(size_level)
+		
 		add_child(enemy)
-		print("生成敌人: ", enemy.name, " 位置: ", spawn_position)
+		print("生成敌人: ", enemy.name, " 位置: ", spawn_position, " 体型等级: ", size_level)
 	else:
 		push_error("EnemyManager: 敌人实例化失败")
+
+func _select_size_level() -> int:
+	"""根据游戏时间选择敌人体型等级"""
+	# 计算时间进度（0.0 - 1.0）
+	var time_progress = min(_game_time / _max_unlock_time, 1.0)
+	
+	# 根据时间进度计算可用的最大体型等级
+	var max_unlocked_level = int(1 + time_progress * (Constants.EnemyConstants.MAX_SIZE_LEVEL - 1))
+	max_unlocked_level = clamp(max_unlocked_level, Constants.EnemyConstants.SIZE_LEVEL_1, Constants.EnemyConstants.MAX_SIZE_LEVEL)
+	
+	# 计算每个体型的权重（大体型权重随时间增加）
+	var weights = []
+	var total_weight = 0.0
+	
+	for level in range(Constants.EnemyConstants.SIZE_LEVEL_1, max_unlocked_level + 1):
+		# 基础权重
+		var base_weight = 1.0
+		
+		# 时间加成（大体型随时间获得更高权重）
+		var time_bonus = float(level - 1) * time_progress * _time_scale_factor
+		
+		# 最终权重
+		var final_weight = base_weight + time_bonus
+		weights.append(final_weight)
+		total_weight += final_weight
+	
+	# 根据权重随机选择体型
+	var random_value = randf() * total_weight
+	var accumulated_weight = 0.0
+	
+	for i in range(weights.size()):
+		accumulated_weight += weights[i]
+		if random_value <= accumulated_weight:
+			return Constants.EnemyConstants.SIZE_LEVEL_1 + i
+	
+	# 默认返回最小体型
+	return Constants.EnemyConstants.SIZE_LEVEL_1
 
 func _get_available_enemies() -> Array[PackedScene]:
 	"""根据当前难度等级获取可用的敌人类型"""
@@ -148,3 +214,11 @@ func start_spawning() -> void:
 	if spawn_interval <= 0:
 		spawn_interval = Constants.EnemyConstants.DEFAULT_SPAWN_INTERVAL
 	print("开始生成敌人，间隔: ", spawn_interval, " 秒")
+
+func get_game_time() -> float:
+	"""获取游戏运行时间"""
+	return _game_time
+
+func get_current_spawn_interval() -> float:
+	"""获取当前刷新间隔"""
+	return spawn_interval
