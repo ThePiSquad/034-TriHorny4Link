@@ -47,6 +47,10 @@ func _ready() -> void:
 	if hud:
 		hud.icon_selected.connect(_on_icon_selected)
 		hud.selection_cleared.connect(_on_selection_cleared)
+	
+	# 设置placement_preview的structure_manager引用
+	if placement_preview and structure_manager:
+		placement_preview.set_structure_manager(structure_manager)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_camera_mode"):

@@ -5,9 +5,18 @@ extends Node2D
 
 var _structure_type: Enums.StructureType = Enums.StructureType.TURRET
 var _is_visible: bool = true
+var _structure_manager: StructureManager
+
+var _valid_fill_color: Color = Color(0.5, 0.5, 0.5, 0.5)
+var _valid_stroke_color: Color = Color(1, 1, 1, 0.8)
+var _invalid_fill_color: Color = Color(1, 0, 0, 0.5)
+var _invalid_stroke_color: Color = Color(1, 0.3, 0.3, 0.8)
 
 func _ready() -> void:
 	_update_appearance()
+
+func set_structure_manager(manager: StructureManager) -> void:
+	_structure_manager = manager
 
 func set_structure_type(type: Enums.StructureType) -> void:
 	_structure_type = type
@@ -21,6 +30,30 @@ func update_position(world_position: Vector2) -> void:
 	var grid_world_pos = grid_coord.to_world_coord()
 	
 	position = Vector2(grid_world_pos) + Vector2(Constants.grid_size / 2, Constants.grid_size / 2)
+	
+	# 检查放置有效性并更新颜色
+	_update_validity_color(grid_coord)
+
+func _update_validity_color(grid_coord: GridCoord) -> void:
+	"""根据放置有效性更新颜色"""
+	if not shape_drawer:
+		return
+	
+	var is_valid = true
+	
+	# 检查炮塔放置限制
+	if _structure_type == Enums.StructureType.TURRET and _structure_manager:
+		is_valid = _structure_manager.can_place_turret(grid_coord)
+	
+	# 更新颜色
+	if is_valid:
+		shape_drawer.fill_color = _valid_fill_color
+		shape_drawer.stroke_color = _valid_stroke_color
+	else:
+		shape_drawer.fill_color = _invalid_fill_color
+		shape_drawer.stroke_color = _invalid_stroke_color
+	
+	shape_drawer.queue_redraw()
 
 func show_preview() -> void:
 	_is_visible = true
@@ -37,20 +70,12 @@ func _update_appearance() -> void:
 	match _structure_type:
 		Enums.StructureType.TURRET:
 			shape_drawer.shape_type = Enums.ShapeType.TRIANGLE
-			shape_drawer.fill_color = Color(0.5, 0.5, 0.5, 0.5)
-			shape_drawer.stroke_color = Color(1, 1, 1, 0.8)
 		Enums.StructureType.CONDUIT:
 			shape_drawer.shape_type = Enums.ShapeType.RECTANGLE
-			shape_drawer.fill_color = Color(0.5, 0.5, 0.5, 0.5)
-			shape_drawer.stroke_color = Color(1, 1, 1, 0.8)
 		Enums.StructureType.CRYSTAL:
 			shape_drawer.shape_type = Enums.ShapeType.CIRCLE
-			shape_drawer.fill_color = Color(0.5, 0.5, 0.5, 0.5)
-			shape_drawer.stroke_color = Color(1, 1, 1, 0.8)
 		Enums.StructureType.MONO_CRYSTAL:
 			shape_drawer.shape_type = Enums.ShapeType.CIRCLE
-			shape_drawer.fill_color = Color(0.5, 0.5, 0.5, 0.5)
-			shape_drawer.stroke_color = Color(1, 1, 1, 0.8)
 	
 	shape_drawer.shape_size = Vector2(Constants.grid_size, Constants.grid_size)
 	shape_drawer.queue_redraw()

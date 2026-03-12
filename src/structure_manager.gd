@@ -25,6 +25,11 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 	if _has_enemy_nearby(pos):
 		return false
 	
+	# 检查炮塔放置限制（必须靠近conduit）
+	if type == Enums.StructureType.TURRET:
+		if not _has_nearby_conduit(pos):
+			return false
+	
 	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
 	var south = structures.get(Vector2i(pos.south().x, pos.south().y))
 	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
@@ -176,3 +181,54 @@ func _has_enemy_nearby(pos: GridCoord) -> bool:
 				return true
 	
 	return false
+
+func _has_nearby_conduit(pos: GridCoord) -> bool:
+	"""检查指定位置周围上下左右是否存在conduit"""
+	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
+	var south = structures.get(Vector2i(pos.south().x, pos.south().y))
+	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
+	var east = structures.get(Vector2i(pos.east().x, pos.east().y))
+	
+	# 验证邻居的有效性
+	if north != null and not is_instance_valid(north):
+		north = null
+	if south != null and not is_instance_valid(south):
+		south = null
+	if west != null and not is_instance_valid(west):
+		west = null
+	if east != null and not is_instance_valid(east):
+		east = null
+	
+	# 检查是否有conduit
+	if north != null and north.get_structure_type() == Enums.StructureType.CONDUIT:
+		return true
+	if south != null and south.get_structure_type() == Enums.StructureType.CONDUIT:
+		return true
+	if west != null and west.get_structure_type() == Enums.StructureType.CONDUIT:
+		return true
+	if east != null and east.get_structure_type() == Enums.StructureType.CONDUIT:
+		return true
+	
+	return false
+
+func can_place_turret(pos: GridCoord) -> bool:
+	"""检查是否可以在指定位置放置炮塔"""
+	# 检查是否有敌人在目标位置附近
+	if _has_enemy_nearby(pos):
+		return false
+	
+	# 检查是否靠近conduit
+	if not _has_nearby_conduit(pos):
+		return false
+	
+	# 检查位置是否已被占用
+	var pos_key = Vector2i(pos.x, pos.y)
+	if structures.get(pos_key) != null:
+		return false
+	
+	# 检查是否在保留坐标中
+	for reserved in Constants.generator_reserved_coords:
+		if reserved.x == pos.x and reserved.y == pos.y:
+			return false
+	
+	return true
