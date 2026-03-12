@@ -45,14 +45,17 @@ func _update_barrier_visual() -> void:
 	if not shape_drawer:
 		return
 	
-	if is_barrier:
-		# 屏障模式：显示更粗的边框
-		shape_drawer.stroke_enabled = true
-		shape_drawer.stroke_width = 1.0
-		shape_drawer.stroke_color = Color.GRAY
-	else:
-		# 导线模式：正常显示
-		shape_drawer.stroke_enabled = false
+	shape_drawer.stroke_enabled = true
+	shape_drawer.stroke_width = 1.0
+	#shape_drawer.stroke_color = Color.GRAY
+	#if is_barrier:
+		## 屏障模式：显示更粗的边框
+		#shape_drawer.stroke_enabled = true
+		#shape_drawer.stroke_width = 1.0
+		#shape_drawer.stroke_color = Color.GRAY
+	#else:
+		## 导线模式：正常显示
+		#shape_drawer.stroke_enabled = false
 
 func _on_barrier_area_entered(area: Area2D) -> void:
 	if not is_barrier:

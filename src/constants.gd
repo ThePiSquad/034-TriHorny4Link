@@ -42,7 +42,7 @@ class CameraConstants:
 
 # 输入相关常量
 class InputConstants:
-	const PLACE_INTERVAL: float = 0.1
+	const PLACE_INTERVAL: float = 0.05
 
 # 敌人相关常量
 class EnemyConstants:
@@ -51,8 +51,8 @@ class EnemyConstants:
 	const MIN_DIFFICULTY: int = 1
 	const MAX_DIFFICULTY: int = 5
 	const DEFAULT_DIFFICULTY: int = 2
-	const MIN_SPAWN_DISTANCE: float = 300.0  # 距离水晶的最小生成距离
-	const DEFAULT_SPAWN_INTERVAL: float = 5.0  # 默认刷新间隔（秒）
+	const MIN_SPAWN_DISTANCE: float = 15 * grid_size  # 距离水晶的最小生成距离
+	const DEFAULT_SPAWN_INTERVAL: float = 3.0  # 默认刷新间隔（秒）
 	
 	# 体型系统
 	const SIZE_LEVEL_1: int = 1
@@ -87,10 +87,10 @@ class EnemyConstants:
 	}
 	
 	# 时间相关生成配置
-	const TIME_SCALE_FACTOR: float = 0.1  # 时间缩放因子（每秒增加的概率）
-	const MAX_SIZE_UNLOCK_TIME: float = 300.0  # 完全解锁所有体型所需时间（秒）
-	const SPAWN_INTERVAL_MIN: float = 1.0  # 最小刷新间隔（秒）
-	const SPAWN_INTERVAL_MAX: float = 5.0  # 最大刷新间隔（秒）
+	const TIME_SCALE_FACTOR: float = 0.5  # 时间缩放因子（每秒增加的概率）
+	const MAX_SIZE_UNLOCK_TIME: float = 100.0  # 完全解锁所有体型所需时间（秒）
+	const SPAWN_INTERVAL_MIN: float = 0.5  # 最小刷新间隔（秒）
+	const SPAWN_INTERVAL_MAX: float = 3.0  # 最大刷新间隔（秒）
 
 # 碰撞层常量
 const STRUCTURE_LAYER: int = 2  # 结构层
@@ -115,63 +115,63 @@ static func get_color(type: Enums.ColorType) -> Color:
 static var TURRET_CONFIG = {
 	Enums.ColorType.RED: {
 		"fire_rate": 0.75,
-		"bullet_speed": 300.0,
+		"bullet_speed": 450.0,
 		"bullet_damage": 30.0,
 		"detection_range": 10 * grid_size,
-		"bullet_lifetime": 1.5,
+		"bullet_lifetime": 2.0,
 		"shotgun_enabled": true,
 		"shotgun_count": 3,
 		"shotgun_angle_spread": 15.0
 	},
 	Enums.ColorType.BLUE: {
 		"fire_rate": 2.0,
-		"bullet_speed": 500.0,
+		"bullet_speed": 1000.0,
 		"bullet_damage": 20.0,
-		"detection_range": 14 * grid_size,
-		"bullet_lifetime": 2.0
+		"detection_range": 12 * grid_size,
+		"bullet_lifetime": 1.2
 	},
 	Enums.ColorType.YELLOW: {
 		"fire_rate": 1.0,
 		"bullet_speed": 800.0,
 		"bullet_damage": 10.0,
-		"detection_range": 18 * grid_size,
-		"bullet_lifetime": 0.8,
+		"detection_range": 16 * grid_size,
+		"bullet_lifetime": 0.5,
 		"magic_enabled": true,
 		"magic_beam_width": 8.0,
 		"magic_beam_duration": 0.2
 	},
 	Enums.ColorType.GREEN: {
-		"fire_rate": 1.0,
-		"bullet_speed": 550.0,
+		"fire_rate": 1.5,
+		"bullet_speed": 850.0,
 		"bullet_damage": 25.0,
-		"detection_range": 16 * grid_size,
-		"bullet_lifetime": 2.0,
+		"detection_range": 15 * grid_size,
+		"bullet_lifetime": 1.6,
 		"homing_enabled": true,
-		"homing_detection_range": 150.0,
-		"homing_turn_speed": 5.0
+		"homing_detection_range": 250.0,
+		"homing_turn_speed": 10.0
 	},
 	Enums.ColorType.ORANGE: {
 		"fire_rate": 0.5,
 		"bullet_speed": 550.0,
 		"bullet_damage": 22.0,
-		"detection_range": 12 * grid_size,
-		"bullet_lifetime": 1.0,
+		"detection_range": 13 * grid_size,
+		"bullet_lifetime": 0.6,
 		"lightning_enabled": true,
 		"lightning_chain_range": 384.0,
 		"lightning_max_chain": 3
 	},
 	Enums.ColorType.PURPLE: {
 		"fire_rate": 0.5,
-		"bullet_speed": 380.0,
-		"bullet_damage": 40.0,
+		"bullet_speed": 580.0,
+		"bullet_damage": 45.0,
 		"detection_range": 8 * grid_size,
-		"bullet_lifetime": 3.8,
+		"bullet_lifetime": 2.0,
 		"explosive_enabled": true,
 		"explosion_radius": 200.0,
 		"explosion_particle_duration": 1.0
 	},
 	Enums.ColorType.BLACK: {
-		"fire_rate": 0.25,
+		"fire_rate": 0.1,
 		"bullet_speed": 400.0,
 		"bullet_damage": 10.0,
 		"detection_range": 4 * grid_size,

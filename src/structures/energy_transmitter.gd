@@ -195,6 +195,7 @@ func _set_color(color_type: Enums.ColorType) -> void:
 	if shape_drawer:
 		var base_color :Color= Constants.COLOR_MAP.get(color_type, Color.WHITE)
 		shape_drawer.fill_color = base_color
+		shape_drawer.stroke_color = base_color.lightened(0.3)
 		shape_drawer.queue_redraw()
 	
 	# 发射颜色改变信号

@@ -78,7 +78,7 @@ func _check_activation_status() -> void:
 	
 	if energy_level == null or energy_level.is_empty():
 		is_active = false
-	elif color == Enums.ColorType.WHITE:
+	elif color == Enums.ColorType.WHITE or color == Enums.ColorType.BLACK:
 		is_active = false
 	else:
 		is_active = true
@@ -95,7 +95,7 @@ func _update_activation_visual() -> void:
 	if is_active:
 		var base_color = Constants.COLOR_MAP.get(color, Color.WHITE)
 		shape_drawer.fill_color = base_color
-		shape_drawer.stroke_color = Color.WHITE
+		shape_drawer.stroke_color = base_color.lightened(0.3)
 	
 	shape_drawer.queue_redraw()
 

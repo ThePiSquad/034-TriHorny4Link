@@ -88,7 +88,7 @@ func set_size_level(level: int) -> void:
 	if shape_drawer:
 		_initialize_shape()
 	
-	print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed)
+	#print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed)
 
 func _ready() -> void:
 	super._ready()
@@ -106,7 +106,7 @@ func _ready() -> void:
 	if random_initial_rotation and shape_drawer:
 		var random_angle = randf_range(0.0, 360.0)
 		shape_drawer.rotation_degrees = random_angle
-		print("敌人随机旋转角度: ", random_angle, " 度")
+		#print("敌人随机旋转角度: ", random_angle, " 度")
 	
 	# 初始化Crystal位置
 	_crystal_position = _get_crystal_position()
@@ -158,7 +158,7 @@ func _check_barrier_validity() -> void:
 		# 检查屏障是否在场景树中
 		if not _current_barrier.is_inside_tree():
 			# 屏障已被删除，恢复移动
-			print("屏障已被删除，恢复移动")
+			#print("屏障已被删除，恢复移动")
 			_current_barrier = null
 			_blocked_by_barrier = false
 			# 攻击完成后重新规划路径
@@ -174,7 +174,7 @@ func _check_barrier_validity() -> void:
 		if _current_barrier.has_method("get_health"):
 			if _current_barrier.get_health() <= 0:
 				# 屏障已被摧毁，恢复移动
-				print("屏障生命值为0，恢复移动")
+				#print("屏障生命值为0，恢复移动")
 				_current_barrier = null
 				_blocked_by_barrier = false
 				# 攻击完成后重新规划路径
@@ -218,7 +218,7 @@ func _try_avoid_barrier() -> void:
 	"""尝试寻找绕过屏障的路径"""
 	# 检查是否达到最大尝试次数
 	if _avoid_attempts >= max_avoid_attempts:
-		print("达到最大绕行尝试次数，开始攻击屏障")
+		#print("达到最大绕行尝试次数，开始攻击屏障")
 		_avoid_attempts = 0
 		_is_avoiding = false
 		return
@@ -226,7 +226,7 @@ func _try_avoid_barrier() -> void:
 	# 获取Crystal位置
 	_crystal_position = _get_crystal_position()
 	if _crystal_position == Vector2(114514,1919810):
-		print("未找到Crystal，无法进行避障")
+		#print("未找到Crystal，无法进行避障")
 		return
 	
 	# 生成可能的绕行方向
@@ -248,7 +248,7 @@ func _try_avoid_barrier() -> void:
 	
 	if best_direction:
 		# 找到有效路径，开始绕行
-		print("找到绕行路径，方向: ", best_direction)
+		#print("找到绕行路径，方向: ", best_direction)
 		_is_avoiding = true
 		_avoid_attempts = 0
 		# 绕行时不攻击屏障
@@ -256,7 +256,7 @@ func _try_avoid_barrier() -> void:
 		_blocked_by_barrier = false
 	else:
 		# 没有找到路径，增加尝试次数
-		print("未找到绕行路径，尝试次数: ", _avoid_attempts + 1)
+		#print("未找到绕行路径，尝试次数: ", _avoid_attempts + 1)
 		_avoid_attempts += 1
 
 func _continue_avoidance(original_direction: Vector2) -> void:
@@ -267,7 +267,7 @@ func _continue_avoidance(original_direction: Vector2) -> void:
 	# 检查直接路径是否清除
 	if _is_path_clear(global_position + crystal_dir * check_distance):
 		# 直接路径清除，结束绕行
-		print("直接路径清除，结束绕行")
+		#print("直接路径清除，结束绕行")
 		_is_avoiding = false
 		_avoid_attempts = 0
 		return
@@ -357,7 +357,7 @@ func on_barrier_hit(barrier: Node2D) -> void:
 	if _barrier_hit_cooldown > 0:
 		return
 	
-	print("敌人被屏障阻挡")
+	#print("敌人被屏障阻挡")
 	_blocked_by_barrier = true
 	_current_barrier = barrier
 	_barrier_hit_cooldown = 0.5  # 冷却时间0.5秒
@@ -372,7 +372,7 @@ func on_barrier_hit(barrier: Node2D) -> void:
 
 func _on_barrier_destroyed(source: Node) -> void:
 	"""屏障被摧毁时的回调"""
-	print("屏障被摧毁信号触发")
+	#print("屏障被摧毁信号触发")
 	_current_barrier = null
 	_blocked_by_barrier = false
 	_attack_priority = false
@@ -385,7 +385,7 @@ func _attack_barrier(barrier: Node2D) -> void:
 	"""攻击屏障"""
 	if barrier and barrier.has_method("take_damage"):
 		barrier.take_damage(attack_damage, self)
-		print("敌人攻击屏障，造成伤害: ", attack_damage)
+		#print("敌人攻击屏障，造成伤害: ", attack_damage)
 
 func _update_path_planning(delta: float) -> void:
 	"""更新路径规划"""
@@ -393,7 +393,7 @@ func _update_path_planning(delta: float) -> void:
 	if _last_path_update >= _path_update_interval:
 		_last_path_update = 0.0
 		# 定期更新Crystal位置
-		_update_crystal_position()
+		#_update_crystal_position()
 		# 更新路径（如果不在攻击优先级状态）
 		if not _attack_priority:
 			_update_path()
@@ -402,20 +402,20 @@ func _handle_attack_priority() -> void:
 	"""处理攻击优先级"""
 	# 如果正在攻击屏障，设置攻击优先级
 	if _current_barrier and not _attack_priority:
-		print("设置攻击优先级，目标: ", _current_barrier.name)
+		#print("设置攻击优先级，目标: ", _current_barrier.name)
 		_attack_priority = true
 		_priority_target = _current_barrier
 	# 如果屏障已经消失，解除攻击优先级
 	if _attack_priority and not _current_barrier:
-		print("屏障已消失，解除攻击优先级")
+		#print("屏障已消失，解除攻击优先级")
 		_attack_priority = false
 		_priority_target = null
 
 func _update_crystal_position() -> void:
 	"""更新Crystal位置"""
 	_crystal_position = _get_crystal_position()
-	if _crystal_position != Vector2(114514, 1919810):
-		print("更新Crystal位置: ", _crystal_position)
+	#if _crystal_position != Vector2(114514, 1919810):
+		#print("更新Crystal位置: ", _crystal_position)
 
 # A*寻路相关方法
 class PathNode:
@@ -571,8 +571,8 @@ func _update_path() -> void:
 	# 更新路径可视化
 	_update_path_visualization()
 	
-	if _current_path.size() == 0:
-		print("未找到路径")
+	#if _current_path.size() == 0:
+		#print("未找到路径")
 
 func _update_path_visualization() -> void:
 	"""更新路径可视化"""

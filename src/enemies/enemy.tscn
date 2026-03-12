@@ -9,6 +9,7 @@ script = ExtResource("1_a8hw6")
 move_speed = 100.0
 attack_damage = 10.0
 enemy_size = Vector2(64, 64)
+size_level = 1
 random_initial_rotation = false
 check_distance = 256.0
 max_avoid_attempts = 3

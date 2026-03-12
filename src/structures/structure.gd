@@ -120,6 +120,7 @@ func _ready() -> void:
 	update.emit()
 	if shape_drawer:
 		shape_drawer.fill_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
+		shape_drawer.stroke_color = shape_drawer.fill_color.lightened(0.3)
 	call_deferred("_setup_input_handling")
 
 func _setup_input_handling() -> void:

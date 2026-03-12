@@ -43,6 +43,7 @@ script = ExtResource("7_jvefd")
 [node name="EnemyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
 enemy_list = Array[PackedScene]([ExtResource("9_eemcn"), ExtResource("10_eemcn")])
+spawn_interval = 1.0
 
 [node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera", "resource_manager")]
 script = ExtResource("9_input")
