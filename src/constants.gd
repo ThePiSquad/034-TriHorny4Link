@@ -97,14 +97,14 @@ const STRUCTURE_LAYER: int = 2  # 结构层
 const ENEMY_LAYER: int = 4      # 敌人层
 
 static var COLOR_MAP = {
-	Enums.ColorType.WHITE: Color.WHITE,
-	Enums.ColorType.BLACK: Color.BLACK,
-	Enums.ColorType.RED: Color("ff4545ff"),
-	Enums.ColorType.BLUE: Color("4587ffff"),
-	Enums.ColorType.YELLOW: Color("ffde45ff"),
+	Enums.ColorType.WHITE: Color("#CCCCCCFF"),
+	Enums.ColorType.BLACK: Color("#444444ff"),
+	Enums.ColorType.RED: Color("#ff4545ff"),
+	Enums.ColorType.BLUE: Color("#4587ffff"),
+	Enums.ColorType.YELLOW: Color("#ffde45ff"),
 	Enums.ColorType.GREEN: Color("#62B245ff"),
-	Enums.ColorType.ORANGE: Color("FF9225ff"),
-	Enums.ColorType.PURPLE: Color("#A245A2"),
+	Enums.ColorType.ORANGE: Color("#FF9225ff"),
+	Enums.ColorType.PURPLE: Color("#A245A2ff"),
 }
 
 static func get_color(type: Enums.ColorType) -> Color:
