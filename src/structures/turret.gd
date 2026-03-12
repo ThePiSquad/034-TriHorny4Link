@@ -3,6 +3,7 @@ class_name Turret
 
 var bullet_scene: PackedScene = preload("res://src/bullets/bullet.tscn")
 var homing_bullet_scene: PackedScene = preload("res://src/bullets/homing_bullet.tscn")
+var magic_bullet_scene: PackedScene = preload("res://src/bullets/magic_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -21,6 +22,11 @@ var shotgun_angle_spread: float = 15.0
 var homing_enabled: bool = false
 var homing_detection_range: float = 150.0
 var homing_turn_speed: float = 5.0
+
+# 魔法子弹配置
+var magic_enabled: bool = false
+var magic_beam_width: float = 8.0
+var magic_beam_duration: float = 0.2
 
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
@@ -90,7 +96,9 @@ func _get_angle_to_target(target_position: Vector2) -> float:
 func shot() -> void:
 	var base_angle = _get_angle_to_target(target.global_position) - PI / 2
 	
-	if shotgun_enabled and shotgun_count > 1:
+	if magic_enabled and target:
+		_fire_magic_bullet()
+	elif shotgun_enabled and shotgun_count > 1:
 		_fire_shotgun(base_angle)
 	else:
 		_fire_single_bullet(base_angle)
@@ -130,6 +138,24 @@ func _fire_shotgun(base_angle: float) -> void:
 		var angle = start_angle + angle_spread_rad * i
 		_fire_single_bullet(angle)
 
+func _fire_magic_bullet() -> void:
+	if not target or not magic_bullet_scene:
+		return
+	
+	var bullet = magic_bullet_scene.instantiate()
+	if not bullet or not bullet is MagicBullet:
+		return
+	
+	var start_pos = global_position
+	var target_pos = target.global_position
+	
+	bullet.set_target(target, start_pos, target_pos)
+	bullet.init(Vector2.ZERO, int(bullet_damage), magic_beam_duration, color)
+	
+	# 魔法子弹不需要位置，它会根据start_pos和target_pos绘制光束
+	bullet.global_position = Vector2.ZERO
+	get_parent().add_child(bullet)
+
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
 	fire_rate = config.get("fire_rate", 1.0)
@@ -147,6 +173,11 @@ func _update_turret_attributes() -> void:
 	homing_enabled = config.get("homing_enabled", false)
 	homing_detection_range = config.get("homing_detection_range", 150.0)
 	homing_turn_speed = config.get("homing_turn_speed", 5.0)
+	
+	# 魔法子弹配置
+	magic_enabled = config.get("magic_enabled", false)
+	magic_beam_width = config.get("magic_beam_width", 8.0)
+	magic_beam_duration = config.get("magic_beam_duration", 0.2)
 	
 	_update_detection_range()
 
