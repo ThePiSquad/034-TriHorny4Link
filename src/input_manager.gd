@@ -12,6 +12,7 @@ signal mode_changed(mode: InputMode)
 @export var placement_preview: PlacementPreview
 @export var hud: HUD
 @export var camera: Camera2D
+@export var resource_manager: ResourceManager
 
 var current_mode: InputMode = InputMode.PLACEMENT
 var selected_structure_type: Enums.StructureType = Enums.StructureType.TURRET
@@ -212,9 +213,14 @@ func _try_place() -> void:
 	if not structure_manager or not _is_selection_active():
 		return
 	
+	if not _can_afford_structure():
+		return
+	
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
-	structure_manager.spawn(selected_structure_type, grid_coord, selected_color_type)
+	
+	if structure_manager.spawn(selected_structure_type, grid_coord, selected_color_type):
+		_consume_resources()
 
 func _try_remove() -> void:
 	if not structure_manager:
@@ -223,6 +229,50 @@ func _try_remove() -> void:
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
 	structure_manager.remove(grid_coord)
+
+func _can_afford_structure() -> bool:
+	if not resource_manager:
+		return true
+	
+	match selected_structure_type:
+		Enums.StructureType.MONO_CRYSTAL:
+			match selected_color_type:
+				Enums.ColorType.RED:
+					return resource_manager.has_enough_resources("red", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+				Enums.ColorType.BLUE:
+					return resource_manager.has_enough_resources("blue", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+				Enums.ColorType.YELLOW:
+					return resource_manager.has_enough_resources("yellow", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+				_:
+					return true
+		Enums.StructureType.CONDUIT, Enums.StructureType.TURRET:
+			return resource_manager.has_enough_resources_all(
+				Constants.ResourceConstants.CONDUIT_COST,
+				Constants.ResourceConstants.CONDUIT_COST,
+				Constants.ResourceConstants.CONDUIT_COST
+			)
+		_:
+			return true
+
+func _consume_resources() -> void:
+	if not resource_manager:
+		return
+	
+	match selected_structure_type:
+		Enums.StructureType.MONO_CRYSTAL:
+			match selected_color_type:
+				Enums.ColorType.RED:
+					resource_manager.consume_resources("red", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+				Enums.ColorType.BLUE:
+					resource_manager.consume_resources("blue", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+				Enums.ColorType.YELLOW:
+					resource_manager.consume_resources("yellow", Constants.ResourceConstants.MONO_CRYSTAL_COST)
+		Enums.StructureType.CONDUIT, Enums.StructureType.TURRET:
+			resource_manager.consume_resources_all(
+				Constants.ResourceConstants.CONDUIT_COST,
+				Constants.ResourceConstants.CONDUIT_COST,
+				Constants.ResourceConstants.CONDUIT_COST
+			)
 
 func set_selected_structure_type(type: Enums.StructureType) -> void:
 	selected_structure_type = type

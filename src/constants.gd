@@ -20,6 +20,14 @@ const ENERGY_DECAY_PER_TILE: int = 1
 # 最大能量传播距离
 const MAX_ENERGY_RANGE: int = 10
 
+# 资源系统常量
+class ResourceConstants:
+	const PRODUCTION_RATE: float = 2.0  # 每秒生产资源量
+	const MAX_STORAGE: int = 100  # 最大存储上限
+	const MONO_CRYSTAL_COST: int = 10  # 单色水晶消耗
+	const CONDUIT_COST: int = 2  # 导管消耗（每种颜色）
+	const TURRET_COST: int = 4  # 炮塔消耗（每种颜色）
+
 # 相机相关常量
 class CameraConstants:
 	const ZOOM_SPEED: float = 0.1
