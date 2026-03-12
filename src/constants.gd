@@ -96,7 +96,10 @@ static var TURRET_CONFIG = {
 		"bullet_speed": 550.0,
 		"bullet_damage": 25.0,
 		"detection_range": 8 * grid_size,
-		"bullet_lifetime": 2.0
+		"bullet_lifetime": 2.0,
+		"homing_enabled": true,
+		"homing_detection_range": 150.0,
+		"homing_turn_speed": 5.0
 	},
 	Enums.ColorType.ORANGE: {
 		"fire_rate": 0.5,

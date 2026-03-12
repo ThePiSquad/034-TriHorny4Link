@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dhoming001"]
+
+[ext_resource type="Script" path="res://src/bullets/homing_bullet.gd" id="1_homing"]
+[ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="2_drawer"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_homing"]
+radius = 8.0
+
+[node name="HomingBullet" type="Node2D"]
+script = ExtResource("1_homing")
+
+[node name="ShapeDrawer" type="Node2D" parent="."]
+script = ExtResource("2_drawer")
+shape_type = 0
+shape_size = Vector2(16, 16)
+fill_color = Color(0, 1, 0.5, 1)
+stroke_enabled = false
+
+[node name="HitArea2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea2D"]
+shape = SubResource("CircleShape2D_homing")
+
+[connection signal="area_entered" from="HitArea2D" to="." method="_on_hit_area_2d_area_entered"]

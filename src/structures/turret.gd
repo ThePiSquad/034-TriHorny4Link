@@ -2,6 +2,7 @@ extends EnergyTransmitter
 class_name Turret
 
 var bullet_scene: PackedScene = preload("res://src/bullets/bullet.tscn")
+var homing_bullet_scene: PackedScene = preload("res://src/bullets/homing_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -15,6 +16,11 @@ var rotation_speed: float = 5.0
 var shotgun_enabled: bool = false
 var shotgun_count: int = 1
 var shotgun_angle_spread: float = 15.0
+
+# 追踪子弹配置
+var homing_enabled: bool = false
+var homing_detection_range: float = 150.0
+var homing_turn_speed: float = 5.0
 
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
@@ -82,9 +88,6 @@ func _get_angle_to_target(target_position: Vector2) -> float:
 	return angle + PI / 2
 
 func shot() -> void:
-	if not bullet_scene:
-		return
-	
 	var base_angle = _get_angle_to_target(target.global_position) - PI / 2
 	
 	if shotgun_enabled and shotgun_count > 1:
@@ -96,7 +99,13 @@ func shot() -> void:
 	fire_timer = 1.0 / fire_rate
 
 func _fire_single_bullet(angle: float) -> void:
-	var bullet: Bullet = bullet_scene.instantiate()
+	var bullet: Node2D
+	
+	if homing_enabled and homing_bullet_scene:
+		bullet = homing_bullet_scene.instantiate()
+	else:
+		bullet = bullet_scene.instantiate()
+	
 	if not bullet:
 		return
 	
@@ -104,7 +113,13 @@ func _fire_single_bullet(angle: float) -> void:
 	var bullet_velocity = direction * bullet_speed
 	
 	bullet.global_position = global_position + direction * 32
-	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	
+	if bullet is HomingBullet:
+		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+		bullet.set_homing_config(true, homing_detection_range, homing_turn_speed)
+	elif bullet is Bullet:
+		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	
 	get_parent().add_child(bullet)
 
 func _fire_shotgun(base_angle: float) -> void:
@@ -127,6 +142,11 @@ func _update_turret_attributes() -> void:
 	shotgun_enabled = config.get("shotgun_enabled", false)
 	shotgun_count = config.get("shotgun_count", 1)
 	shotgun_angle_spread = config.get("shotgun_angle_spread", 15.0)
+	
+	# 追踪子弹配置
+	homing_enabled = config.get("homing_enabled", false)
+	homing_detection_range = config.get("homing_detection_range", 150.0)
+	homing_turn_speed = config.get("homing_turn_speed", 5.0)
 	
 	_update_detection_range()
 
