@@ -1,6 +1,7 @@
 class_name StructureManager extends Node2D
 
 var structures: Dictionary[Vector2i, Structure]
+var connection_manager: ConnectionManager
 
 var crystal_scene: PackedScene = preload("res://src/structures/crystal.tscn")
 var conduit_scene: PackedScene = preload("res://src/structures/conduit.tscn")
@@ -9,6 +10,9 @@ var mono_crystal_scene: PackedScene = preload("res://src/structures/mono_crystal
 
 func _ready() -> void:
 	structures = {}
+	# 创建连接管理器
+	connection_manager = ConnectionManager.new()
+	add_child(connection_manager)
 
 func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorType = Enums.ColorType.WHITE) -> bool:
 	var pos_key = Vector2i(pos.x, pos.y)
@@ -75,6 +79,9 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 		_update_neighbor_connections(pos, structure)
 		structure.update_energy_level()
 		
+		# 更新相邻连线的颜色
+		_update_neighbor_connections_color(pos, structure)
+		
 		return true
 	else:
 		return false
@@ -94,6 +101,9 @@ func remove(pos: GridCoord) -> bool:
 	
 	if structure.is_queued_for_deletion():
 		return false
+	
+	# 移除相关连接
+	_remove_structure_connections(structure)
 	
 	structure.destroyed.emit()
 	structures.erase(pos_key)
@@ -232,3 +242,101 @@ func can_place_turret(pos: GridCoord) -> bool:
 			return false
 	
 	return true
+
+func _update_neighbor_connections_color(pos: GridCoord, structure: Structure) -> void:
+	"""更新相邻连线的颜色"""
+	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
+	var south = structures.get(Vector2i(pos.south().x, pos.south().y))
+	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
+	var east = structures.get(Vector2i(pos.east().x, pos.east().y))
+	
+	# 验证邻居的有效性
+	if north != null and not is_instance_valid(north):
+		north = null
+	if south != null and not is_instance_valid(south):
+		south = null
+	if west != null and not is_instance_valid(west):
+		west = null
+	if east != null and not is_instance_valid(east):
+		east = null
+	
+	# 更新与邻居的连接
+	if north and is_instance_valid(north):
+		connection_manager.add_connection(structure, north)
+		connection_manager.update_connection_colors(structure)
+		connection_manager.update_connection_colors(north)
+	if south and is_instance_valid(south):
+		connection_manager.add_connection(structure, south)
+		connection_manager.update_connection_colors(structure)
+		connection_manager.update_connection_colors(south)
+	if west and is_instance_valid(west):
+		connection_manager.add_connection(structure, west)
+		connection_manager.update_connection_colors(structure)
+		connection_manager.update_connection_colors(west)
+	if east and is_instance_valid(east):
+		connection_manager.add_connection(structure, east)
+		connection_manager.update_connection_colors(structure)
+		connection_manager.update_connection_colors(east)
+
+func _update_connections(pos: GridCoord, structure: Structure) -> void:
+	"""更新建筑的连接"""
+	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
+	var south = structures.get(Vector2i(pos.south().x, pos.south().y))
+	var west = structures.get(Vector2i(pos.west().x, pos.west().y))
+	var east = structures.get(Vector2i(pos.east().x, pos.east().y))
+	
+	if north and is_instance_valid(north):
+		connection_manager.add_connection(structure, north)
+	if south and is_instance_valid(south):
+		connection_manager.add_connection(structure, south)
+	if west and is_instance_valid(west):
+		connection_manager.add_connection(structure, west)
+	if east and is_instance_valid(east):
+		connection_manager.add_connection(structure, east)
+
+func _remove_structure_connections(structure: Structure) -> void:
+	"""移除建筑的所有连接"""
+	# 移除与邻居的连接
+	if structure.north and is_instance_valid(structure.north):
+		connection_manager.remove_connection(structure, structure.north)
+	if structure.south and is_instance_valid(structure.south):
+		connection_manager.remove_connection(structure, structure.south)
+	if structure.west and is_instance_valid(structure.west):
+		connection_manager.remove_connection(structure, structure.west)
+	if structure.east and is_instance_valid(structure.east):
+		connection_manager.remove_connection(structure, structure.east)
+
+func update_all_connections() -> void:
+	"""更新所有连接"""
+	connection_manager.update_connections()
+
+func update_chain_connections(structure: Structure) -> void:
+	"""手动触发链路上的所有连线更新"""
+	_update_chain_connections(structure)
+
+func _update_chain_connections(start_structure: Structure) -> void:
+	"""更新链路上的所有连线"""
+	if not start_structure or not is_instance_valid(start_structure):
+		return
+	
+	# 使用BFS遍历整个链路
+	var visited: Array[Structure] = []
+	var queue: Array[Structure] = [start_structure]
+	
+	while queue.size() > 0:
+		var current = queue.pop_front()
+		
+		# 检查是否已访问
+		if current in visited:
+			continue
+		
+		visited.append(current)
+		
+		# 获取所有邻居
+		var neighbors = [current.north, current.south, current.west, current.east]
+		
+		for neighbor in neighbors:
+			if neighbor and is_instance_valid(neighbor) and not (neighbor in visited):
+				# 更新连接
+				connection_manager.add_connection(current, neighbor)
+				queue.append(neighbor)

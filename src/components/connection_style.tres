@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ConnectionStyle" format=3 uid="uid://bgfey68r1l30a"]
+
+[ext_resource type="Script" path="res://src/components/connection_style.gd" id="1_bxq64"]
+
+[resource]
+script = ExtResource("1_bxq64")
+line_width = 4.0
+line_color = Color(1, 1, 1, 1)
+energy_speed = 200.0
+energy_intensity = 1.0

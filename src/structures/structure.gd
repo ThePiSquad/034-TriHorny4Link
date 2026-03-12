@@ -3,6 +3,8 @@ extends Damageable
 
 signal update
 signal destroyed
+# 信号：颜色改变时发射
+signal color_changed(color_type: Enums.ColorType)
 
 var energy_level: EnergyLevel = EnergyLevel.new()
 
@@ -16,10 +18,15 @@ var _color: Enums.ColorType = Enums.ColorType.WHITE
 	get():
 		return _color
 	set(s):
+		var old_color = _color
 		_color = s
 		_sync_color_to_energy_level(s)
 		if is_node_ready() and shape_drawer:
 			shape_drawer.fill_color = Constants.COLOR_MAP[s]
+		
+		# 如果颜色改变了，发射信号
+		if old_color != s:
+			color_changed.emit(s)
 
 var north: Structure = null:
 	set(s):

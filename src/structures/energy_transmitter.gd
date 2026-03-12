@@ -196,6 +196,9 @@ func _set_color(color_type: Enums.ColorType) -> void:
 		var base_color :Color= Constants.COLOR_MAP.get(color_type, Color.WHITE)
 		shape_drawer.fill_color = base_color
 		shape_drawer.queue_redraw()
+	
+	# 发射颜色改变信号
+	color_changed.emit(color_type)
 
 #func _process(_delta: float) -> void:
 	## 可视化能量效果
