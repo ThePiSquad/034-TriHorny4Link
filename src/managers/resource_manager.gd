@@ -4,9 +4,9 @@ extends Node
 signal resource_changed
 
 var resources: Dictionary = {
-	"red": 0,
-	"blue": 0,
-	"yellow": 0
+	"red": 20,
+	"blue": 20,
+	"yellow": 20
 }
 
 var max_storage: int = Constants.ResourceConstants.MAX_STORAGE
