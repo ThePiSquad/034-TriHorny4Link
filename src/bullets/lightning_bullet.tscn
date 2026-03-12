@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ccd1yehh8kg0r"]
+
+[ext_resource type="Script" uid="uid://cxsbxoia5fklw" path="res://src/bullets/lightning_bullet.gd" id="1_lightning"]
+[ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="2_drawer"]
+
+[node name="LightningBullet" type="Node2D" unique_id=1209777403]
+script = ExtResource("1_lightning")
+
+[node name="ShapeDrawer" type="Node2D" parent="." unique_id=741123525]
+script = ExtResource("2_drawer")
+fill_enabled = false
+metadata/_custom_type_script = "uid://bbx5xpwg4my7w"

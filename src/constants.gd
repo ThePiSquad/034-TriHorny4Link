@@ -109,7 +109,10 @@ static var TURRET_CONFIG = {
 		"bullet_speed": 550.0,
 		"bullet_damage": 22.0,
 		"detection_range": 6 * grid_size,
-		"bullet_lifetime": 1.0
+		"bullet_lifetime": 1.0,
+		"lightning_enabled": true,
+		"lightning_chain_range": 384.0,
+		"lightning_max_chain": 3
 	},
 	Enums.ColorType.PURPLE: {
 		"fire_rate": 0.5,
