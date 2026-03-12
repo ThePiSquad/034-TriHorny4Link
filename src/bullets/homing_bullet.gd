@@ -11,6 +11,12 @@ var _target: Node2D = null
 var _retarget_timer: float = 0.0
 var _speed: float = 0.0
 
+# 尾巴视觉效果
+var _trail_points: Array[Vector2] = []
+var _trail_max_length: int = 8
+var _trail_update_interval: float = 0.03
+var _trail_timer: float = 0.0
+
 func _ready() -> void:
 	super._ready()
 	_speed = _velocity.length()
@@ -27,11 +33,41 @@ func _process(delta: float) -> void:
 		_update_target(delta)
 		_apply_homing(delta)
 	
+	_update_trail(delta)
+	
 	position += _velocity * delta
 	_lifetime -= delta
 	
 	if _lifetime <= 0:
 		destroy()
+
+func _update_trail(delta: float) -> void:
+	_trail_timer -= delta
+	
+	if _trail_timer <= 0:
+		_trail_timer = _trail_update_interval
+		_trail_points.push_front(global_position)
+		
+		if _trail_points.size() > _trail_max_length:
+			_trail_points.pop_back()
+	
+	queue_redraw()
+
+func _draw() -> void:
+	if _trail_points.size() < 2:
+		return
+	
+	var local_points: Array[Vector2] = []
+	for point in _trail_points:
+		local_points.append(to_local(point))
+	
+	for i in range(local_points.size() - 1):
+		var alpha = float(local_points.size() - i) / float(local_points.size())
+		var width = 4.0 * alpha
+		var color = shape_drawer.fill_color
+		color.a = alpha * 0.6
+		
+		draw_line(local_points[i], local_points[i + 1], color, width, true)
 
 func _update_target(delta: float) -> void:
 	_retarget_timer -= delta
