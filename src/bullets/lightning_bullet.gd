@@ -10,7 +10,7 @@ var beam_fade_out: float = 0.15
 # 连锁闪电配置
 var chain_range: float = 384.0
 var max_chain_targets: int = 3
-var damage_multipliers: Array[float] = [1.0, 0.7, 0.4]
+var damage_multipliers: Array[float] = [1.0, 0.75, 0.5, 0.25, 0.1]
 
 var _target: Node2D
 var _beam_timer: float = 0.0
