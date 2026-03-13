@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cif4jbm8x54r"]
+
+[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="2_texture"]
+
+[sub_resource type="Curve" id="Curve_uk8yn"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_eh8ue"]
+curve = SubResource("Curve_uk8yn")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_a4bk3"]
+particle_flag_disable_z = true
+angle_min = 1.0728835e-05
+angle_max = 90.000015
+spread = 180.0
+flatness = 1.0
+initial_velocity_min = 570.0
+initial_velocity_max = 630.0
+gravity = Vector3(0, 0, 0)
+damping_min = 50.000004
+damping_max = 150.0
+scale_min = 0.049999997
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_eh8ue")
+
+[node name="HitPtc" type="GPUParticles2D" unique_id=694230983]
+emitting = false
+texture = ExtResource("2_texture")
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_a4bk3")
+script = ExtResource("1_script")

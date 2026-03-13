@@ -40,6 +40,9 @@ var death_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.
 var base_particle_amount: int = 24  # 基础粒子数量
 var shape_influence_factor : int = 2
 
+# 受击粒子特效相关
+var hit_particle_scene: PackedScene = preload("res://src/particles/hit_ptc.tscn")
+
 # 屏障相关
 var _blocked_by_barrier: bool = false
 var _barrier_hit_cooldown: float = 0.0
@@ -302,6 +305,38 @@ func _on_hit(source: Node) -> void:
 		var bullet = source as Bullet
 		if _is_kinetic_bullet(bullet):
 			_apply_knockback(bullet)
+		
+		# 生成受击粒子特效
+		_spawn_hit_particle(bullet)
+
+func _spawn_hit_particle(bullet: Bullet) -> void:
+	"""生成受击粒子特效"""
+	if not hit_particle_scene:
+		return
+	
+	# 实例化粒子特效
+	var hit_particle = hit_particle_scene.instantiate()
+	if hit_particle:
+		# 设置粒子位置为敌人位置
+		hit_particle.global_position = global_position
+		
+		# 获取子弹颜色并设置粒子颜色
+		if bullet.has_method("get_bullet_type"):
+			var bullet_color_type = bullet.get_bullet_type()
+			var bullet_color = Constants.COLOR_MAP.get(bullet_color_type, Color.WHITE)
+			
+			# 设置粒子系统的颜色
+			_set_particle_color(hit_particle, bullet_color)
+		
+		# 添加到场景中
+		get_tree().current_scene.add_child(hit_particle)
+
+func _set_particle_color(particle: Node, color: Color) -> void:
+	"""设置粒子系统的颜色"""
+	if particle is GPUParticles2D:
+		var material = particle.process_material
+		if material is ParticleProcessMaterial:
+			material.color = color
 
 func _is_kinetic_bullet(bullet: Bullet) -> bool:
 	"""检查是否是动能子弹"""

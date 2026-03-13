@@ -35,6 +35,9 @@ func set_bullet_type(value: Enums.ColorType) -> void:
 func set_is_active(value: bool) -> void:
 	_is_active = value
 
+func get_bullet_type() -> Enums.ColorType:
+	return _bullet_type
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	_velocity = velocity_
 	_attack_damage = damage
