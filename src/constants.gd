@@ -35,10 +35,10 @@ class CameraConstants:
 	const MAX_ZOOM: float = 2.0
 	const MOVE_SPEED: float = 500.0
 	const ACCELERATION: float = 5.0
-	const MIN_X: float = -1000.0
-	const MAX_X: float = 1000.0
-	const MIN_Y: float = -1000.0
-	const MAX_Y: float = 1000.0
+	const MIN_X: float = -1024.0
+	const MAX_X: float = 1024.0
+	const MIN_Y: float = -1024.0
+	const MAX_Y: float = 1024.0
 
 # 输入相关常量
 class InputConstants:

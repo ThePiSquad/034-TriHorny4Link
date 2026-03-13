@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://tbmaen6cqwmv"]
+
+[ext_resource type="Script" uid="uid://j3besywvgels" path="res://src/managers/background_manager.gd" id="1_bxq64"]
+
+[node name="BackgroundManager" type="Node2D" unique_id=2093951831]
+script = ExtResource("1_bxq64")
