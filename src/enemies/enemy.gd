@@ -272,7 +272,15 @@ func _update_hit_effect(delta: float) -> void:
 		_knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, delta * 5.0)
 
 func _on_kinetic_hit(bullet: Bullet) -> void:
-	"""受到动能子弹攻击时的处理"""
+	"""受到动能子弹攻击时的处理（已废弃，使用_on_hit 统一处理）"""
+	pass
+
+func _on_magic_hit(bullet: MagicBullet) -> void:
+	"""受到魔法子弹攻击时的处理（已废弃，使用_on_hit 统一处理）"""
+	pass
+
+func _on_hit(source: Node) -> void:
+	"""受到任何伤害时的统一处理"""
 	if _is_teleporting:
 		return
 	
@@ -280,6 +288,24 @@ func _on_kinetic_hit(bullet: Bullet) -> void:
 	_hit_flash_timer = 0.0
 	_hit_flash_count = 0
 	
+	# 立即开始闪烁
+	shape_drawer.fill_color = Color.WHITE
+	
+	# 如果是动能子弹，添加击退效果
+	if source is Bullet:
+		var bullet = source as Bullet
+		if _is_kinetic_bullet(bullet):
+			_apply_knockback(bullet)
+
+func _is_kinetic_bullet(bullet: Bullet) -> bool:
+	"""检查是否是动能子弹"""
+	for attr in bullet.attributes:
+		if attr == Enums.BulletAttributes.KINETIC:
+			return true
+	return false
+
+func _apply_knockback(bullet: Bullet) -> void:
+	"""应用击退效果"""
 	# 计算击退方向（子弹飞行方向）
 	var knockback_direction = bullet.get_velocity().normalized()
 	
@@ -291,22 +317,6 @@ func _on_kinetic_hit(bullet: Bullet) -> void:
 	
 	var final_knockback = _knockback_force * size_multiplier
 	_knockback_velocity = knockback_direction * final_knockback
-	
-	# 立即开始闪烁
-	shape_drawer.fill_color = Color.WHITE
-
-func _on_magic_hit(bullet: MagicBullet) -> void:
-	"""受到魔法子弹攻击时的处理"""
-	if _is_teleporting:
-		return
-	
-	_is_hit = true
-	_hit_flash_timer = 0.0
-	_hit_flash_count = 0
-	
-	# 魔法子弹没有击退效果，只有闪烁效果
-	# 立即开始闪烁
-	shape_drawer.fill_color = Color.WHITE
 
 func _finish_hit_effect() -> void:
 	"""完成受击效果"""

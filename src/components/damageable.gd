@@ -44,9 +44,16 @@ func take_damage(amount: float, source: Node = null) -> void:
 	
 	_last_damage_source = source
 	current_health -= amount
+	
+	# 触发受击效果（如果有）
+	if has_method("_on_hit"):
+		_on_hit(source)
+	
 	if current_health <= 0.0:
 		_on_death()
 
+func _on_hit(_source:Node):
+	pass
 
 func get_health() -> float:
 	return current_health

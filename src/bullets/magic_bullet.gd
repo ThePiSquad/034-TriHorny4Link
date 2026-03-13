@@ -65,7 +65,3 @@ func _ready() -> void:
 	if _target and is_instance_valid(_target):
 		if _target.has_method("take_damage"):
 			_target.take_damage(_attack_damage, self)
-		
-		# 触发受击效果
-		if _target.has_method("_on_magic_hit"):
-			_target._on_magic_hit(self)

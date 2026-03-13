@@ -60,20 +60,7 @@ func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 	if body and body.is_in_group("enemy"):
 		if body.has_method("take_damage"):
 			body.take_damage(_attack_damage, self)
-		
-		# 检查是否是动能子弹，触发受击效果
-		if _is_kinetic_bullet():
-			if body.has_method("_on_kinetic_hit"):
-				body._on_kinetic_hit(self)
-		
 		destroy()
-
-func _is_kinetic_bullet() -> bool:
-	"""检查是否是动能子弹"""
-	for attr in attributes:
-		if attr == Enums.BulletAttributes.KINETIC:
-			return true
-	return false
 
 func destroy() -> void:
 	_is_active = false
