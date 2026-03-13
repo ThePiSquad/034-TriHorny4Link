@@ -77,24 +77,34 @@ func _update_from_style() -> void:
 
 func _determine_energy_source_and_target() -> void:
 	"""确定能量源和目标"""
-	# 检查是否有MonoCrystal
-	var start_is_mono = start_structure and is_instance_valid(start_structure) and start_structure.get_structure_type() == Enums.StructureType.MONO_CRYSTAL
-	var end_is_mono = end_structure and is_instance_valid(end_structure) and end_structure.get_structure_type() == Enums.StructureType.MONO_CRYSTAL
+	# 检查是否有 Crystal（能量源）
+	var start_is_crystal = start_structure and is_instance_valid(start_structure) and start_structure.get_structure_type() == Enums.StructureType.CRYSTAL
+	var end_is_crystal = end_structure and is_instance_valid(end_structure) and end_structure.get_structure_type() == Enums.StructureType.CRYSTAL
 	
-	if start_is_mono and not end_is_mono:
+	if start_is_crystal and not end_is_crystal:
+		# Crystal 是能量源，另一个建筑是能量目标
 		_energy_source = start_structure
 		_energy_target = end_structure
-	elif end_is_mono and not start_is_mono:
+	elif end_is_crystal and not start_is_crystal:
+		# Crystal 是能量源，另一个建筑是能量目标
 		_energy_source = end_structure
 		_energy_target = start_structure
 	else:
-		# 两个都是或都不是MonoCrystal，默认从start到end
+		# 两个都是或都不是 Crystal，默认从 start 到 end
 		_energy_source = start_structure
 		_energy_target = end_structure
 
 func _set_line_color() -> void:
 	"""设置连接线颜色"""
-	# 智能选择颜色：根据邻居的能量等级选择颜色
+	# 特殊情况：如果是 Crystal 到 MonoCrystal 的连接，使用 MonoCrystal 的颜色
+	if _energy_target and is_instance_valid(_energy_target):
+		if _energy_target.get_structure_type() == Enums.StructureType.MONO_CRYSTAL:
+			# 获取 MonoCrystal 的颜色
+			var mono_color_type = _energy_target.color
+			line_color = Constants.COLOR_MAP.get(mono_color_type, Color.WHITE)
+			return
+	
+	# 普通情况：智能选择颜色：根据邻居的能量等级选择颜色
 	var color_type = _determine_color_from_neighbors()
 	line_color = Constants.COLOR_MAP.get(color_type, Color.WHITE)
 

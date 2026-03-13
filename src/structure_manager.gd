@@ -82,6 +82,10 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 		# 更新相邻连线的颜色
 		_update_neighbor_connections_color(pos, structure)
 		
+		# 如果是 MonoCrystal，创建到 Crystal 的连接
+		if type == Enums.StructureType.MONO_CRYSTAL:
+			_create_connection_to_crystal(structure)
+		
 		# 生成放置粒子效果
 		_spawn_place_particle(structure)
 		
@@ -183,7 +187,7 @@ func get_structure(pos: GridCoord) -> Structure:
 func _has_enemy_nearby(pos: GridCoord) -> bool:
 	"""检查是否有敌人在目标位置附近"""
 	var world_pos = pos.to_world_coord()
-	var check_radius = Constants.grid_size * 1.5  # 检查半径为1.5个格子
+	var check_radius = Constants.grid_size * 1.5  # 检查半径为 1.5 个格子
 	
 	# 获取场景中的所有敌人
 	var enemies = get_tree().get_nodes_in_group("enemy")
@@ -194,6 +198,27 @@ func _has_enemy_nearby(pos: GridCoord) -> bool:
 				return true
 	
 	return false
+
+func _create_connection_to_crystal(mono_crystal: Structure) -> void:
+	"""创建 MonoCrystal 到 Crystal 的连接"""
+	# 获取所有 Crystal 建筑
+	var crystals = get_tree().get_nodes_in_group("crystal")
+	if crystals.is_empty():
+		return
+	
+	# 获取第一个有效的 Crystal
+	var crystal: Structure = null
+	for c in crystals:
+		if c and is_instance_valid(c) and c is Structure:
+			crystal = c
+			break
+	
+	if not crystal:
+		return
+	
+	# 创建连接
+	if connection_manager:
+		connection_manager.add_connection(mono_crystal, crystal)
 
 func _has_nearby_conduit(pos: GridCoord) -> bool:
 	"""检查指定位置周围上下左右是否存在conduit"""
