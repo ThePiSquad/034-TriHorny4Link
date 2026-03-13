@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b8gan7yolydrq"]
 
 [ext_resource type="Texture2D" uid="uid://c6gd2nu1t2b15" path="res://assets/particles/rect_particle.png" id="1_f87rr"]
+[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="2_u6wyu"]
 
 [sub_resource type="Curve" id="Curve_jarja"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -32,3 +33,4 @@ amount = 24
 texture = ExtResource("1_f87rr")
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_byfkj")
+script = ExtResource("2_u6wyu")
