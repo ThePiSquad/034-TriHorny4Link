@@ -8,6 +8,7 @@ radius = 8.0
 
 [node name="HomingBullet" type="Node2D" unique_id=1282499349]
 script = ExtResource("1_homing")
+attributes = Array[int]([0])
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=1558529561]
 script = ExtResource("2_drawer")

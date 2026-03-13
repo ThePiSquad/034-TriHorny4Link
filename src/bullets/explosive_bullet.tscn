@@ -8,6 +8,7 @@ radius = 12.0
 
 [node name="ExplosiveBullet" type="Node2D" unique_id=1267136871]
 script = ExtResource("1_explosive")
+attributes = Array[int]([0])
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=1117489534]
 script = ExtResource("2_drawer")

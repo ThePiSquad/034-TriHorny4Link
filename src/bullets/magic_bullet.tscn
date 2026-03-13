@@ -5,6 +5,7 @@
 
 [node name="MagicBullet" type="Node2D" unique_id=166809495]
 script = ExtResource("1_magic")
+attributes = Array[int]([1])
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=1550951227]
 script = ExtResource("2_drawer")
