@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b8rvgajsbmod6" path="res://src/enemies/enemy.gd" id="1_a8hw6"]
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
-[ext_resource type="Shader" uid="uid://c1wduup77o1i3" path="res://src/enemies/teleport_effect.gdshader" id="3_yk438"]
+[ext_resource type="Shader" uid="uid://c1wduup77o1i3" path="res://src/shader/teleport_effect.gdshader" id="3_yk438"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_abny1"]
 shader = ExtResource("3_yk438")
