@@ -47,6 +47,13 @@ var can_fire: bool = true
 # 失活状态
 var is_active: bool = false
 
+# 射击亮度提升效果
+var _is_firing_flash: bool = false
+var _firing_flash_duration: float = 0.15  # 亮度提升持续时间（秒）
+var _firing_flash_tween: Tween = null
+var _original_fill_color: Color = Color.WHITE
+var _original_stroke_color: Color = Color.WHITE
+
 @onready var detection_area: Area2D = $DetectionArea
 @onready var detection_shape: CollisionShape2D = $DetectionArea/CollisionShape2D
 
@@ -164,8 +171,36 @@ func shot() -> void:
 	else:
 		_fire_single_bullet(base_angle)
 	
+	# 触发亮度提升效果
+	_start_firing_flash()
+	
 	can_fire = false
 	fire_timer = 1.0 / fire_rate
+
+func _start_firing_flash() -> void:
+	"""启动射击亮度提升效果"""
+	if not shape_drawer:
+		return
+	
+	# 停止之前的补间动画
+	if _firing_flash_tween and _firing_flash_tween.is_valid():
+		_firing_flash_tween.kill()
+	
+	# 保存原始颜色
+	_original_fill_color = shape_drawer.fill_color
+	
+	# 计算目标颜色（提亮 50%）
+	var target_fill_color = _original_fill_color.lightened(0.5)
+	
+	# 创建补间动画
+	_firing_flash_tween = create_tween()
+	_firing_flash_tween.set_trans(Tween.TRANS_SINE)
+	_firing_flash_tween.set_ease(Tween.EASE_IN_OUT)
+	_firing_flash_tween.set_loops(1)
+	
+	# 补间动画：从原始颜色到提亮颜色，然后回到原始颜色
+	_firing_flash_tween.tween_property(shape_drawer, "fill_color", target_fill_color, _firing_flash_duration / 2.0)
+	_firing_flash_tween.tween_property(shape_drawer, "fill_color", _original_fill_color, _firing_flash_duration / 2.0)
 
 func _fire_single_bullet(angle: float) -> void:
 	var bullet: Node2D
