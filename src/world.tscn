@@ -13,7 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://b105um8got3cl" path="res://src/enemies/triangle_enemy.tscn" id="10_eemcn"]
 [ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="10_preview"]
 [ext_resource type="Script" uid="uid://bh7o0ibko5x6i" path="res://src/managers/resource_manager.gd" id="13_njovb"]
-[ext_resource type="PackedScene" uid="uid://bgfey68r1l30b" path="res://src/managers/background_manager.tscn" id="14_bg"]
+[ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="14_bg"]
+[ext_resource type="Script" uid="uid://dj73u0t4nipjs" path="res://src/managers/screen_shake_manager.gd" id="15_shake"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
 script = ExtResource("2_xlegt")
@@ -24,6 +25,10 @@ script = ExtResource("1_tp5op")
 state = SubResource("Resource_0qwtu")
 
 [node name="BackgroundManager" parent="." unique_id=1234567890 instance=ExtResource("14_bg")]
+
+[node name="ScreenShakeManager" type="Node" parent="." unique_id=2000000001 node_paths=PackedStringArray("camera")]
+script = ExtResource("15_shake")
+camera = NodePath("../Camera2D")
 
 [node name="StateManager" type="Node" parent="." unique_id=1854887110]
 unique_name_in_owner = true

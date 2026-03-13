@@ -83,6 +83,28 @@ func connect_neighbor(s: Structure) -> void:
 	if not s.destroyed.is_connected(self.on_neighbor_destroyed):
 		s.destroyed.connect(self.on_neighbor_destroyed)
 
+func _on_hit(source: Node) -> void:
+	"""受到任何伤害时的统一处理"""
+	# 触发屏幕抖动
+	_trigger_screen_shake()
+
+func _trigger_screen_shake() -> void:
+	"""触发屏幕抖动效果"""
+	var world = get_tree().get_first_node_in_group("world")
+	if world and world.has_node("ScreenShakeManager"):
+		var shake_manager = world.get_node("ScreenShakeManager")
+		if shake_manager and shake_manager.has_method("shake"):
+			# 根据建筑类型调整抖动强度
+			var intensity = 8.0
+			var duration = 0.3
+			
+			# CRYSTAL 受到攻击时抖动更强
+			if structure_type == Enums.StructureType.CRYSTAL:
+				intensity = 12.0
+				duration = 0.4
+			
+			shake_manager.shake(duration, intensity)
+
 func on_health_depleted() -> void:
 	var manager = get_parent()
 	if manager is StructureManager:

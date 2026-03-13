@@ -8,6 +8,7 @@ extends Node2D
 @onready var hud: HUD = $HUD
 @onready var camera: Camera2D = $Camera2D
 @onready var resource_manager: ResourceManager = $ResourceManager
+@onready var screen_shake_manager: ScreenShakeManager = $ScreenShakeManager
 
 func _ready() -> void:
 	# 连接 InputManager 的引用
@@ -23,6 +24,12 @@ func _ready() -> void:
 	# 连接资源管理器到 HUD
 	resource_manager.resource_changed.connect(_on_resource_changed)
 	_update_hud_resources()
+	
+	# 设置屏幕抖动管理器的相机引用
+	screen_shake_manager.camera = camera
+	
+	# 将 World 节点添加到 world 组
+	add_to_group("world")
 
 func _on_resource_changed() -> void:
 	_update_hud_resources()
