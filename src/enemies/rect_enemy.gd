@@ -9,4 +9,10 @@ func _initialize_shape() -> void:
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	super._on_hitbox_area_entered(area)
+
+func _setup_particle_texture(particle: GPUParticles2D) -> void:
+	"""设置矩形敌人的死亡粒子纹理"""
+	var texture = load("res://assets/particles/rect_particle.png")
+	if texture:
+		particle.texture = texture
 	

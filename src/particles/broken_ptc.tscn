@@ -15,17 +15,20 @@ angle_min = 1.0728835e-05
 angle_max = 90.000015
 spread = 180.0
 flatness = 1.0
-initial_velocity_min = 90.0
-initial_velocity_max = 150.0
+initial_velocity_min = 70.0
+initial_velocity_max = 170.0
 gravity = Vector3(0, 0, 0)
 damping_min = 50.000004
 damping_max = 150.0
-scale_min = 0.02
-scale_max = 0.14999999
+scale_min = 0.049999997
+scale_max = 0.25
+color = Color(0.93333334, 0.13333334, 0.13333334, 1)
 alpha_curve = SubResource("CurveTexture_uir4w")
 
 [node name="BrokenPtc" type="GPUParticles2D" unique_id=676788154]
-amount = 16
+emitting = false
+amount = 24
 texture = ExtResource("1_f87rr")
+one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_byfkj")

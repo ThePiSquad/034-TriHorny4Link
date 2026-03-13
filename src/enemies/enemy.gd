@@ -30,10 +30,14 @@ var _is_hit: bool = false  # 是否正在受击
 var _hit_flash_duration: float = 0.2  # 闪烁持续时间（秒）
 var _hit_flash_timer: float = 0.0  # 闪烁计时器
 var _hit_flash_count: int = 0  # 闪烁次数
-var _max_flash_count: int = 2  # 最大闪烁次数
+var _max_flash_count: int = 3  # 最大闪烁次数
 var _original_color: Color = Color.WHITE  # 原始颜色
 var _knockback_force: float = 200.0  # 击退力度
 var _knockback_velocity: Vector2 = Vector2.ZERO  # 击退速度
+
+# 死亡粒子特效相关
+var death_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.tscn")
+var base_particle_amount: int = 24  # 基础粒子数量
 
 # 屏障相关
 var _blocked_by_barrier: bool = false
@@ -164,12 +168,45 @@ func _initialize_teleport_effect() -> void:
 		_start_teleport()
 
 func _on_damageable_died(source: Node) -> void:
+	# 生成死亡粒子特效
+	_spawn_death_particle()
+	
 	# 断开屏障的死亡信号连接
 	if _current_barrier and _current_barrier.has_signal("died"):
 		if _current_barrier.died.is_connected(_on_barrier_destroyed):
 			_current_barrier.died.disconnect(_on_barrier_destroyed)
 	
 	queue_free()
+
+func _spawn_death_particle() -> void:
+	"""生成死亡粒子特效"""
+	if not death_particle_scene:
+		return
+	
+	var particle : GPUParticles2D = death_particle_scene.instantiate()
+	if not particle:
+		return
+	
+	# 设置粒子位置为敌人位置
+	particle.global_position = global_position
+	
+	# 根据敌人体型计算粒子数量
+	var size_multiplier = enemy_size.x / Constants.grid_size
+	particle.amount = int(base_particle_amount * size_multiplier)
+	
+	particle.one_shot = true
+	particle.emitting = true
+	
+	# 设置粒子纹理（由子类实现）
+	_setup_particle_texture(particle)
+	
+	# 添加到场景中
+	get_parent().add_child(particle)
+
+func _setup_particle_texture(particle: GPUParticles2D) -> void:
+	"""设置粒子纹理（由子类重写）"""
+	# 基类不设置纹理，由子类实现
+	pass
 
 func _process(delta: float) -> void:
 	# 更新传送效果（始终更新，即使在传送期间）
