@@ -25,6 +25,16 @@ var _teleport_duration: float = 1  # 传送动画持续时间（秒）
 var _teleport_timer: float = 0.0  # 传送计时器
 var _teleport_material: ShaderMaterial  # 传送效果材质
 
+# 受击反馈相关
+var _is_hit: bool = false  # 是否正在受击
+var _hit_flash_duration: float = 0.2  # 闪烁持续时间（秒）
+var _hit_flash_timer: float = 0.0  # 闪烁计时器
+var _hit_flash_count: int = 0  # 闪烁次数
+var _max_flash_count: int = 2  # 最大闪烁次数
+var _original_color: Color = Color.WHITE  # 原始颜色
+var _knockback_force: float = 200.0  # 击退力度
+var _knockback_velocity: Vector2 = Vector2.ZERO  # 击退速度
+
 # 屏障相关
 var _blocked_by_barrier: bool = false
 var _barrier_hit_cooldown: float = 0.0
@@ -105,14 +115,18 @@ func _ready() -> void:
 	else:
 		_initialize_shape()
 	
-	# 添加到enemy组，让结构管理器能够找到
+	# 添加到 enemy 组，让结构管理器能够找到
 	add_to_group("enemy")
 	
 	# 应用随机旋转效果（如果启用）
 	if random_initial_rotation and shape_drawer:
 		var random_angle = randf_range(0.0, 360.0)
 		shape_drawer.rotation_degrees = random_angle
-		#print("敌人随机旋转角度: ", random_angle, " 度")
+		#print("敌人随机旋转角度：", random_angle, " 度")
+	
+	# 保存原始颜色
+	if shape_drawer:
+		_original_color = shape_drawer.fill_color
 	
 	# 初始化 Crystal 位置
 	_crystal_position = _get_crystal_position()
@@ -161,6 +175,9 @@ func _process(delta: float) -> void:
 	# 更新传送效果（始终更新，即使在传送期间）
 	_update_teleport(delta)
 	
+	# 更新受击效果
+	_update_hit_effect(delta)
+	
 	# 如果正在传送，跳过其他逻辑
 	if _is_teleporting:
 		return
@@ -186,6 +203,82 @@ func _process(delta: float) -> void:
 			_attack_barrier(_current_barrier)
 	
 	_update_movement(delta)
+
+func _update_hit_effect(delta: float) -> void:
+	"""更新受击效果"""
+	if not _is_hit:
+		return
+	
+	# 更新闪烁计时器
+	_hit_flash_timer += delta
+	
+	# 计算闪烁次数
+	var flash_interval = _hit_flash_duration / _max_flash_count
+	var current_flash = int(_hit_flash_timer / flash_interval)
+	
+	if current_flash >= _max_flash_count:
+		# 闪烁完成，恢复原始颜色
+		_finish_hit_effect()
+		return
+	
+	# 切换颜色（奇数次显示白色，偶数次显示原始颜色）
+	if shape_drawer:
+		if current_flash % 2 == 0:
+			shape_drawer.fill_color = Color.WHITE
+		else:
+			shape_drawer.fill_color = _original_color
+	
+	# 应用击退效果
+	if _knockback_velocity != Vector2.ZERO:
+		position += _knockback_velocity * delta
+		# 衰减击退速度
+		_knockback_velocity = _knockback_velocity.lerp(Vector2.ZERO, delta * 5.0)
+
+func _on_kinetic_hit(bullet: Bullet) -> void:
+	"""受到动能子弹攻击时的处理"""
+	if _is_teleporting:
+		return
+	
+	_is_hit = true
+	_hit_flash_timer = 0.0
+	_hit_flash_count = 0
+	
+	# 计算击退方向（子弹飞行方向）
+	var knockback_direction = bullet.get_velocity().normalized()
+	
+	# 根据体型计算击退力度（体型越大越难击退）
+	var size_multiplier = 1.0
+	if Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS.has(size_level):
+		var multipliers = Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS[size_level]
+		size_multiplier = 1.0 / multipliers.health  # 血量越高越难击退
+	
+	var final_knockback = _knockback_force * size_multiplier
+	_knockback_velocity = knockback_direction * final_knockback
+	
+	# 立即开始闪烁
+	shape_drawer.fill_color = Color.WHITE
+
+func _on_magic_hit(bullet: MagicBullet) -> void:
+	"""受到魔法子弹攻击时的处理"""
+	if _is_teleporting:
+		return
+	
+	_is_hit = true
+	_hit_flash_timer = 0.0
+	_hit_flash_count = 0
+	
+	# 魔法子弹没有击退效果，只有闪烁效果
+	# 立即开始闪烁
+	shape_drawer.fill_color = Color.WHITE
+
+func _finish_hit_effect() -> void:
+	"""完成受击效果"""
+	_is_hit = false
+	_knockback_velocity = Vector2.ZERO
+	
+	# 恢复原始颜色
+	if shape_drawer:
+		shape_drawer.fill_color = _original_color
 
 func _update_teleport(delta: float) -> void:
 	"""更新传送效果"""
@@ -229,6 +322,13 @@ func _on_teleport_complete() -> void:
 	"""传送完成后的处理"""
 	# 可以在子类中重写此方法
 	pass
+
+func can_be_targeted() -> bool:
+	"""检查是否可以被索敌"""
+	# 传送期间不能被索敌
+	if _is_teleporting:
+		return false
+	return true
 
 func _check_barrier_validity() -> void:
 	"""检查屏障是否仍然有效"""

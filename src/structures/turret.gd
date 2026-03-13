@@ -110,8 +110,18 @@ func _update_target() -> void:
 		target = null
 		return
 	
-	enemies_in_range.sort_custom(_compare_distance)
-	target = enemies_in_range[0]
+	# 过滤掉正在传送的敌人
+	var valid_enemies = []
+	for enemy in enemies_in_range:
+		if enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
+			valid_enemies.append(enemy)
+	
+	if valid_enemies.is_empty():
+		target = null
+		return
+	
+	valid_enemies.sort_custom(_compare_distance)
+	target = valid_enemies[0]
 
 func _compare_distance(a: Node2D, b: Node2D) -> bool:
 	var dist_a = global_position.distance_to(a.global_position)
@@ -284,8 +294,10 @@ func update_energy_level() -> void:
 func _on_detection_area_area_entered(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy and enemy.is_in_group("enemy"):
-		if not enemy in enemies_in_range:
-			enemies_in_range.append(enemy)
+		# 检查敌人是否可以被索敌
+		if enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
+			if not enemy in enemies_in_range:
+				enemies_in_range.append(enemy)
 
 func _on_detection_area_area_exited(area: Area2D) -> void:
 	var enemy = area.get_parent()

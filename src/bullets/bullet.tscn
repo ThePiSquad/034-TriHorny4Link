@@ -8,6 +8,7 @@ size = Vector2(16, 16)
 
 [node name="Bullet" type="Node2D" unique_id=1846070966]
 script = ExtResource("1_1ojd5")
+attributes = Array[int]([0])
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=698014297]
 script = ExtResource("1_4342n")
