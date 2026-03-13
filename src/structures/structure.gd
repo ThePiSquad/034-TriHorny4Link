@@ -14,6 +14,9 @@ var energy_level: EnergyLevel = EnergyLevel.new()
 
 var _color: Enums.ColorType = Enums.ColorType.WHITE
 
+# 粒子特效相关
+var particle_scene: PackedScene = preload("res://src/particles/energy_diss_ptc.tscn")
+
 @export var color: Enums.ColorType:
 	get():
 		return _color
@@ -84,6 +87,8 @@ func on_health_depleted() -> void:
 	var manager = get_parent()
 	if manager is StructureManager:
 		var pos = GridCoord.from_world_coord(Vector2i(global_position))
+		# 生成摧毁粒子效果
+		_spawn_particle()
 		manager.remove(pos)
 
 func get_structure_type() -> Enums.StructureType:
@@ -145,6 +150,8 @@ func _request_deletion() -> void:
 	var manager = get_parent()
 	if manager is StructureManager:
 		var pos = GridCoord.from_world_coord(Vector2i(global_position))
+		# 生成删除粒子效果
+		_spawn_particle()
 		if not manager.remove(pos):
 			push_warning("Failed to remove structure at position: " + str(pos))
 	else:
@@ -185,3 +192,59 @@ func _sync_color_to_energy_level(color_type: Enums.ColorType) -> void:
 			energy_level.red = 0
 			energy_level.blue = 0
 			energy_level.yellow = 0
+
+func spawn_particle() -> void:
+	"""生成粒子特效（外部调用接口）"""
+	_spawn_particle()
+
+func _spawn_particle() -> void:
+	"""生成粒子特效"""
+	if not particle_scene:
+		return
+	
+	var particle = particle_scene.instantiate()
+	if not particle:
+		return
+	
+	# 设置粒子位置为建筑位置
+	particle.global_position = global_position
+	
+	# 设置粒子纹理和颜色
+	_setup_particle(particle)
+	
+	# 添加到场景中
+	get_parent().add_child(particle)
+
+func setup_particle(particle: GPUParticles2D) -> void:
+	"""设置粒子纹理和颜色（外部调用接口）"""
+	_setup_particle(particle)
+
+func _setup_particle(particle: GPUParticles2D) -> void:
+	"""设置粒子纹理和颜色"""
+	# 根据建筑类型设置纹理
+	var texture_path = ""
+	match structure_type:
+		Enums.StructureType.MONO_CRYSTAL:
+			texture_path = "res://assets/particles/circle_solid_particle.png"
+		Enums.StructureType.CONDUIT:
+			texture_path = "res://assets/particles/rect_solid_particle.png"
+		Enums.StructureType.TURRET:
+			texture_path = "res://assets/particles/t_solid_particle.png"
+	
+	# 加载并设置纹理
+	if texture_path != "":
+		var texture = load(texture_path)
+		if texture:
+			particle.texture = texture
+	
+	# 根据建筑颜色设置粒子颜色
+	if particle.process_material is ParticleProcessMaterial:
+		var mat = particle.process_material as ParticleProcessMaterial
+		var color = Constants.COLOR_MAP.get(_color, Color.WHITE)
+		mat.color = color
+	
+	# 设置 one shot 模式
+	particle.one_shot = true
+	
+	# 启动粒子发射
+	particle.emitting = true

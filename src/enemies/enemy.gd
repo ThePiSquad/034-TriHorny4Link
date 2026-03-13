@@ -38,6 +38,7 @@ var _knockback_velocity: Vector2 = Vector2.ZERO  # 击退速度
 # 死亡粒子特效相关
 var death_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.tscn")
 var base_particle_amount: int = 24  # 基础粒子数量
+var shape_influence_factor : int = 2
 
 # 屏障相关
 var _blocked_by_barrier: bool = false
@@ -191,8 +192,13 @@ func _spawn_death_particle() -> void:
 	particle.global_position = global_position
 	
 	# 根据敌人体型计算粒子数量
-	var size_multiplier = enemy_size.x / Constants.grid_size
+	var size_multiplier = (enemy_size.x / Constants.grid_size) * shape_influence_factor
 	particle.amount = int(base_particle_amount * size_multiplier)
+	particle.process_material.emission_sphere_radius = 16 * size_multiplier
+	particle.process_material.scale_min = 0.05 * size_multiplier
+	particle.process_material.scale_max = 0.35 * size_multiplier
+	particle.process_material.initial_velocity_min = 70 * size_multiplier
+	particle.process_material.initial_velocity_max = 170 * size_multiplier
 	
 	particle.one_shot = true
 	particle.emitting = true

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://v1yg358ob3xi"]
 
-[ext_resource type="Texture2D" uid="uid://c6gd2nu1t2b15" path="res://assets/particles/rect_particle.png" id="1_4gjvv"]
+[ext_resource type="Texture2D" uid="uid://b3a04uumb4v6q" path="res://assets/particles/rect_solid_particle.png" id="1_4gjvv"]
 
 [sub_resource type="Curve" id="Curve_uk8yn"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -15,16 +15,17 @@ angle_min = 1.0728835e-05
 angle_max = 90.000015
 spread = 180.0
 flatness = 1.0
-initial_velocity_min = 90.0
-initial_velocity_max = 150.0
+initial_velocity_min = 170.0
+initial_velocity_max = 230.0
 gravity = Vector3(0, 0, 0)
 damping_min = 50.000004
 damping_max = 150.0
-scale_min = 0.02
-scale_max = 0.14999999
+scale_min = 0.049999997
+scale_max = 0.19999999
 scale_curve = SubResource("CurveTexture_eh8ue")
 
 [node name="EnergyDissPtc" type="GPUParticles2D" unique_id=566778249]
+amount = 12
 texture = ExtResource("1_4gjvv")
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_wugy2")

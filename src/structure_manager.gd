@@ -82,6 +82,9 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 		# 更新相邻连线的颜色
 		_update_neighbor_connections_color(pos, structure)
 		
+		# 生成放置粒子效果
+		_spawn_place_particle(structure)
+		
 		return true
 	else:
 		return false
@@ -277,6 +280,24 @@ func _update_neighbor_connections_color(pos: GridCoord, structure: Structure) ->
 		connection_manager.add_connection(structure, east)
 		connection_manager.update_connection_colors(structure)
 		connection_manager.update_connection_colors(east)
+
+func _spawn_place_particle(structure: Structure) -> void:
+	"""生成放置粒子效果"""
+	if not structure or not structure.particle_scene:
+		return
+	
+	var particle = structure.particle_scene.instantiate()
+	if not particle:
+		return
+	
+	# 设置粒子位置为建筑位置
+	particle.global_position = structure.global_position
+	
+	# 设置粒子纹理和颜色
+	structure.setup_particle(particle)
+	
+	# 添加到场景中
+	add_child(particle)
 
 func _update_connections(pos: GridCoord, structure: Structure) -> void:
 	"""更新建筑的连接"""
