@@ -3,6 +3,15 @@
 [ext_resource type="Script" uid="uid://b8rvgajsbmod6" path="res://src/enemies/enemy.gd" id="1_a8hw6"]
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
+[ext_resource type="Shader" uid="uid://c1wduup77o1i3" path="res://src/enemies/teleport_effect.gdshader" id="3_yk438"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_abny1"]
+shader = ExtResource("3_yk438")
+shader_parameter/shape_size = Vector2(64, 64)
+shader_parameter/progress = 0.0
+shader_parameter/noise_desnity = 60.0
+shader_parameter/beam_size = 0.15000000596046
+shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
 
 [node name="Enemy" unique_id=265451698 groups=["enemy"] instance=ExtResource("2_yvjb1")]
 script = ExtResource("1_a8hw6")
@@ -16,6 +25,7 @@ max_avoid_attempts = 3
 show_path_visualization = false
 
 [node name="ShapeDrawer" type="Node2D" parent="." index="0" unique_id=590652366]
+material = SubResource("ShaderMaterial_abny1")
 script = ExtResource("3_abny1")
 stroke_enabled = false
 metadata/_custom_type_script = "uid://bbx5xpwg4my7w"

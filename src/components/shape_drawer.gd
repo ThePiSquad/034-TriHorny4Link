@@ -11,7 +11,10 @@ extends Node2D
 @export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size):
 	set(s):
 		shape_size = s
+		_update_shader_params() 
 		_update_collision_shape()
+		queue_redraw()
+
 @export var corner_radius: float = 8.0
 
 # 填充配置
@@ -191,3 +194,8 @@ func _draw_rounded_rectangle_stroke() -> void:
 	
 	points.append(points[0])
 	draw_polyline(points, stroke_color, stroke_width, true)
+
+func _update_shader_params() -> void:
+	if material is ShaderMaterial:
+		# 告诉 Shader 当前形状的长宽，用于计算 UV 映射
+		material.set_shader_parameter("shape_size", shape_size)

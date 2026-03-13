@@ -1,10 +1,4 @@
-[gd_scene format=3 uid="uid://b105um8got3cl"]
-
-[ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_ef7xj"]
-[ext_resource type="Script" uid="uid://53xfbs7cn8c4" path="res://src/enemies/triangle_enemy.gd" id="2_drdgn"]
-
-[sub_resource type="Shader" id="Shader_drdgn"]
-code = "shader_type canvas_item;
+shader_type canvas_item;
 
 // 新增：接收形状的大小，用于计算 UV 映射
 uniform vec2 shape_size = vec2(100.0, 100.0);
@@ -64,35 +58,4 @@ void fragment() {
     tex.a *= d2;
     
     COLOR = tex;
-}"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_56tku"]
-shader = SubResource("Shader_drdgn")
-shader_parameter/shape_size = Vector2(64, 64)
-shader_parameter/progress = 0.0
-shader_parameter/noise_desnity = 60.0
-shader_parameter/beam_size = 0.15000000596046
-shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
-
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_drdgn"]
-points = PackedVector2Array(0, -32, -32, 32, 32, 32)
-
-[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_56tku"]
-points = PackedVector2Array(0, -32, -32, 32, 32, 32)
-
-[node name="TriangleEnemy" unique_id=531630275 instance=ExtResource("1_ef7xj")]
-script = ExtResource("2_drdgn")
-random_initial_rotation = true
-
-[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
-material = SubResource("ShaderMaterial_56tku")
-shape_type = 1
-fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
-stroke_color = Color(0.68235296, 0, 0, 1)
-stroke_enabled = true
-
-[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
-shape = SubResource("ConvexPolygonShape2D_drdgn")
-
-[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
-shape = SubResource("ConvexPolygonShape2D_56tku")
+}
