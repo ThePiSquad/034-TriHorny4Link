@@ -193,10 +193,12 @@ func _set_color(color_type: Enums.ColorType) -> void:
 	# 设置颜色并更新显示
 	_color = color_type
 	if shape_drawer:
-		var base_color :Color= Constants.COLOR_MAP.get(color_type, Color.WHITE)
-		shape_drawer.fill_color = base_color
-		shape_drawer.stroke_color = base_color.lightened(0.3)
-		shape_drawer.queue_redraw()
+		# 如果正在闪白期间，不要覆盖颜色
+		if not _flash_color_override:
+			var base_color :Color= Constants.COLOR_MAP.get(color_type, Color.WHITE)
+			shape_drawer.fill_color = base_color
+			shape_drawer.stroke_color = base_color.lightened(0.3)
+			shape_drawer.queue_redraw()
 	
 	# 发射颜色改变信号
 	color_changed.emit(color_type)

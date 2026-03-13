@@ -17,6 +17,14 @@ var _color: Enums.ColorType = Enums.ColorType.WHITE
 # 粒子特效相关
 var particle_scene: PackedScene = preload("res://src/particles/energy_diss_ptc.tscn")
 
+# 受击闪白效果相关
+var _is_hit: bool = false  # 是否正在受击
+var _hit_flash_duration: float = 0.2  # 闪烁持续时间（秒）
+var _hit_flash_timer: float = 0.0  # 闪烁计时器
+var _max_flash_count: int = 3  # 最大闪烁次数
+var _original_color: Color = Color.WHITE  # 原始颜色
+var _flash_color_override: bool = false  # 是否正在覆盖颜色
+
 @export var color: Enums.ColorType:
 	get():
 		return _color
@@ -25,7 +33,9 @@ var particle_scene: PackedScene = preload("res://src/particles/energy_diss_ptc.t
 		_color = s
 		_sync_color_to_energy_level(s)
 		if is_node_ready() and shape_drawer:
-			shape_drawer.fill_color = Constants.COLOR_MAP[s]
+			# 如果正在闪白期间，不要覆盖颜色
+			if not _flash_color_override:
+				shape_drawer.fill_color = Constants.COLOR_MAP[s]
 		
 		# 如果颜色改变了，发射信号
 		if old_color != s:
@@ -87,6 +97,59 @@ func _on_hit(source: Node) -> void:
 	"""受到任何伤害时的统一处理"""
 	# 触发屏幕抖动
 	_trigger_screen_shake()
+	
+	# 触发闪白效果
+	_start_hit_flash()
+
+func _start_hit_flash() -> void:
+	"""启动受击闪白效果"""
+	if not shape_drawer:
+		return
+	
+	_is_hit = true
+	_hit_flash_timer = 0.0
+	_flash_color_override = true  # 启用颜色覆盖
+	
+	# 保存当前实际显示的颜色（而不是_color 属性）
+	_original_color = shape_drawer.fill_color
+	
+	# 立即变为白色
+	shape_drawer.fill_color = Color.WHITE
+
+func _process(delta: float) -> void:
+	# 更新受击闪白效果
+	if _is_hit:
+		_update_hit_flash(delta)
+
+func _update_hit_flash(delta: float) -> void:
+	"""更新受击闪白效果"""
+	_hit_flash_timer += delta
+	
+	# 计算闪烁次数
+	var flash_interval = _hit_flash_duration / _max_flash_count
+	var current_flash = int(_hit_flash_timer / flash_interval)
+	
+	if current_flash >= _max_flash_count:
+		# 闪烁完成，恢复原始颜色
+		_finish_hit_flash()
+		return
+	
+	# 切换颜色（奇数次显示白色，偶数次显示原始颜色）
+	if shape_drawer:
+		if current_flash % 2 == 0:
+			shape_drawer.fill_color = Color.WHITE
+		else:
+			shape_drawer.fill_color = _original_color
+
+func _finish_hit_flash() -> void:
+	"""完成受击闪白效果"""
+	_is_hit = false
+	_flash_color_override = false  # 禁用颜色覆盖
+	
+	# 恢复原始颜色
+	if shape_drawer:
+		shape_drawer.fill_color = _original_color
+		shape_drawer.stroke_color = _original_color.lightened(0.3)
 
 func _trigger_screen_shake() -> void:
 	"""触发屏幕抖动效果"""
