@@ -19,6 +19,12 @@ extends Damageable
 var direction: Vector2
 var base_position: Vector2 = Vector2.ZERO
 
+# 传送效果相关
+var _is_teleporting: bool = false  # 是否正在传送
+var _teleport_duration: float = 1  # 传送动画持续时间（秒）
+var _teleport_timer: float = 0.0  # 传送计时器
+var _teleport_material: ShaderMaterial  # 传送效果材质
+
 # 屏障相关
 var _blocked_by_barrier: bool = false
 var _barrier_hit_cooldown: float = 0.0
@@ -108,10 +114,10 @@ func _ready() -> void:
 		shape_drawer.rotation_degrees = random_angle
 		#print("敌人随机旋转角度: ", random_angle, " 度")
 	
-	# 初始化Crystal位置
+	# 初始化 Crystal 位置
 	_crystal_position = _get_crystal_position()
 	
-	# 创建路径可视化Line2D
+	# 创建路径可视化 Line2D
 	_path_visualization = Line2D.new()
 	_path_visualization.name = "PathVisualization"
 	_path_visualization.width = 2.0
@@ -120,6 +126,28 @@ func _ready() -> void:
 	add_child(_path_visualization)
 	
 	died.connect(_on_damageable_died)
+	
+	# 初始化传送效果
+	_initialize_teleport_effect()
+
+func _initialize_teleport_effect() -> void:
+	"""初始化传送效果"""
+	# 加载传送效果着色器
+	var shader = load("res://src/shader/teleport_effect.gdshader")
+	if shader:
+		_teleport_material = ShaderMaterial.new()
+		_teleport_material.shader = shader
+		
+		# 设置初始参数
+		_teleport_material.set_shader_parameter("progress", 1.0)
+		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x, enemy_size.y))
+		
+		# 应用材质到 shape_drawer
+		if shape_drawer:
+			shape_drawer.material = _teleport_material
+		
+		# 启动传送动画
+		_start_teleport()
 
 func _on_damageable_died(source: Node) -> void:
 	# 断开屏障的死亡信号连接
@@ -130,6 +158,13 @@ func _on_damageable_died(source: Node) -> void:
 	queue_free()
 
 func _process(delta: float) -> void:
+	# 更新传送效果（始终更新，即使在传送期间）
+	_update_teleport(delta)
+	
+	# 如果正在传送，跳过其他逻辑
+	if _is_teleporting:
+		return
+	
 	# 更新屏障冷却计时器
 	if _barrier_hit_cooldown > 0:
 		_barrier_hit_cooldown -= delta
@@ -151,6 +186,49 @@ func _process(delta: float) -> void:
 			_attack_barrier(_current_barrier)
 	
 	_update_movement(delta)
+
+func _update_teleport(delta: float) -> void:
+	"""更新传送效果"""
+	if not _is_teleporting:
+		return
+	
+	# 更新传送计时器
+	_teleport_timer += delta
+	
+	# 计算 progress 值（从 1.0 平滑过渡到 0.0）
+	var progress = 1.0 - (_teleport_timer / _teleport_duration)
+	progress = clamp(progress, 0.0, 1.0)
+	
+	# 更新着色器参数
+	if _teleport_material:
+		_teleport_material.set_shader_parameter("progress", progress)
+	
+	# 检查传送是否完成
+	if progress <= 0.0:
+		_finish_teleport()
+
+func _start_teleport() -> void:
+	"""启动传送效果"""
+	_is_teleporting = true
+	_teleport_timer = 0.0
+	
+	# 设置无敌状态
+	invincible = true
+
+func _finish_teleport() -> void:
+	"""完成传送效果"""
+	_is_teleporting = false
+	
+	# 恢复可受击状态
+	invincible = false
+	
+	# 触发后续逻辑
+	_on_teleport_complete()
+
+func _on_teleport_complete() -> void:
+	"""传送完成后的处理"""
+	# 可以在子类中重写此方法
+	pass
 
 func _check_barrier_validity() -> void:
 	"""检查屏障是否仍然有效"""

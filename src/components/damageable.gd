@@ -27,19 +27,25 @@ var current_health: float:
 				died.emit(_last_damage_source)
 
 var _last_damage_source: Node = null
+var invincible: bool = false  # 无敌状态
 
 func _ready() -> void:
 	current_health = max_health
 	
 
 func take_damage(amount: float, source: Node = null) -> void:
+	# 检查无敌状态
+	if invincible:
+		return
+	
 	if current_health <= 0.0:
 		_on_death()
 		return
 	
 	_last_damage_source = source
 	current_health -= amount
-	if current_health <= 0.0:	_on_death()
+	if current_health <= 0.0:
+		_on_death()
 
 
 func get_health() -> float:
