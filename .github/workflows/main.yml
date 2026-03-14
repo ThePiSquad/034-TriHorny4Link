@@ -8,34 +8,43 @@ permissions:
   contents: write
 
 jobs:
+  # 先获取版本号
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - name: Extract version
+        id: extract
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
   build:
+    needs: get-version
     runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [windows, linux]
         include:
           - platform: windows
-            export_preset: "Windows Desktop"  # 与你的预设名称完全一致
+            export_preset: "Windows Desktop"
             export_path: "build/windows/TriHorny4Link.exe"
-            final_name: "TriHorny4Link-${{ env.VERSION }}-windows.exe"
           - platform: linux
-            export_preset: "Linux"  # 与你的预设名称完全一致
+            export_preset: "Linux"
             export_path: "build/linux/034GameJam"
-            final_name: "TriHorny4Link-${{ env.VERSION }}-linux.x86_64"
 
     steps:
-      - name: Get version from tag
-        id: get_version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          VERSION=${VERSION#v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version extracted: $VERSION"
-
       - uses: actions/checkout@v4
         with:
           lfs: true
           fetch-depth: 0
+
+      - name: Set version environment
+        run: |
+          echo "VERSION=${{ needs.get-version.outputs.version }}" >> $GITHUB_ENV
 
       - name: Setup Godot 4.6.1
         run: |
@@ -52,7 +61,6 @@ jobs:
           mv ~/.local/share/godot/export_templates/4.6.1.stable/templates/* ~/.local/share/godot/export_templates/4.6.1.stable/
           rm -f Godot_v4.6.1-stable_*.zip Godot_v4.6.1-stable_*.tpz
           
-          # 验证安装
           godot --version
 
       - name: Export for ${{ matrix.platform }}
@@ -63,40 +71,41 @@ jobs:
           # 导出游戏
           godot --headless --export-release "${{ matrix.export_preset }}" "${{ matrix.export_path }}"
           
-          # 检查导出文件
+          # 重命名文件，添加版本号
           if [ "${{ matrix.platform }}" == "windows" ]; then
-            # Windows 导出为 exe
             if [ -f "${{ matrix.export_path }}" ]; then
-              cp "${{ matrix.export_path }}" "${{ matrix.final_name }}"
-              echo "✅ Windows build successful: ${{ matrix.final_name }}"
+              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-windows.exe"
+              cp "${{ matrix.export_path }}" "$FINAL_NAME"
+              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+              echo "✅ Windows build: $FINAL_NAME"
             fi
           else
-            # Linux 导出（可能是一个可执行文件）
             if [ -f "build/linux/034GameJam" ]; then
-              cp "build/linux/034GameJam" "${{ matrix.final_name }}"
-              chmod +x "${{ matrix.final_name }}"
-              echo "✅ Linux build successful: ${{ matrix.final_name }}"
+              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.x86_64"
+              cp "build/linux/034GameJam" "$FINAL_NAME"
+              chmod +x "$FINAL_NAME"
+              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+              echo "✅ Linux build: $FINAL_NAME"
             elif [ -d "build/linux" ]; then
-              # 如果是目录，打包
-              tar -czf "${{ matrix.final_name }}.tar.gz" -C build/linux .
-              mv "${{ matrix.final_name }}.tar.gz" "${{ matrix.final_name }}"
-              echo "✅ Linux build packaged: ${{ matrix.final_name }}"
+              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.tar.gz"
+              tar -czf "$FINAL_NAME" -C build/linux .
+              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+              echo "✅ Linux build packaged: $FINAL_NAME"
             fi
           fi
           
-          # 列出生成的文件
           ls -la
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.final_name }}
-          path: ${{ matrix.final_name }}
+          name: TriHorny4Link-${{ needs.get-version.outputs.version }}-${{ matrix.platform }}
+          path: ${{ env.FINAL_NAME }}
           if-no-files-found: error
           retention-days: 7
 
   release:
-    needs: build
+    needs: [get-version, build]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -113,8 +122,7 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          VERSION=${VERSION#v}
+          VERSION="${{ needs.get-version.outputs.version }}"
           PREVIOUS_TAG=$(git tag --sort=-v:refname | head -n 2 | tail -n 1)
           
           cat > release_notes.md << EOF
@@ -132,8 +140,8 @@ jobs:
           
           | 平台 | 文件 | 大小 |
           |------|------|------|
-          | Windows | \`TriHorny4Link-$VERSION-windows.exe\` | $(ls -lh TriHorny4Link-$VERSION-windows.exe 2>/dev/null | awk '{print $5}' || echo "N/A") |
-          | Linux | \`TriHorny4Link-$VERSION-linux.x86_64\` | $(ls -lh TriHorny4Link-$VERSION-linux.x86_64 2>/dev/null | awk '{print $5}' || echo "N/A") |
+          | Windows | \`TriHorny4Link-$VERSION-windows.exe\` | $(ls -lh releases/TriHorny4Link-$VERSION-windows.exe 2>/dev/null | awk '{print $5}' || echo "N/A") |
+          | Linux | \`TriHorny4Link-$VERSION-linux.x86_64\` | $(ls -lh releases/TriHorny4Link-$VERSION-linux.x86_64 2>/dev/null | awk '{print $5}' || echo "N/A") |
           
           ## 🚀 安装说明
           
@@ -149,20 +157,17 @@ jobs:
           ## 🔄 完整变更
           \${{ github.server_url }}/\${{ github.repository }}/compare/$PREVIOUS_TAG...${{ github.ref_name }}
           EOF
-          
-          echo "Release notes generated"
+
+      - name: List downloaded files
+        run: ls -la releases/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            TriHorny4Link-*.exe
-            TriHorny4Link-*.x86_64
-            TriHorny4Link-*.tar.gz
+          files: releases/*
           body_path: release_notes.md
-          name: TriHorny4Link ${{ env.VERSION }}
+          name: TriHorny4Link ${{ needs.get-version.outputs.version }}
           draft: false
           prerelease: false
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
