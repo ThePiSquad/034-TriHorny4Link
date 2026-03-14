@@ -9,6 +9,7 @@ extends Node2D
 @onready var camera: Camera2D = $Camera2D
 @onready var resource_manager: ResourceManager = $ResourceManager
 @onready var screen_shake_manager: ScreenShakeManager = $ScreenShakeManager
+@onready var crystal: Node2D = $WorldPainter/StructureManager/Crystal
 
 # 游戏结束场景
 var game_over_scene: PackedScene = preload("res://src/ui/game_over_screen.tscn")
@@ -36,6 +37,9 @@ func _ready() -> void:
 	
 	# 初始化 GameManager
 	_initialize_game_manager()
+	
+	# 摄像机初始位置设置：将 Crystal 居中
+	_center_camera_on_crystal()
 
 func _initialize_game_manager() -> void:
 	"""初始化游戏管理器"""
@@ -78,3 +82,12 @@ func _update_hud_resources() -> void:
 	var blue_ratio = resource_manager.get_resource_ratio("blue")
 	var yellow_ratio = resource_manager.get_resource_ratio("yellow")
 	hud.set_resource_ratios(red_ratio, blue_ratio, yellow_ratio)
+
+func _center_camera_on_crystal() -> void:
+	"""将摄像机居中到 Crystal 对象"""
+	if crystal and camera:
+		# 获取 Crystal 的全局位置
+		var crystal_global_position = crystal.global_position
+		# 设置摄像机的位置为 Crystal 的位置
+		camera.global_position = crystal_global_position
+		print("摄像机已居中到 Crystal，位置：", crystal_global_position)
