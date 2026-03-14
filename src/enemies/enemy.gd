@@ -775,8 +775,13 @@ func _find_path(start: Vector2, goal: Vector2) -> Array[Vector2]:
 	var start_node = PathNode.new(start, null, 0.0, _calculate_heuristic(start, goal))
 	open_list.append(start_node)
 	
+	# 最大迭代次数限制，防止寻路卡住游戏
+	var max_iterations = 100
+	var iterations = 0
+	
 	# 主循环
-	while open_list.size() > 0:
+	while open_list.size() > 0 and iterations < max_iterations:
+		iterations += 1
 		# 找到F值最小的节点
 		var current_node = open_list[0]
 		var current_index = 0
@@ -856,8 +861,35 @@ func _update_path() -> void:
 	# 更新路径可视化
 	_update_path_visualization()
 	
-	#if _current_path.size() == 0:
-		#print("未找到路径")
+	# 如果没有找到路径，尝试寻找最近的障碍物进行攻击
+	if _current_path.size() == 0:
+		_try_attack_nearby_barrier()
+
+func _try_attack_nearby_barrier() -> void:
+	"""尝试攻击附近的障碍物"""
+	# 使用射线检测寻找障碍物
+	var space_state = get_world_2d().direct_space_state
+	var directions = [
+		Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1),
+		Vector2(1, 1).normalized(), Vector2(-1, 1).normalized(),
+		Vector2(1, -1).normalized(), Vector2(-1, -1).normalized()
+	]
+	
+	for dir in directions:
+		var query = PhysicsRayQueryParameters2D.new()
+		query.from = global_position
+		query.to = global_position + dir * check_distance
+		query.exclude = [self]
+		query.collision_mask = Constants.STRUCTURE_LAYER
+		var result = space_state.intersect_ray(query)
+		
+		if not result.is_empty():
+			var body = result.collider.get_parent()
+			if body and body.has_method("get_structure_type"):
+				if body.get_structure_type() == Enums.StructureType.CONDUIT:
+					# 找到最近的Conduit，开始攻击
+					on_barrier_hit(body)
+					return
 
 func _update_path_visualization() -> void:
 	"""更新路径可视化"""
