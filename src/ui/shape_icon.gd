@@ -97,3 +97,19 @@ func _is_selection_trigger(event: InputEvent) -> bool:
 	elif event is InputEventScreenTouch:
 		return event.pressed
 	return false
+
+func _mouse_entered() -> void:
+	"""鼠标进入时的效果"""
+	if not is_selected and hud and hud.has_method("is_animation_enabled") and hud.is_animation_enabled():
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_BACK)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.2)
+
+func _mouse_exited() -> void:
+	"""鼠标离开时的效果"""
+	if not is_selected and hud and hud.has_method("is_animation_enabled") and hud.is_animation_enabled():
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_BACK)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.2)
