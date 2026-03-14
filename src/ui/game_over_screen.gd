@@ -1,10 +1,14 @@
 extends Control
 class_name GameOverScreen
 
+# Debug 模式开关
+const DEBUG_MODE: bool = true  # 设置为 true 启用 debug 模式
+
 # 分数显示容器
 @onready var score_container: VBoxContainer = $MarginContainer/VBoxContainer/ScoreContainer
 @onready var restart_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/RestartButton
 @onready var main_menu_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/MainMenuButton
+@onready var debug_score_display: VBoxContainer = $MarginContainer/VBoxContainer/DebugScoreDisplay
 
 # 游戏数据
 var survival_time: float = 0.0
@@ -33,6 +37,9 @@ func _ready() -> void:
 	
 	# 显示分数
 	_display_scores()
+	
+	# 显示 debug 信息（如果启用）
+	_update_debug_display()
 
 func _load_pattern_display_scene() -> void:
 	"""加载图案显示场景"""
@@ -86,7 +93,7 @@ func _display_survival_time() -> void:
 	score_container.add_child(container)
 	
 	# 显示时间数值（用图形数量表示）
-	_add_time_indicator(time_score)
+	#_add_time_indicator(time_score)
 
 func _add_time_indicator(seconds: int) -> void:
 	"""添加时间指示器"""
@@ -138,16 +145,65 @@ func _create_pattern_display(pattern: ScoreDisplayUtils.ScorePattern) -> Control
 	placeholder.color = Color.WHITE
 	return placeholder
 
+func _update_debug_display() -> void:
+	"""更新 debug 信息显示"""
+	if not DEBUG_MODE:
+		# 隐藏 debug 显示
+		if debug_score_display:
+			debug_score_display.visible = false
+		return
+	
+	# 显示 debug 信息
+	if debug_score_display:
+		debug_score_display.visible = true
+		
+		# 清空现有内容
+		for child in debug_score_display.get_children():
+			child.queue_free()
+		
+		# 添加 debug 标题
+		var debug_title = Label.new()
+		debug_title.text = "Debug Info"
+		debug_title.add_theme_font_size_override("font_size", 20)
+		debug_title.add_theme_color_override("font_color", Color.YELLOW)
+		debug_title.add_theme_constant_override("horizontal_alignment", 1)  # 1 = CENTER
+		debug_score_display.add_child(debug_title)
+		
+		# 添加生存时间
+		var time_label = Label.new()
+		time_label.text = "生存时间: " + str(int(survival_time)) + " 秒"
+		time_label.add_theme_constant_override("horizontal_alignment", 1)  # 1 = CENTER
+		time_label.add_theme_color_override("font_color", Color.BLUE)
+		debug_score_display.add_child(time_label)
+		
+		# 添加敌人分数
+		var enemy_label = Label.new()
+		enemy_label.text = "敌人分数: " + str(enemy_score)
+		enemy_label.add_theme_constant_override("horizontal_alignment", 1)  # 1 = CENTER
+		enemy_label.add_theme_color_override("font_color", Color.RED)
+		debug_score_display.add_child(enemy_label)
+		
+		# 添加总分
+		var total_label = Label.new()
+		total_label.text = "总分数: " + str(total_score)
+		total_label.add_theme_font_size_override("font_size", 18)
+		total_label.add_theme_constant_override("horizontal_alignment", 1)  # 1 = CENTER
+		total_label.add_theme_color_override("font_color", Color.YELLOW)
+		debug_score_display.add_child(total_label)
+
 func _on_restart_button_pressed() -> void:
 	"""重新开始游戏"""
 	# 重新加载当前场景
-	get_tree().reload_current_scene()
+	var transition_manager = TransitionManager.instance
+	if transition_manager:
+		transition_manager.change_scene("res://src/world.tscn")
+	else:
+		get_tree().reload_current_scene()
 
 func _on_main_menu_button_pressed() -> void:
 	"""返回主菜单"""
 	# 切换到主菜单场景
-	# 切换到游戏场景
-	var transition_manager = TransitionManager
+	var transition_manager = TransitionManager.instance
 	if transition_manager:
 		transition_manager.change_scene("res://src/main_menu.tscn")
 	else:

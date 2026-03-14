@@ -56,15 +56,19 @@ func _on_game_over() -> void:
 	print("收到游戏结束事件，切换到结束页面")
 	# 延迟切换，确保粒子效果播放完成
 	await get_tree().create_timer(2.0).timeout
-	_show_game_over_screen()
+	_switch_to_game_over_scene()
 
-func _show_game_over_screen() -> void:
-	"""显示游戏结束页面"""
-	if game_over_scene:
-		var game_over = game_over_scene.instantiate()
-		if game_over:
-			add_child(game_over)
-			print("游戏结束页面已显示")
+func _switch_to_game_over_scene() -> void:
+	"""切换到游戏结束场景"""
+	var transition_manager = TransitionManager.instance
+	if transition_manager:
+		print("使用 TransitionManager 切换到游戏结束场景")
+		transition_manager.change_scene("res://src/ui/game_over_screen.tscn")
+	else:
+		print("警告：TransitionManager 实例不存在，使用默认场景切换")
+		var scene_tree = get_tree()
+		if scene_tree:
+			scene_tree.change_scene_to_file("res://src/ui/game_over_screen.tscn")
 
 func _on_resource_changed() -> void:
 	_update_hud_resources()
