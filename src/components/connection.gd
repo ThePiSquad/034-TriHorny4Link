@@ -77,11 +77,22 @@ func _update_from_style() -> void:
 
 func _determine_energy_source_and_target() -> void:
 	"""确定能量源和目标"""
-	# 检查是否有 Crystal（能量源）
+	# 检查是否有 Crystal 或 MonoCrystal
 	var start_is_crystal = start_structure and is_instance_valid(start_structure) and start_structure.get_structure_type() == Enums.StructureType.CRYSTAL
 	var end_is_crystal = end_structure and is_instance_valid(end_structure) and end_structure.get_structure_type() == Enums.StructureType.CRYSTAL
 	
-	if start_is_crystal and not end_is_crystal:
+	var start_is_mono = start_structure and is_instance_valid(start_structure) and start_structure.get_structure_type() == Enums.StructureType.MONO_CRYSTAL
+	var end_is_mono = end_structure and is_instance_valid(end_structure) and end_structure.get_structure_type() == Enums.StructureType.MONO_CRYSTAL
+	
+	if start_is_mono and end_is_crystal:
+		# MonoCrystal 是能量源，Crystal 是能量目标
+		_energy_source = start_structure
+		_energy_target = end_structure
+	elif end_is_mono and start_is_crystal:
+		# MonoCrystal 是能量源，Crystal 是能量目标
+		_energy_source = end_structure
+		_energy_target = start_structure
+	elif start_is_crystal and not end_is_crystal:
 		# Crystal 是能量源，另一个建筑是能量目标
 		_energy_source = start_structure
 		_energy_target = end_structure
@@ -96,11 +107,11 @@ func _determine_energy_source_and_target() -> void:
 
 func _set_line_color() -> void:
 	"""设置连接线颜色"""
-	# 特殊情况：如果是 Crystal 到 MonoCrystal 的连接，使用 MonoCrystal 的颜色
-	if _energy_target and is_instance_valid(_energy_target):
-		if _energy_target.get_structure_type() == Enums.StructureType.MONO_CRYSTAL:
+	# 特殊情况：如果是 MonoCrystal 到 Crystal 的连接，使用 MonoCrystal 的颜色
+	if _energy_source and is_instance_valid(_energy_source):
+		if _energy_source.get_structure_type() == Enums.StructureType.MONO_CRYSTAL:
 			# 获取 MonoCrystal 的颜色
-			var mono_color_type = _energy_target.color
+			var mono_color_type = _energy_source.color
 			line_color = Constants.COLOR_MAP.get(mono_color_type, Color.WHITE)
 			return
 	
@@ -180,17 +191,15 @@ func _draw() -> void:
 	
 	var start_pos = start_structure.global_position
 	var end_pos = end_structure.global_position
-	var source_pos = _energy_source.global_position
-	var target_pos = _energy_target.global_position
 	
 	# 绘制主线
 	draw_line(start_pos, end_pos, line_color, line_width)
 	
 	# 绘制能量流动
-	if _line_length > 0 and _energy_source and _energy_target:
+	if _line_length > 0 and _energy_source and _energy_target and is_instance_valid(_energy_source) and is_instance_valid(_energy_target):
+		var source_pos = _energy_source.global_position
+		var target_pos = _energy_target.global_position
 		var energy_pos = _energy_position
-		var energy_start = source_pos
-		var energy_end = target_pos
 		
 		# 计算能量流动方向向量
 		var flow_direction = (target_pos - source_pos).normalized()

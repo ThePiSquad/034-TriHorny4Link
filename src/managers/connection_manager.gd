@@ -35,6 +35,11 @@ func remove_connection(start_structure: Structure, end_structure: Structure) -> 
 			connection.queue_free()
 		connections.erase(key)
 
+func has_connection(start_structure: Structure, end_structure: Structure) -> bool:
+	"""检查两个建筑之间是否存在连接"""
+	var key = _get_connection_key(start_structure, end_structure)
+	return connections.has(key)
+
 func update_connections() -> void:
 	"""更新所有连接"""
 	# 性能优化：只更新需要更新的连接

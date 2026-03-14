@@ -85,6 +85,9 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 		# 如果是 MonoCrystal，创建到 Crystal 的连接
 		if type == Enums.StructureType.MONO_CRYSTAL:
 			_create_connection_to_crystal(structure)
+			# 强制更新连接
+			if connection_manager:
+				connection_manager.update_connections()
 		
 		# 生成放置粒子效果
 		_spawn_place_particle(structure)
@@ -204,6 +207,7 @@ func _create_connection_to_crystal(mono_crystal: Structure) -> void:
 	# 获取所有 Crystal 建筑
 	var crystals = get_tree().get_nodes_in_group("crystal")
 	if crystals.is_empty():
+		push_warning("没有找到 Crystal 节点")
 		return
 	
 	# 获取第一个有效的 Crystal
@@ -214,11 +218,22 @@ func _create_connection_to_crystal(mono_crystal: Structure) -> void:
 			break
 	
 	if not crystal:
+		push_warning("没有找到有效的 Crystal")
+		return
+	
+	# 检查 connection_manager
+	if not connection_manager:
+		push_warning("ConnectionManager 不可用")
+		return
+	
+	# 检查连接是否已存在
+	if connection_manager.has_connection(mono_crystal, crystal):
+		print("MonoCrystal 到 Crystal 的连接已存在")
 		return
 	
 	# 创建连接
-	if connection_manager:
-		connection_manager.add_connection(mono_crystal, crystal)
+	connection_manager.add_connection(mono_crystal, crystal)
+	print("创建 MonoCrystal 到 Crystal 的连接，MonoCrystal 位置：", mono_crystal.global_position, " Crystal 位置：", crystal.global_position)
 
 func _has_nearby_conduit(pos: GridCoord) -> bool:
 	"""检查指定位置周围上下左右是否存在conduit"""
@@ -342,6 +357,9 @@ func _update_connections(pos: GridCoord, structure: Structure) -> void:
 
 func _remove_structure_connections(structure: Structure) -> void:
 	"""移除建筑的所有连接"""
+	if not connection_manager:
+		return
+	
 	# 移除与邻居的连接
 	if structure.north and is_instance_valid(structure.north):
 		connection_manager.remove_connection(structure, structure.north)
@@ -351,6 +369,14 @@ func _remove_structure_connections(structure: Structure) -> void:
 		connection_manager.remove_connection(structure, structure.west)
 	if structure.east and is_instance_valid(structure.east):
 		connection_manager.remove_connection(structure, structure.east)
+	
+	# 还需要移除到 Crystal 的连接（如果是 MonoCrystal）
+	if structure.get_structure_type() == Enums.StructureType.MONO_CRYSTAL:
+		var crystals = get_tree().get_nodes_in_group("crystal")
+		for c in crystals:
+			if c and is_instance_valid(c) and c is Structure:
+				connection_manager.remove_connection(structure, c)
+				break
 
 func update_all_connections() -> void:
 	"""更新所有连接"""
