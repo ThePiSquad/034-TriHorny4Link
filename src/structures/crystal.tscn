@@ -3,6 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_bh81t"]
 [ext_resource type="Script" uid="uid://6k1rt52tj2i2" path="res://src/structures/crystal.gd" id="2_a7xd5"]
 [ext_resource type="Texture2D" uid="uid://cvak6u0orwdcs" path="res://assets/particles/circle_ring_particle.png" id="3_qpxc7"]
+[ext_resource type="Shader" uid="uid://dvnwhb2nittn3" path="res://src/shaders/rainbow_noise.gdshader" id="4_8uyoo"]
+[ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="5_payua"]
 
 [sub_resource type="Curve" id="Curve_8uyoo"]
 _data = [Vector2(0.031531528, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.5132098, 0.0, 0, 0]
@@ -15,6 +17,19 @@ curve = SubResource("Curve_8uyoo")
 particle_flag_disable_z = true
 gravity = Vector3(0, 0, 0)
 alpha_curve = SubResource("CurveTexture_payua")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jg61f"]
+shader = ExtResource("4_8uyoo")
+shader_parameter/shape_size = Vector2(64, 64)
+shader_parameter/noise_intensity = 0.70800003363
+shader_parameter/color_speed = 0.38000001805
+shader_parameter/noise_scale = 0.35600001365012
+shader_parameter/red_speed = 1.0
+shader_parameter/green_speed = 1.2
+shader_parameter/blue_speed = 0.8
+shader_parameter/distortion = 0.3
+shader_parameter/use_distortion = false
+shader_parameter/blend_mode = 0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_a7xd5"]
 radius = 64.0
@@ -37,6 +52,12 @@ process_material = SubResource("ParticleProcessMaterial_5ikj7")
 [node name="ShapeDrawer" parent="." index="1" unique_id=701557668]
 shape_size = Vector2(128, 128)
 fill_color = Color(1, 1, 1, 1)
+
+[node name="RGB" type="Sprite2D" parent="." index="2" unique_id=1521620468]
+visible = false
+material = SubResource("ShaderMaterial_jg61f")
+scale = Vector2(2, 2)
+texture = ExtResource("5_payua")
 
 [node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
 shape = SubResource("CircleShape2D_a7xd5")
