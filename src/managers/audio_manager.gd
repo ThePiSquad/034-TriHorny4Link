@@ -148,27 +148,27 @@ func play_ui_click() -> void:
 
 func play_ui_hover() -> void:
 	"""播放UI悬停音效"""
-	play_sound("ui_hover", -10.0, 1.2)
+	play_sound("ui_hover", -8.0, 1.2)
 
 func play_building_place() -> void:
 	"""播放建筑放置音效"""
-	play_sound("building_place", -3.0)
+	play_sound("building_place", -6.0)
 
 func play_turret_shoot(type: String) -> void:
 	"""播放炮塔发射音效"""
-	play_sound("turret_shoot_" + type, -8.0, randf_range(0.9, 1.1))
+	play_sound("turret_shoot_" + type, -16.0, randf_range(0.9, 1.1))
 
 func play_bullet_hit(type: String) -> void:
 	"""播放子弹命中音效"""
-	play_sound("bullet_hit_" + type, -6.0, randf_range(0.8, 1.2))
+	play_sound("bullet_hit_" + type, -12.0, randf_range(0.8, 1.2))
 
 func play_base_attacked() -> void:
 	"""播放基地被攻击音效"""
-	play_sound("base_attacked", -2.0)
+	play_sound("base_attacked", -3.0)
 
 func play_enemy_hit() -> void:
-	"""播放基地被攻击音效"""
-	play_sound("enemy_hit", -2.0)
+	"""播放敌人被攻击音效"""
+	play_sound("enemy_hit", -8.0)
 
 func set_master_volume(volume_db: float) -> void:
 	"""设置主音量"""
