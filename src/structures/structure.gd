@@ -9,7 +9,6 @@ signal color_changed(color_type: Enums.ColorType)
 var energy_level: EnergyLevel = EnergyLevel.new()
 
 @onready var shape_drawer: ShapeDrawer = $ShapeDrawer
-@onready var point_light_2d: PointLight2D = $PointLight2D
 
 @export var structure_type: Enums.StructureType
 

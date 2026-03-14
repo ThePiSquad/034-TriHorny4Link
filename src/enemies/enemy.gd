@@ -18,7 +18,7 @@ extends Damageable
 
 var direction: Vector2
 var base_position: Vector2 = Vector2.ZERO
-
+var shader = load("res://src/shaders/teleport_effect.gdshader")
 # 传送效果相关
 var _is_teleporting: bool = false  # 是否正在传送
 var _teleport_duration: float = 1  # 传送动画持续时间（秒）
@@ -155,15 +155,15 @@ func _ready() -> void:
 func _initialize_teleport_effect() -> void:
 	"""初始化传送效果"""
 	# 加载传送效果着色器
-	var shader = load("res://src/shader/teleport_effect.gdshader")
 	if shader:
 		_teleport_material = ShaderMaterial.new()
 		_teleport_material.shader = shader
 		
 		# 设置初始参数
 		_teleport_material.set_shader_parameter("progress", 1.0)
-		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x, enemy_size.y))
-		
+		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x * 3, enemy_size.y * 3))
+		_teleport_material.set_shader_parameter("beam_size", 0.15)
+		_teleport_material.set_shader_parameter("color", Color.RED)
 		# 应用材质到 shape_drawer
 		if shape_drawer:
 			shape_drawer.material = _teleport_material

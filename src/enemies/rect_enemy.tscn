@@ -12,7 +12,7 @@ uniform vec2 shape_size = vec2(100.0, 100.0);
 uniform float progress : hint_range(0.0, 1.0);
 uniform float noise_desnity = 60.0;
 uniform float beam_size : hint_range(0.01, 0.15);
-uniform vec4 color : source_color = vec4(0.0, 1.02, 1.2, 1.0);
+uniform vec4 color : source_color = vec4(1.0, 0.0, 0.0, 1.0);
 
 // 用于将顶点位置从 vertex 传到 fragment
 varying vec2 v_pos;
@@ -72,7 +72,7 @@ shader_parameter/shape_size = Vector2(128, 128)
 shader_parameter/progress = 0.0
 shader_parameter/noise_desnity = 60.0
 shader_parameter/beam_size = 0.15000000596046
-shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
+shader_parameter/color = Color(1, 0, 0, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gf85d"]
 

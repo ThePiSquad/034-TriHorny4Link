@@ -57,6 +57,9 @@ var _original_stroke_color: Color = Color.WHITE
 @onready var detection_area: Area2D = $DetectionArea
 @onready var detection_shape: CollisionShape2D = $DetectionArea/CollisionShape2D
 
+var _enemy_cleanup_timer: float = 0.0
+var _enemy_cleanup_interval: float = 1.0  # 每秒清理一次无效敌人
+
 func _ready() -> void:
 	super._ready()
 	structure_type = Enums.StructureType.TURRET
@@ -97,6 +100,12 @@ func _process(delta: float) -> void:
 	_update_fire_timer(delta)
 	_check_activation_status()
 	
+	# 定期清理无效敌人
+	_enemy_cleanup_timer += delta
+	if _enemy_cleanup_timer >= _enemy_cleanup_interval:
+		_cleanup_invalid_enemies()
+		_enemy_cleanup_timer = 0.0
+	
 	if not is_active:
 		return
 	
@@ -105,6 +114,20 @@ func _process(delta: float) -> void:
 	
 	if target and can_fire:
 		shot()
+
+func _cleanup_invalid_enemies() -> void:
+	"""清理无效的敌人引用"""
+	var cleaned_enemies = []
+	for enemy in enemies_in_range:
+		if is_instance_valid(enemy) and enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
+			cleaned_enemies.append(enemy)
+	
+	# 只在有变化时更新数组
+	if cleaned_enemies.size() != enemies_in_range.size():
+		enemies_in_range = cleaned_enemies
+		# 如果目标失效，清除目标
+		if not is_instance_valid(target) or (target and not target.can_be_targeted()):
+			target = null
 
 func _check_activation_status() -> void:
 	"""检查炮台是否处于激活状态"""
@@ -149,18 +172,13 @@ func _update_target() -> void:
 		target = null
 		return
 	
-	# 过滤掉正在传送的敌人
-	var valid_enemies = []
-	for enemy in enemies_in_range:
-		if enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
-			valid_enemies.append(enemy)
-	
-	if valid_enemies.is_empty():
-		target = null
+	# 如果当前目标仍然有效且可以锁定，继续锁定
+	if is_instance_valid(target) and target.can_be_targeted():
 		return
 	
-	valid_enemies.sort_custom(_compare_distance)
-	target = valid_enemies[0]
+	# 选择最近的敌人
+	enemies_in_range.sort_custom(_compare_distance)
+	target = enemies_in_range[0]
 
 func _compare_distance(a: Node2D, b: Node2D) -> bool:
 	var dist_a = global_position.distance_to(a.global_position)
@@ -363,11 +381,15 @@ func _on_detection_area_area_entered(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy and enemy.is_in_group("enemy"):
 		# 检查敌人是否可以被索敌
-		if enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
+		if is_instance_valid(enemy) and enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
 			if not enemy in enemies_in_range:
 				enemies_in_range.append(enemy)
 
 func _on_detection_area_area_exited(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy and enemy.is_in_group("enemy"):
-		enemies_in_range.erase(enemy)
+		if enemy in enemies_in_range:
+			enemies_in_range.erase(enemy)
+		# 如果当前目标是离开的敌人，立即清除
+		if target == enemy:
+			target = null
