@@ -1,0 +1,75 @@
+name: Build Godot Project
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [windows, linux]  
+        include:
+          - platform: windows
+            export_name: Windows
+            extension: exe
+          - platform: linux
+            export_name: Linux/X11
+            extension: x86_64
+
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version extracted: $VERSION"
+
+      - uses: actions/checkout@v4  # 升级到 v4
+        with:
+          lfs: true
+
+      - name: Build the game
+        id: build
+        uses: yeslayla/build-godot-action@v1.5.0
+        with:
+          name: "TriHorny4Link"
+          preset: ${{ matrix.export_name }}
+          debugMode: "false"
+
+      - name: Prepare build
+        run: |
+          BUILD_PATH="${{ github.workspace }}/${{ steps.build.outputs.build }}"
+          FINAL_NAME="TriHorny4Link-${{ env.VERSION }}-${{ matrix.platform }}"
+          
+          if [ "${{ matrix.platform }}" == "windows" ]; then
+            FINAL_NAME="$FINAL_NAME.exe"
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            FINAL_NAME="$FINAL_NAME.x86_64"
+          fi
+          
+          # 复制而不是移动，避免权限问题
+          cp "$BUILD_PATH" "$FINAL_NAME"
+          echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4  # 升级到 v4
+        with:
+          name: ${{ env.FINAL_NAME }}
+          path: ${{ env.FINAL_NAME }}
+          if-no-files-found: error
+
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.FINAL_NAME }}
+          asset_name: ${{ env.FINAL_NAME }}
+          asset_content_type: application/octet-stream
