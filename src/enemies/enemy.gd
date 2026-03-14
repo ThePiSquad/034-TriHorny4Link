@@ -336,7 +336,11 @@ func _set_particle_color(particle: Node, color: Color) -> void:
 	if particle is GPUParticles2D:
 		var material = particle.process_material
 		if material is ParticleProcessMaterial:
-			material.color = color
+			# 创建材质的副本以避免影响其他实例
+			var new_material = material.duplicate()
+			new_material.color = color
+			# 应用新材质
+			particle.process_material = new_material
 
 func _is_kinetic_bullet(bullet: Bullet) -> bool:
 	"""检查是否是动能子弹"""
