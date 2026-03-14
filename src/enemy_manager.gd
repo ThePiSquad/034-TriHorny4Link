@@ -38,8 +38,6 @@ func _ready() -> void:
 	current_difficulty = clamp(current_difficulty, 
 		Constants.EnemyConstants.MIN_DIFFICULTY, 
 		Constants.EnemyConstants.MAX_DIFFICULTY)
-	
-	print("EnemyManager 初始化完成 - 难度等级: ", current_difficulty, " 刷新间隔: ", spawn_interval)
 
 func _process(delta: float) -> void:
 	# 更新游戏时间
@@ -66,7 +64,6 @@ func _process(delta: float) -> void:
 				_wave_enemies_spawned += 1
 				if _wave_enemies_spawned >= Constants.EnemyConstants.WAVE_ENEMY_COUNT:
 					_is_wave_active = false
-					print("波次 ", _current_wave, " 结束")
 
 func _update_spawn_interval() -> void:
 	"""根据游戏时间和玩家表现动态调整刷新间隔 - 前期压力大，后期平缓"""
@@ -141,8 +138,6 @@ func _update_wave_system(delta: float) -> void:
 		
 		# 波次期间降低刷新间隔
 		spawn_interval = max(spawn_interval * Constants.EnemyConstants.WAVE_SPAWN_INTERVAL_MULTIPLIER, Constants.EnemyConstants.SPAWN_INTERVAL_MIN)
-		
-		print("波次 ", _current_wave, " 开始！难度提升到: ", current_difficulty, " 刷新间隔: ", spawn_interval)
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
@@ -150,7 +145,6 @@ func _find_crystal_position() -> void:
 	var crystals = get_tree().get_nodes_in_group("crystal")
 	if crystals.size() > 0:
 		_crystal_position = crystals[0].global_position
-		print("找到水晶位置: ", _crystal_position)
 	else:
 		# 如果没有找到水晶，使用默认位置
 		_crystal_position = Vector2.ZERO
@@ -169,10 +163,12 @@ func _try_spawn_enemy() -> void:
 		push_warning("EnemyManager: 没有可用的敌人类型")
 		return
 	
-	# 生成随机位置
-	var spawn_position = _generate_spawn_position()
+	# 先选择体型等级（用于确定生成距离）
+	var size_level = _select_size_level()
+	
+	# 根据体型等级生成位置（大体型敌人生成更远）
+	var spawn_position = _generate_spawn_position_for_size(size_level)
 	if spawn_position == Vector2.ZERO:
-		# 位置生成失败
 		push_warning("EnemyManager: 无法生成有效的敌人位置")
 		return
 	
@@ -185,13 +181,11 @@ func _try_spawn_enemy() -> void:
 	if enemy:
 		enemy.global_position = spawn_position
 		
-		# 根据游戏时间设置敌人体型
-		var size_level = _select_size_level()
+		# 设置敌人体型
 		if enemy.has_method("set_size_level"):
 			enemy.set_size_level(size_level)
 		
 		add_child(enemy)
-		print("生成敌人: ", enemy.name, " 位置: ", spawn_position, " 体型等级: ", size_level)
 	else:
 		push_error("EnemyManager: 敌人实例化失败")
 
@@ -264,6 +258,59 @@ func _get_available_enemies() -> Array[PackedScene]:
 	
 	return available_enemies
 
+func _generate_spawn_position_for_size(size_level: int) -> Vector2:
+	"""根据体型等级生成位置 - 大体型敌人生成更远"""
+	var spawn_position: Vector2 = Vector2.ZERO
+	var attempts: int = 0
+	
+	# 根据体型等级调整生成距离
+	# 体型越大，最小和最大距离都增加
+	var size_ratio = float(size_level) / float(Constants.EnemyConstants.MAX_SIZE_LEVEL)
+	
+	# 大体型敌人（11级以上）额外增加距离
+	var extra_distance = 0.0
+	if size_level >= Constants.EnemyConstants.SIZE_LEVEL_11:
+		# 巨型敌人额外增加距离，最大增加50%
+		extra_distance = (float(size_level - Constants.EnemyConstants.SIZE_LEVEL_10) / 10.0) * 0.5
+	
+	# 计算该体型的最小和最大生成距离
+	var min_dist = Constants.EnemyConstants.MIN_SPAWN_DISTANCE * (1.0 + size_ratio * 0.3)
+	var max_dist = Constants.EnemyConstants.MAX_SPAWN_DISTANCE * (1.0 + extra_distance)
+	
+	# 确保最大距离大于最小距离
+	max_dist = max(max_dist, min_dist * 1.5)
+	
+	while attempts < _max_spawn_attempts:
+		# 使用环形分布生成位置
+		var distance_bias = pow(randf(), Constants.EnemyConstants.SPAWN_DISTANCE_BIAS)
+		var spawn_distance = lerp(min_dist, max_dist, distance_bias)
+		
+		# 随机角度（0-360度，四面八方）
+		var spawn_angle = randf() * 2.0 * PI
+		
+		# 计算生成位置（基于水晶位置）
+		spawn_position = _crystal_position + Vector2(
+			cos(spawn_angle) * spawn_distance,
+			sin(spawn_angle) * spawn_distance
+		)
+		
+		# 检查是否在地图范围内
+		if spawn_position.x >= Constants.CameraConstants.MIN_X and \
+		   spawn_position.x <= Constants.CameraConstants.MAX_X and \
+		   spawn_position.y >= Constants.CameraConstants.MIN_Y and \
+		   spawn_position.y <= Constants.CameraConstants.MAX_Y:
+			return spawn_position
+		
+		attempts += 1
+	
+	# 如果多次尝试都失败，使用备选方案
+	var fallback_angle = randf() * 2.0 * PI
+	spawn_position = _crystal_position + Vector2(
+		cos(fallback_angle) * min_dist,
+		sin(fallback_angle) * min_dist
+	)
+	return spawn_position
+
 func _generate_spawn_position() -> Vector2:
 	"""生成随机位置，敌人在远处生成，从四面八方涌来"""
 	var spawn_position: Vector2 = Vector2.ZERO
@@ -310,28 +357,23 @@ func set_difficulty(difficulty: int) -> void:
 	current_difficulty = clamp(difficulty, 
 		Constants.EnemyConstants.MIN_DIFFICULTY, 
 		Constants.EnemyConstants.MAX_DIFFICULTY)
-	print("设置难度等级: ", current_difficulty)
 
 func set_spawn_interval(interval: float) -> void:
 	"""设置刷新间隔"""
-	spawn_interval = max(0.5, interval)  # 最小间隔0.5秒
-	print("设置刷新间隔: ", spawn_interval, " 秒")
+	spawn_interval = max(0.5, interval)
 
 func set_min_spawn_distance(distance: float) -> void:
 	"""设置最小生成距离"""
-	min_spawn_distance = max(100.0, distance)  # 最小距离100像素
-	print("设置最小生成距离: ", min_spawn_distance)
+	min_spawn_distance = max(100.0, distance)
 
 func stop_spawning() -> void:
 	"""停止生成敌人"""
-	spawn_interval = 0.0  # 设置为0表示停止
-	print("停止生成敌人")
+	spawn_interval = 0.0
 
 func start_spawning() -> void:
 	"""开始生成敌人"""
 	if spawn_interval <= 0:
 		spawn_interval = Constants.EnemyConstants.DEFAULT_SPAWN_INTERVAL
-	print("开始生成敌人，间隔: ", spawn_interval, " 秒")
 
 func get_game_time() -> float:
 	"""获取游戏运行时间"""

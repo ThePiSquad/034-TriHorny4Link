@@ -126,7 +126,7 @@ func set_size_level(level: int) -> void:
 	if shape_drawer:
 		_initialize_shape()
 	
-	print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed, "，攻击力: ", attack_damage)
+	# print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed, "，攻击力: ", attack_damage)
 
 func _ready() -> void:
 	super._ready()
