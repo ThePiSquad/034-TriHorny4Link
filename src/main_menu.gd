@@ -5,12 +5,19 @@ extends Control
 
 @onready var start_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/StartButton
 @onready var quit_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/QuitButton
+@onready var dynamic_background: DynamicBackground = $DynamicBackground
 var transition_manager = TransitionManager
 
 # 游戏场景路径
 const GAME_SCENE_PATH = "res://src/world.tscn"
 
 func _ready() -> void:
+	# 初始化动态背景
+	if dynamic_background:
+		dynamic_background.grid_size = 64.0
+		dynamic_background.background_scale = 0.8
+		dynamic_background.opacity = 0.3
+	
 	_setup_buttons()
 	_setup_animations()
 	
