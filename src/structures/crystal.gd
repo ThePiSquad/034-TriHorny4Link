@@ -6,7 +6,7 @@ var _game_start_time: float = 0.0
 var _is_game_started: bool = false
 
 # 死亡粒子特效
-var broken_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.tscn")
+var broken_particle_scene: PackedScene = preload("res://src/particles/crystal_broken.tscn")
 
 func _ready() -> void:
 	super._ready()
@@ -37,7 +37,9 @@ func on_health_depleted() -> void:
 func _spawn_broken_particle() -> void:
 	"""播放 Crystal 被摧毁的粒子特效"""
 	if broken_particle_scene:
-		var particle = broken_particle_scene.instantiate()
+		var particle :GPUParticles2D= broken_particle_scene.instantiate()
+		particle.emitting = true
+		
 		if particle:
 			get_parent().add_child(particle)
 			particle.global_position = global_position
