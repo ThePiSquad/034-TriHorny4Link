@@ -200,15 +200,7 @@ func _display_score_details() -> void:
 	var details_container = VBoxContainer.new()
 	details_container.add_theme_constant_override("separation", 15)
 	details_container.add_theme_constant_override("alignment", 1)  # 1 = CENTER
-	
-	# 添加标题
-	var title_label = Label.new()
-	title_label.text = "详细分数"
-	title_label.add_theme_font_size_override("font_size", 16)
-	title_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))  # 灰色
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	details_container.add_child(title_label)
-	
+
 	# 创建水平容器显示两项明细
 	var hbox = HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 40)
