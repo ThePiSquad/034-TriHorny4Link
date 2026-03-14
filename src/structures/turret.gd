@@ -62,6 +62,33 @@ func _ready() -> void:
 	structure_type = Enums.StructureType.TURRET
 	detection_shape.shape.radius = detection_range
 	_update_turret_attributes()
+	
+	# 连接颜色变化信号
+	color_changed.connect(_on_color_changed)
+	
+	# 初始颜色同步
+	_sync_visual_to_current_color()
+
+func _on_color_changed(new_color: Enums.ColorType) -> void:
+	"""当颜色改变时同步视觉效果"""
+	_sync_visual_to_current_color()
+
+func _sync_visual_to_current_color() -> void:
+	"""同步视觉效果到当前颜色"""
+	if not shape_drawer:
+		return
+	
+	# 根据当前状态更新颜色
+	if is_active:
+		var base_color = Constants.COLOR_MAP.get(color, Color.WHITE)
+		shape_drawer.fill_color = base_color
+		shape_drawer.stroke_color = base_color.lightened(0.3)
+		_original_fill_color = base_color  # 更新原始颜色用于射击闪光
+	else:
+		# 失活状态保持当前颜色
+		_original_fill_color = shape_drawer.fill_color
+	
+	shape_drawer.queue_redraw()
 
 func _init() -> void:
 	structure_type = Enums.StructureType.TURRET
@@ -98,11 +125,16 @@ func _update_activation_visual() -> void:
 	if not shape_drawer:
 		return
 	
-	# 失活时不修改颜色，保持当前颜色（白色或黑色）
+	# 根据激活状态更新颜色
 	if is_active:
+		# 激活状态：使用当前颜色的正常显示
 		var base_color = Constants.COLOR_MAP.get(color, Color.WHITE)
 		shape_drawer.fill_color = base_color
 		shape_drawer.stroke_color = base_color.lightened(0.3)
+		_original_fill_color = base_color  # 更新原始颜色用于射击闪光
+	else:
+		# 失活状态：保持当前颜色（不改变）
+		_original_fill_color = shape_drawer.fill_color
 	
 	shape_drawer.queue_redraw()
 
@@ -186,8 +218,9 @@ func _start_firing_flash() -> void:
 	if _firing_flash_tween and _firing_flash_tween.is_valid():
 		_firing_flash_tween.kill()
 	
-	# 保存原始颜色
-	_original_fill_color = shape_drawer.fill_color
+	# 获取当前实际颜色（确保是最新的）
+	var current_fill_color = shape_drawer.fill_color
+	_original_fill_color = current_fill_color
 	
 	# 计算目标颜色（提亮 50%）
 	var target_fill_color = _original_fill_color.lightened(0.5)
