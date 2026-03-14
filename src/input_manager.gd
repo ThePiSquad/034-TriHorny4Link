@@ -53,6 +53,15 @@ func _ready() -> void:
 		placement_preview.set_structure_manager(structure_manager)
 
 func _input(event: InputEvent) -> void:
+	# 处理鼠标滚轮事件（任何模式下都可用）
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_zoom_camera(1.0 + _zoom_speed)
+			return
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_zoom_camera(1.0 - _zoom_speed)
+			return
+	
 	if event.is_action_pressed("toggle_camera_mode"):
 		_toggle_mode()
 		return
@@ -149,10 +158,6 @@ func _handle_camera_input(event: InputEvent) -> void:
 			_camera_dragging = event.pressed
 			if event.pressed:
 				_last_mouse_position = event.position
-		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_zoom_camera(1.0 + _zoom_speed)
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_zoom_camera(1.0 - _zoom_speed)
 
 func _update_camera_drag() -> void:
 	if _camera_dragging and camera:
@@ -178,6 +183,10 @@ func _zoom_camera(zoom_factor: float) -> void:
 	camera.zoom = new_zoom
 
 func _handle_placement_input(event: InputEvent) -> void:
+	# 鼠标滚轮事件已经在 _input 函数中处理，这里不需要再处理
+	if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		return
+	
 	var hovered_control = get_viewport().gui_get_hovered_control()
 	
 	if event is InputEventMouseButton:
