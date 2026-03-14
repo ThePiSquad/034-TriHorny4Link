@@ -81,6 +81,10 @@ func _sync_visual_to_current_color() -> void:
 	if not shape_drawer:
 		return
 	
+	# 停止任何正在运行的 Tween 动画，避免覆盖新颜色
+	if _firing_flash_tween and _firing_flash_tween.is_valid():
+		_firing_flash_tween.kill()
+	
 	# 根据当前状态更新颜色
 	if is_active:
 		var base_color = Constants.COLOR_MAP.get(color, Color.WHITE)
@@ -147,6 +151,10 @@ func _update_activation_visual() -> void:
 	"""更新激活/失活状态的视觉效果"""
 	if not shape_drawer:
 		return
+	
+	# 停止任何正在运行的 Tween 动画，避免覆盖新颜色
+	if _firing_flash_tween and _firing_flash_tween.is_valid():
+		_firing_flash_tween.kill()
 	
 	# 根据激活状态更新颜色
 	if is_active:
