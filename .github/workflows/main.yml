@@ -3,22 +3,25 @@ on:
   push:
     tags:
       - 'v*'
-  release:
-    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [windows, linux]  
+        platform: [windows, linux]
         include:
           - platform: windows
-            export_name: Windows
-            extension: exe
+            export_preset: "Windows Desktop"  # 与你的预设名称完全一致
+            export_path: "build/windows/TriHorny4Link.exe"
+            final_name: "TriHorny4Link-${{ env.VERSION }}-windows.exe"
           - platform: linux
-            export_name: Linux/X11
-            extension: x86_64
+            export_preset: "Linux"  # 与你的预设名称完全一致
+            export_path: "build/linux/034GameJam"
+            final_name: "TriHorny4Link-${{ env.VERSION }}-linux.x86_64"
 
     steps:
       - name: Get version from tag
@@ -29,47 +32,137 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Version extracted: $VERSION"
 
-      - uses: actions/checkout@v4  # 升级到 v4
+      - uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-depth: 0
 
-      - name: Build the game
-        id: build
-        uses: yeslayla/build-godot-action@v1.5.0
-        with:
-          name: "TriHorny4Link"
-          preset: ${{ matrix.export_name }}
-          debugMode: "false"
-
-      - name: Prepare build
+      - name: Setup Godot 4.6.1
         run: |
-          BUILD_PATH="${{ github.workspace }}/${{ steps.build.outputs.build }}"
-          FINAL_NAME="TriHorny4Link-${{ env.VERSION }}-${{ matrix.platform }}"
+          # 下载 Godot 4.6.1 编辑器
+          wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
+          unzip Godot_v4.6.1-stable_linux.x86_64.zip
+          chmod +x Godot_v4.6.1-stable_linux.x86_64
+          sudo mv Godot_v4.6.1-stable_linux.x86_64 /usr/local/bin/godot
           
+          # 下载并安装导出模板
+          mkdir -p ~/.local/share/godot/export_templates/4.6.1.stable
+          wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
+          unzip Godot_v4.6.1-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.6.1.stable
+          mv ~/.local/share/godot/export_templates/4.6.1.stable/templates/* ~/.local/share/godot/export_templates/4.6.1.stable/
+          rm -f Godot_v4.6.1-stable_*.zip Godot_v4.6.1-stable_*.tpz
+          
+          # 验证安装
+          godot --version
+
+      - name: Export for ${{ matrix.platform }}
+        run: |
+          # 创建导出目录
+          mkdir -p build/${{ matrix.platform }}
+          
+          # 导出游戏
+          godot --headless --export-release "${{ matrix.export_preset }}" "${{ matrix.export_path }}"
+          
+          # 检查导出文件
           if [ "${{ matrix.platform }}" == "windows" ]; then
-            FINAL_NAME="$FINAL_NAME.exe"
-          elif [ "${{ matrix.platform }}" == "linux" ]; then
-            FINAL_NAME="$FINAL_NAME.x86_64"
+            # Windows 导出为 exe
+            if [ -f "${{ matrix.export_path }}" ]; then
+              cp "${{ matrix.export_path }}" "${{ matrix.final_name }}"
+              echo "✅ Windows build successful: ${{ matrix.final_name }}"
+            fi
+          else
+            # Linux 导出（可能是一个可执行文件）
+            if [ -f "build/linux/034GameJam" ]; then
+              cp "build/linux/034GameJam" "${{ matrix.final_name }}"
+              chmod +x "${{ matrix.final_name }}"
+              echo "✅ Linux build successful: ${{ matrix.final_name }}"
+            elif [ -d "build/linux" ]; then
+              # 如果是目录，打包
+              tar -czf "${{ matrix.final_name }}.tar.gz" -C build/linux .
+              mv "${{ matrix.final_name }}.tar.gz" "${{ matrix.final_name }}"
+              echo "✅ Linux build packaged: ${{ matrix.final_name }}"
+            fi
           fi
           
-          # 复制而不是移动，避免权限问题
-          cp "$BUILD_PATH" "$FINAL_NAME"
-          echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+          # 列出生成的文件
+          ls -la
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4  # 升级到 v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.FINAL_NAME }}
-          path: ${{ env.FINAL_NAME }}
+          name: ${{ matrix.final_name }}
+          path: ${{ matrix.final_name }}
           if-no-files-found: error
+          retention-days: 7
 
-      - name: Upload to Release
-        if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all builds
+        uses: actions/download-artifact@v4
+        with:
+          path: ./releases
+          merge-multiple: true
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          PREVIOUS_TAG=$(git tag --sort=-v:refname | head -n 2 | tail -n 1)
+          
+          cat > release_notes.md << EOF
+          # 🎮 TriHorny4Link $VERSION 发布
+          
+          ## ✨ 更新内容
+          
+          $(if [ -n "$PREVIOUS_TAG" ]; then
+            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD
+          else
+            echo "- 首次发布"
+          fi)
+          
+          ## 📦 下载
+          
+          | 平台 | 文件 | 大小 |
+          |------|------|------|
+          | Windows | \`TriHorny4Link-$VERSION-windows.exe\` | $(ls -lh TriHorny4Link-$VERSION-windows.exe 2>/dev/null | awk '{print $5}' || echo "N/A") |
+          | Linux | \`TriHorny4Link-$VERSION-linux.x86_64\` | $(ls -lh TriHorny4Link-$VERSION-linux.x86_64 2>/dev/null | awk '{print $5}' || echo "N/A") |
+          
+          ## 🚀 安装说明
+          
+          ### Windows
+          直接运行 \`TriHorny4Link-$VERSION-windows.exe\`
+          
+          ### Linux
+          \`\`\`bash
+          chmod +x TriHorny4Link-$VERSION-linux.x86_64
+          ./TriHorny4Link-$VERSION-linux.x86_64
+          \`\`\`
+          
+          ## 🔄 完整变更
+          \${{ github.server_url }}/\${{ github.repository }}/compare/$PREVIOUS_TAG...${{ github.ref_name }}
+          EOF
+          
+          echo "Release notes generated"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            TriHorny4Link-*.exe
+            TriHorny4Link-*.x86_64
+            TriHorny4Link-*.tar.gz
+          body_path: release_notes.md
+          name: TriHorny4Link ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.FINAL_NAME }}
-          asset_name: ${{ env.FINAL_NAME }}
-          asset_content_type: application/octet-stream
