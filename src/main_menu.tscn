@@ -1,23 +1,29 @@
 [gd_scene format=3 uid="uid://b2xguk7hfd2xq"]
 
 [ext_resource type="Script" uid="uid://bt5i6tymu8adq" path="res://src/main_menu.gd" id="1_main"]
+[ext_resource type="Texture2D" uid="uid://bx3chuthcjhdr" path="res://assets/particles/t_solid_particle.png" id="2_bq8pk"]
+[ext_resource type="Texture2D" uid="uid://b3a04uumb4v6q" path="res://assets/particles/rect_solid_particle.png" id="3_6w7d7"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_guuao"]
-bg_color = Color(0.2, 0.2, 0.3019608, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-shadow_color = Color(0, 0, 0, 0.5019608)
-shadow_size = 4
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_guuao"]
+load_path = "res://.godot/imported/main_title.png-2387c44cbbfd0721c34faa3ff854e343.ctex"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bq8pk"]
-bg_color = Color(0.3019608, 0.3019608, 0.4, 1)
-border_width_left = 10
-border_width_top = 10
-border_width_right = 10
-border_width_bottom = 10
-shadow_size = 4
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_6w7d7"]
+thickness = 0
+vertical = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bq8pk"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_bq8pk"]
+thickness = 0
+vertical = true
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_d3tmf"]
+thickness = 0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1wfgh"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_1jpog"]
+thickness = 0
 
 [node name="MainMenu" type="Control" unique_id=1419952103]
 layout_mode = 3
@@ -50,47 +56,43 @@ layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="GameTitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1737729251]
+[node name="GameTitleT" type="TextureRect" parent="CenterContainer/VBoxContainer" unique_id=1435012899]
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 64
-text = "GameTitle"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1052656878]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7019608, 0.7019608, 0.7019608, 1)
-theme_override_font_sizes/font_size = 24
-text = "PiSquad
-"
-horizontal_alignment = 1
+texture = SubResource("CompressedTexture2D_guuao")
+expand_mode = 5
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer" unique_id=686879200]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="ButtonContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1208533855]
+[node name="ButtonContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1865017726]
 layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
 
 [node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer" unique_id=250589258]
 custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
-theme_override_colors/font_hover_color = Color(0.3019608, 0.78431374, 1, 1)
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
 theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("StyleBoxFlat_guuao")
-theme_override_styles/hover = SubResource("StyleBoxFlat_bq8pk")
-text = "Start"
+theme_override_styles/normal = SubResource("StyleBoxLine_6w7d7")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_bq8pk")
+theme_override_styles/hover = SubResource("StyleBoxLine_bq8pk")
+icon = ExtResource("2_bq8pk")
+icon_alignment = 1
 
 [node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer" unique_id=666597240]
 custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(1, 0.5019608, 0.5019608, 1)
+theme_override_colors/icon_pressed_color = Color(0.73381966, 0, 0.16526812, 1)
+theme_override_colors/icon_hover_color = Color(1, 0.5019608, 0.5019608, 1)
 theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("StyleBoxFlat_guuao")
-theme_override_styles/hover = SubResource("StyleBoxFlat_bq8pk")
-text = "Quit"
+theme_override_styles/normal = SubResource("StyleBoxLine_d3tmf")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_1wfgh")
+theme_override_styles/hover = SubResource("StyleBoxLine_1jpog")
+icon = ExtResource("3_6w7d7")
+icon_alignment = 1
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/QuitButton" to="." method="_on_quit_button_pressed"]
