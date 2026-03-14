@@ -82,7 +82,10 @@ points = PackedVector2Array(0, -32, -32, 32, 32, 32)
 
 [node name="TriangleEnemy" unique_id=531630275 instance=ExtResource("1_ef7xj")]
 script = ExtResource("2_drdgn")
+move_speed = 200.0
+attack_damage = 15.0
 random_initial_rotation = true
+max_health = 50.0
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 material = SubResource("ShaderMaterial_56tku")

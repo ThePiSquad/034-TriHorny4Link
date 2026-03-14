@@ -146,6 +146,7 @@ func _display_total_score() -> void:
 	var section_container = VBoxContainer.new()
 	section_container.add_theme_constant_override("separation", 10)
 	section_container.add_theme_constant_override("alignment", 1)  # 1 = CENTER
+	section_container.name = "TotalScoreSection"
 	
 	# 添加标签（突出显示）
 	var label = Label.new()
@@ -153,6 +154,8 @@ func _display_total_score() -> void:
 	label.add_theme_font_size_override("font_size", 24)
 	label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))  # 金黄色
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.visible = false
+	label.name = "TotalScoreLabel"
 	section_container.add_child(label)
 	
 	# 创建图案容器（使用 FlowContainer 实现自动换行）
@@ -200,6 +203,10 @@ func _display_score_details() -> void:
 	var details_container = VBoxContainer.new()
 	details_container.add_theme_constant_override("separation", 15)
 	details_container.add_theme_constant_override("alignment", 1)  # 1 = CENTER
+	# 默认不可见
+	details_container.visible = false
+	# 设置名称以便在 _input 中引用
+	details_container.name = "ScoreDetailsContainer"
 
 	# 创建水平容器显示两项明细
 	var hbox = HBoxContainer.new()
@@ -240,6 +247,22 @@ func _display_score_details() -> void:
 	
 	details_container.add_child(hbox)
 	score_container.add_child(details_container)
+
+func _input(event: InputEvent) -> void:
+	"""处理输入事件"""
+	if event is InputEventKey and event.pressed and event.keycode == KEY_SPACE:
+		# 按下空格键显示总分标签和详细信息
+		var total_score_section = score_container.get_node_or_null("TotalScoreSection")
+		if total_score_section:
+			var total_score_label = total_score_section.get_node_or_null("TotalScoreLabel")
+			if total_score_label and not total_score_label.visible:
+				total_score_label.visible = true
+				print("显示总分数")
+		
+		var details_container = score_container.get_node_or_null("ScoreDetailsContainer")
+		if details_container and not details_container.visible:
+			details_container.visible = true
+			print("显示分数详细信息")
 
 func _update_debug_display() -> void:
 	"""更新 debug 信息显示"""
