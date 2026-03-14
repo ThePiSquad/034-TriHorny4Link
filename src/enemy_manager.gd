@@ -20,6 +20,12 @@ var _game_time: float = 0.0  # 游戏运行时间（秒）
 var _max_unlock_time: float = Constants.EnemyConstants.MAX_SIZE_UNLOCK_TIME  # 完全解锁所有体型所需时间
 var _time_scale_factor: float = Constants.EnemyConstants.TIME_SCALE_FACTOR  # 时间缩放因子
 
+# 波次系统变量
+var _wave_timer: float = 0.0  # 波次计时器
+var _current_wave: int = 0  # 当前波次
+var _is_wave_active: bool = false  # 波次是否激活
+var _wave_enemies_spawned: int = 0  # 波次已生成敌人数量
+
 func _ready() -> void:
 	# 查找水晶位置
 	_find_crystal_position()
@@ -45,23 +51,98 @@ func _process(delta: float) -> void:
 	# 更新刷新计时器
 	_spawn_timer += delta
 	
+	# 波次系统处理
+	_update_wave_system(delta)
+	
 	# 检查是否达到刷新间隔
 	if _spawn_timer >= spawn_interval:
 		_spawn_timer = 0.0
 		if is_start_spwn:
 			_try_spawn_enemy()
+			
+			# 波次期间额外生成敌人
+			if _is_wave_active and _wave_enemies_spawned < Constants.EnemyConstants.WAVE_ENEMY_COUNT:
+				_try_spawn_enemy()
+				_wave_enemies_spawned += 1
+				if _wave_enemies_spawned >= Constants.EnemyConstants.WAVE_ENEMY_COUNT:
+					_is_wave_active = false
+					print("波次 ", _current_wave, " 结束")
 
 func _update_spawn_interval() -> void:
-	"""根据游戏时间动态调整刷新间隔"""
-	# 计算时间进度（0.0 - 1.0）
-	var time_progress = min(_game_time / _max_unlock_time, 1.0)
+	"""根据游戏时间和玩家表现动态调整刷新间隔 - 前期压力大，后期平缓"""
+	# 计算时间进度（0.0 - 1.0），使用幂函数控制曲线
+	# TIME_PROGRESS_POWER < 1 使前期变化快，后期变化慢
+	var raw_progress = min(_game_time / _max_unlock_time, 1.0)
+	var time_progress = pow(raw_progress, Constants.EnemyConstants.TIME_PROGRESS_POWER)
 	
-	# 根据时间进度调整刷新间隔（时间越长，刷新越快）
+	# 获取玩家表现数据
+	var player_performance = _get_player_performance()
+	
+	# 综合时间和玩家表现调整难度
+	var performance_factor = 1.0
+	if player_performance > Constants.EnemyConstants.PERFORMANCE_HIGH_THRESHOLD:
+		performance_factor = Constants.EnemyConstants.PERFORMANCE_HIGH_FACTOR
+	elif player_performance > Constants.EnemyConstants.PERFORMANCE_MED_THRESHOLD:
+		performance_factor = Constants.EnemyConstants.PERFORMANCE_MED_FACTOR
+	
+	# 波次加成（降低影响，使后期不会太快）
+	var wave_factor = 1.0 + (_current_wave * Constants.EnemyConstants.WAVE_BONUS_PER_WAVE * 0.7)
+	
+	# 前期额外压力 - 游戏开始时额外降低间隔
+	var early_game_bonus = 0.0
+	if _game_time < Constants.EnemyConstants.EARLY_GAME_DURATION:
+		# 前期逐渐降低压力，从最大加成到0
+		early_game_bonus = Constants.EnemyConstants.EARLY_GAME_SPAWN_BONUS * (1.0 - _game_time / Constants.EnemyConstants.EARLY_GAME_DURATION)
+	
+	# 计算目标刷新间隔
 	var interval_range = Constants.EnemyConstants.SPAWN_INTERVAL_MAX - Constants.EnemyConstants.SPAWN_INTERVAL_MIN
-	var new_interval = Constants.EnemyConstants.SPAWN_INTERVAL_MAX - (interval_range * time_progress)
+	var target_interval = Constants.EnemyConstants.SPAWN_INTERVAL_MAX - (interval_range * time_progress * performance_factor * wave_factor)
 	
-	# 平滑过渡到新的刷新间隔
-	spawn_interval = lerp(spawn_interval, new_interval, 0.1)
+	# 应用前期压力加成
+	target_interval = target_interval * (1.0 - early_game_bonus)
+	
+	# 确保最小间隔
+	target_interval = max(target_interval, Constants.EnemyConstants.SPAWN_INTERVAL_MIN)
+	
+	# 限制后期增长 - 如果超过中期目标，减缓下降速度
+	if target_interval < Constants.EnemyConstants.SPAWN_INTERVAL_MID:
+		var mid_to_min_range = Constants.EnemyConstants.SPAWN_INTERVAL_MID - Constants.EnemyConstants.SPAWN_INTERVAL_MIN
+		var current_in_mid_range = Constants.EnemyConstants.SPAWN_INTERVAL_MID - target_interval
+		var slowed_progress = pow(current_in_mid_range / mid_to_min_range, 0.7) * mid_to_min_range
+		target_interval = Constants.EnemyConstants.SPAWN_INTERVAL_MID - slowed_progress
+	
+	# 平滑过渡
+	spawn_interval = lerp(spawn_interval, target_interval, Constants.EnemyConstants.SPAWN_LERP_SPEED)
+
+func _get_player_performance() -> int:
+	"""获取玩家表现数据"""
+	# 尝试获取GameManager实例
+	var game_manager = get_tree().get_root().get_node_or_null("GameManager")
+	if game_manager and game_manager.has_method("get_score_data"):
+		var score_data = game_manager.get_score_data()
+		return score_data.get("enemy_score", 0)
+	return 0
+
+func _update_wave_system(delta: float) -> void:
+	"""更新波次系统"""
+	# 更新波次计时器
+	_wave_timer += delta
+	
+	# 检查是否达到波次间隔
+	if _wave_timer >= Constants.EnemyConstants.WAVE_INTERVAL:
+		_wave_timer = 0.0
+		_current_wave += 1
+		_is_wave_active = true
+		_wave_enemies_spawned = 0
+		
+		# 波次开始，提升难度
+		var difficulty_increase = Constants.EnemyConstants.WAVE_DIFFICULTY_INCREASE + int(_current_wave / Constants.EnemyConstants.WAVE_EXTRA_DIFFICULTY_INTERVAL)
+		current_difficulty = min(current_difficulty + difficulty_increase, Constants.EnemyConstants.MAX_DIFFICULTY)
+		
+		# 波次期间降低刷新间隔
+		spawn_interval = max(spawn_interval * Constants.EnemyConstants.WAVE_SPAWN_INTERVAL_MULTIPLIER, Constants.EnemyConstants.SPAWN_INTERVAL_MIN)
+		
+		print("波次 ", _current_wave, " 开始！难度提升到: ", current_difficulty, " 刷新间隔: ", spawn_interval)
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
@@ -115,27 +196,46 @@ func _try_spawn_enemy() -> void:
 		push_error("EnemyManager: 敌人实例化失败")
 
 func _select_size_level() -> int:
-	"""根据游戏时间选择敌人体型等级"""
-	# 计算时间进度（0.0 - 1.0）
-	var time_progress = min(_game_time / _max_unlock_time, 1.0)
+	"""根据游戏时间选择敌人体型等级 - 前期解锁快，后期平缓"""
+	# 计算时间进度（0.0 - 1.0），使用幂函数控制曲线
+	# SIZE_UNLOCK_POWER < 1 使前期体型解锁更快，后期平缓
+	var raw_time_progress = min(_game_time / _max_unlock_time, 1.0)
+	var time_progress = pow(raw_time_progress, Constants.EnemyConstants.SIZE_UNLOCK_POWER)
 	
-	# 根据时间进度计算可用的最大体型等级
-	var max_unlocked_level = int(1 + time_progress * (Constants.EnemyConstants.MAX_SIZE_LEVEL - 1))
+	# 计算波次加成（降低影响）
+	var wave_bonus = float(_current_wave) * Constants.EnemyConstants.WAVE_BONUS_PER_WAVE * 0.6
+	
+	# 综合时间和波次进度
+	var combined_progress = min(time_progress + wave_bonus, 1.0)
+	
+	# 根据综合进度计算可用的最大体型等级
+	var max_unlocked_level = int(1 + combined_progress * (Constants.EnemyConstants.MAX_SIZE_LEVEL - 1))
 	max_unlocked_level = clamp(max_unlocked_level, Constants.EnemyConstants.SIZE_LEVEL_1, Constants.EnemyConstants.MAX_SIZE_LEVEL)
 	
-	# 计算每个体型的权重（大体型权重随时间增加）
+	# 计算每个体型的权重（大体型权重随时间和波次增加）
 	var weights = []
 	var total_weight = 0.0
 	
 	for level in range(Constants.EnemyConstants.SIZE_LEVEL_1, max_unlocked_level + 1):
 		# 基础权重
-		var base_weight = 1.0
+		var base_weight = 0.8
 		
 		# 时间加成（大体型随时间获得更高权重）
-		var time_bonus = float(level - 1) * time_progress * _time_scale_factor
+		var time_bonus = pow(float(level - 1), Constants.EnemyConstants.SIZE_WEIGHT_POWER) * combined_progress * _time_scale_factor
+		
+		# 波次加成（波次期间提升大体型权重）
+		var wave_bonus_weight = 0.0
+		if _is_wave_active:
+			wave_bonus_weight = pow(float(level - 1), Constants.EnemyConstants.WAVE_SIZE_BONUS_POWER) * Constants.EnemyConstants.WAVE_SIZE_BONUS_FACTOR
+		
+		# 后期游戏加成 - 游戏时间越长，大体型权重越高
+		var late_game_bonus = 0.0
+		if _game_time > Constants.EnemyConstants.LATE_GAME_START_TIME:
+			var late_game_progress = min((_game_time - Constants.EnemyConstants.LATE_GAME_START_TIME) / 60.0, 1.0)
+			late_game_bonus = float(level - 1) * Constants.EnemyConstants.LATE_GAME_BONUS_FACTOR * late_game_progress
 		
 		# 最终权重
-		var final_weight = base_weight + time_bonus
+		var final_weight = base_weight + time_bonus + wave_bonus_weight + late_game_bonus
 		weights.append(final_weight)
 		total_weight += final_weight
 	
@@ -165,27 +265,45 @@ func _get_available_enemies() -> Array[PackedScene]:
 	return available_enemies
 
 func _generate_spawn_position() -> Vector2:
-	"""生成随机位置，确保在地图范围内且距离水晶足够远"""
+	"""生成随机位置，敌人在远处生成，从四面八方涌来"""
 	var spawn_position: Vector2 = Vector2.ZERO
 	var attempts: int = 0
 	
 	while attempts < _max_spawn_attempts:
-		# 生成随机位置
-		spawn_position = Vector2(
-			randf_range(Constants.CameraConstants.MIN_X, Constants.CameraConstants.MAX_X),
-			randf_range(Constants.CameraConstants.MIN_Y, Constants.CameraConstants.MAX_Y)
+		# 使用环形分布生成位置 - 在最小和最大距离之间随机选择距离
+		# 使用幂函数使敌人更倾向于在远处生成（更有涌来的感觉）
+		var distance_bias = pow(randf(), Constants.EnemyConstants.SPAWN_DISTANCE_BIAS)
+		var spawn_distance = lerp(
+			Constants.EnemyConstants.MIN_SPAWN_DISTANCE,
+			Constants.EnemyConstants.MAX_SPAWN_DISTANCE,
+			distance_bias
 		)
 		
-		# 检查距离水晶是否足够远
-		var distance_to_crystal = spawn_position.distance_to(_crystal_position)
-		if distance_to_crystal >= min_spawn_distance:
+		# 随机角度（0-360度，四面八方）
+		var spawn_angle = randf() * 2.0 * PI
+		
+		# 计算生成位置（基于水晶位置）
+		spawn_position = _crystal_position + Vector2(
+			cos(spawn_angle) * spawn_distance,
+			sin(spawn_angle) * spawn_distance
+		)
+		
+		# 检查是否在地图范围内
+		if spawn_position.x >= Constants.CameraConstants.MIN_X and \
+		   spawn_position.x <= Constants.CameraConstants.MAX_X and \
+		   spawn_position.y >= Constants.CameraConstants.MIN_Y and \
+		   spawn_position.y <= Constants.CameraConstants.MAX_Y:
 			return spawn_position
 		
 		attempts += 1
 	
-	# 如果多次尝试都失败，返回零向量表示失败
-	push_warning("EnemyManager: 位置生成失败，尝试次数: ", attempts)
-	return Vector2.ZERO
+	# 如果多次尝试都失败，使用备选方案：在最小距离处生成
+	var fallback_angle = randf() * 2.0 * PI
+	spawn_position = _crystal_position + Vector2(
+		cos(fallback_angle) * Constants.EnemyConstants.MIN_SPAWN_DISTANCE,
+		sin(fallback_angle) * Constants.EnemyConstants.MIN_SPAWN_DISTANCE
+	)
+	return spawn_position
 
 func set_difficulty(difficulty: int) -> void:
 	"""设置难度等级"""

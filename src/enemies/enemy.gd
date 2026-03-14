@@ -8,6 +8,12 @@ extends Damageable
 @export var enemy_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
 @export var size_level: int = Constants.EnemyConstants.SIZE_LEVEL_1
 
+# 基础属性值（由场景设置，用于体型计算）
+var _base_move_speed: float = 0.0
+var _base_max_health: float = 0.0
+var _base_attack_damage: float = 0.0
+var _is_base_values_set: bool = false
+
 # 随机旋转功能
 @export var random_initial_rotation: bool = false
 """
@@ -90,6 +96,13 @@ func set_size_level(level: int) -> void:
 	"""设置敌人体型等级并调整属性"""
 	size_level = clamp(level, Constants.EnemyConstants.SIZE_LEVEL_1, Constants.EnemyConstants.MAX_SIZE_LEVEL)
 	
+	# 第一次调用时保存基础属性值（场景设置的值）
+	if not _is_base_values_set:
+		_base_move_speed = move_speed
+		_base_max_health = max_health
+		_base_attack_damage = attack_damage
+		_is_base_values_set = true
+	
 	# 获取体型尺寸
 	if Constants.EnemyConstants.SIZE_MAP.has(size_level):
 		enemy_size = Constants.EnemyConstants.SIZE_MAP[size_level]
@@ -98,21 +111,22 @@ func set_size_level(level: int) -> void:
 	if Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS.has(size_level):
 		var multipliers = Constants.EnemyConstants.SIZE_ATTRIBUTE_MULTIPLIERS[size_level]
 		
-		# 调整血量
-		if max_health > 0:
-			var new_health = int(max_health * multipliers.health)
-			max_health = new_health
-			current_health = new_health
+		# 调整血量 - 基于场景设置的基础值
+		var new_health = int(_base_max_health * multipliers.health)
+		max_health = new_health
+		current_health = new_health
 		
-		# 调整移动速度
-		var base_speed = 100.0
-		move_speed = base_speed * multipliers.speed
+		# 调整移动速度 - 基于场景设置的基础值
+		move_speed = _base_move_speed * multipliers.speed
+		
+		# 调整攻击力 - 基于场景设置的基础值
+		attack_damage = _base_attack_damage * multipliers.health  # 攻击力与血量同比例增长
 	
 	# 更新形状（只在shape_drawer可用时）
 	if shape_drawer:
 		_initialize_shape()
 	
-	#print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed)
+	print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed, "，攻击力: ", attack_damage)
 
 func _ready() -> void:
 	super._ready()
