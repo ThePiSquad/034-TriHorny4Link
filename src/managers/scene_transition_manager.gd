@@ -25,7 +25,7 @@ static var instance: TransitionManager
 func _ready() -> void:
 	instance = self
 	_setup_transition_overlay()
-	
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	# 保持在场景切换时不被删除
 	set_process_internal(true)
 

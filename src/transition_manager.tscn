@@ -20,10 +20,12 @@ shader_parameter/position = -1.5
 shader_parameter/size = Vector2(128, 114)
 
 [node name="TransitionManager" type="CanvasLayer" unique_id=831622957]
+layer = 10
 script = ExtResource("1_00ehs")
 transition_shader = SubResource("ShaderMaterial_mtm30")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1392808785]
+z_index = 10
 material = SubResource("ShaderMaterial_00ehs")
 anchors_preset = 15
 anchor_right = 1.0

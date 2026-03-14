@@ -42,6 +42,10 @@ var _camera_max_x: float = Constants.CameraConstants.MAX_X
 var _camera_min_y: float = Constants.CameraConstants.MIN_Y
 var _camera_max_y: float = Constants.CameraConstants.MAX_Y
 
+# 暂停菜单相关
+var pause_menu_scene: PackedScene
+var is_paused: bool = false
+
 func _ready() -> void:
 	_update_mode()
 	if hud:
@@ -51,6 +55,9 @@ func _ready() -> void:
 	# 设置placement_preview的structure_manager引用
 	if placement_preview and structure_manager:
 		placement_preview.set_structure_manager(structure_manager)
+	
+	# 预加载暂停菜单场景
+	pause_menu_scene = load("res://src/ui/pause_menu.tscn")
 
 func _input(event: InputEvent) -> void:
 	# 处理鼠标滚轮事件（任何模式下都可用）
@@ -61,6 +68,15 @@ func _input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_zoom_camera(1.0 - _zoom_speed)
 			return
+	
+	# 处理暂停菜单
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_toggle_pause()
+		return
+	
+	# 如果游戏暂停，忽略其他输入
+	if is_paused:
+		return
 	
 	if event.is_action_pressed("toggle_camera_mode"):
 		_toggle_mode()
@@ -86,6 +102,31 @@ func _process(delta: float) -> void:
 	else:
 		_update_placement_preview()
 		_handle_continuous_placement(delta)
+
+func _toggle_pause() -> void:
+	"""切换暂停状态"""
+	if is_paused:
+		# 恢复游戏
+		is_paused = false
+		get_tree().paused = false
+	else:
+		# 暂停游戏
+		is_paused = true
+		get_tree().paused = true
+		# 显示暂停菜单
+		_show_pause_menu()
+
+func _show_pause_menu() -> void:
+	"""显示暂停菜单"""
+	if pause_menu_scene:
+		var pause_menu = pause_menu_scene.instantiate()
+		if pause_menu:
+			get_tree().current_scene.add_child(pause_menu)
+			print("显示暂停菜单")
+		else:
+			print("无法实例化暂停菜单")
+	else:
+		print("暂停菜单场景未加载")
 
 func _handle_camera_movement(delta: float) -> void:
 	if not camera:
