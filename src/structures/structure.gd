@@ -12,6 +12,9 @@ var energy_level: EnergyLevel = EnergyLevel.new()
 
 @export var structure_type: Enums.StructureType
 
+# 是否播放音效（用于背景元素禁用音效）
+@export var play_sound: bool = true
+
 var _color: Enums.ColorType = Enums.ColorType.WHITE
 
 # 粒子特效相关
@@ -212,7 +215,9 @@ func _ready() -> void:
 		shape_drawer.fill_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
 		shape_drawer.stroke_color = shape_drawer.fill_color.lightened(0.3)
 	call_deferred("_setup_input_handling")
-	AudioManager.play_building_place()
+	# 只在需要时播放音效
+	if play_sound:
+		AudioManager.play_building_place()
 
 func _setup_input_handling() -> void:
 	if not shape_drawer:

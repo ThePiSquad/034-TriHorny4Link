@@ -83,6 +83,10 @@ func _setup_structure(structure: Node2D, type: Enums.StructureType, position: Ve
 	"""设置结构属性"""
 	structure.global_position = position
 	
+	# 禁用音效（背景元素不播放音效）
+	if structure.has_method("set"):
+		structure.set("play_sound", false)
+	
 	# 设置结构类型
 	if structure.has_method("set_structure_type"):
 		structure.set_structure_type(type)
