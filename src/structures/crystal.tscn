@@ -2,6 +2,19 @@
 
 [ext_resource type="PackedScene" uid="uid://dfli78g3x0kpv" path="res://src/structures/structure.tscn" id="1_bh81t"]
 [ext_resource type="Script" uid="uid://6k1rt52tj2i2" path="res://src/structures/crystal.gd" id="2_a7xd5"]
+[ext_resource type="Texture2D" uid="uid://cvak6u0orwdcs" path="res://assets/particles/circle_ring_particle.png" id="3_qpxc7"]
+
+[sub_resource type="Curve" id="Curve_8uyoo"]
+_data = [Vector2(0.031531528, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.5132098, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_payua"]
+curve = SubResource("Curve_8uyoo")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5ikj7"]
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+alpha_curve = SubResource("CurveTexture_payua")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_a7xd5"]
 radius = 64.0
@@ -12,9 +25,16 @@ radius = 64.0
 [node name="Crystal" unique_id=102321888 groups=["crystal"] instance=ExtResource("1_bh81t")]
 script = ExtResource("2_a7xd5")
 structure_type = 2
-max_health = 1000.0
+max_health = 200.0
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
+[node name="CircleRing" type="GPUParticles2D" parent="." index="0" unique_id=491202401]
+emitting = false
+amount = 1
+texture = ExtResource("3_qpxc7")
+lifetime = 1.5
+process_material = SubResource("ParticleProcessMaterial_5ikj7")
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=701557668]
 shape_size = Vector2(128, 128)
 fill_color = Color(1, 1, 1, 1)
 
