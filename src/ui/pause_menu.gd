@@ -20,6 +20,8 @@ func _on_resume_button_pressed() -> void:
 func _on_main_menu_button_pressed() -> void:
 	"""返回主菜单"""
 	AudioManager.play_ui_click()
+	# 停止 BGM（返回主菜单时会重新播放）
+	AudioManager.stop_bgm()
 	# 切换到主菜单场景
 	var transition_manager = TransitionManager.instance
 	get_tree().paused = false

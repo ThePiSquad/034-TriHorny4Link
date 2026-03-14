@@ -2,7 +2,7 @@ extends Node2D
 
 class_name Bullet
 
-@onready var hit_area_2d: Area2D = $HitArea2D
+#@onready var hit_area_2d: Area2D = $HitArea2D
 @onready var shape_drawer: ShapeDrawer = $ShapeDrawer
 
 @export var attributes:Array[Enums.BulletAttributes]

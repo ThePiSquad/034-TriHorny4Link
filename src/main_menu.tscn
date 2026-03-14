@@ -9,6 +9,9 @@
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_guuao"]
 load_path = "res://.godot/imported/main_title.png-2387c44cbbfd0721c34faa3ff854e343.ctex"
 
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_1wfgh"]
+color = Color(0.6528635, 0.6528636, 0.6528636, 1)
+
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_6w7d7"]
 thickness = 0
 vertical = true
@@ -61,6 +64,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2078519157]
+custom_minimum_size = Vector2(720, 0)
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
@@ -73,9 +77,11 @@ expand_mode = 5
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer" unique_id=686879200]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_1wfgh")
 
 [node name="ButtonContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1865017726]
 layout_mode = 2
+alignment = 1
 
 [node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer" unique_id=250589258]
 custom_minimum_size = Vector2(250, 60)

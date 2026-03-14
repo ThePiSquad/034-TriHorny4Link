@@ -33,6 +33,14 @@ const SOUND_PATHS = {
 	"base_die": "res://assets/audio/fx_effect_explosion.ogg",
 }
 
+# BGM 文件路径
+const BGM_PATH = "res://assets/audio/bgm.mp3"
+
+# BGM 播放器
+var _bgm_player: AudioStreamPlayer = null
+var _bgm_volume_db: float = -10.0
+var _bgm_pitch_scale: float = 1.0
+
 func _ready() -> void:
 	# 设置单例
 	if instance == null:
@@ -40,6 +48,9 @@ func _ready() -> void:
 	else:
 		queue_free()
 		return
+	
+	# 创建 BGM 播放器
+	_create_bgm_player()
 	
 	# 创建音效播放器池
 	_create_audio_player_pool()
@@ -167,3 +178,63 @@ func set_sound_volume(volume_db: float) -> void:
 	"""设置音效音量"""
 	# 可以创建单独的音效总线来控制
 	pass
+
+func _create_bgm_player() -> void:
+	"""创建 BGM 播放器"""
+	_bgm_player = AudioStreamPlayer.new()
+	_bgm_player.name = "BGMPlayer"
+	_bgm_player.volume_db = _bgm_volume_db
+	_bgm_player.pitch_scale = _bgm_pitch_scale
+	_bgm_player.autoplay = false
+	add_child(_bgm_player)
+
+func play_bgm() -> void:
+	"""播放 BGM"""
+	if not _bgm_player:
+		push_warning("BGM 播放器未初始化")
+		return
+	
+	if _bgm_player.playing:
+		return
+	
+	# 加载 BGM 文件
+	if ResourceLoader.exists(BGM_PATH):
+		var bgm = load(BGM_PATH)
+		if bgm:
+			_bgm_player.stream = bgm
+			_bgm_player.play()
+			print("BGM 开始播放")
+		else:
+			push_warning("无法加载 BGM 文件: " + BGM_PATH)
+	else:
+		push_warning("BGM 文件不存在: " + BGM_PATH)
+
+func stop_bgm() -> void:
+	"""停止 BGM"""
+	if _bgm_player and _bgm_player.playing:
+		_bgm_player.stop()
+		print("BGM 已停止")
+
+func pause_bgm() -> void:
+	"""暂停 BGM"""
+	if _bgm_player and _bgm_player.playing:
+		_bgm_player.stream_paused = true
+		print("BGM 已暂停")
+
+func resume_bgm() -> void:
+	"""恢复 BGM"""
+	if _bgm_player and _bgm_player.stream_paused:
+		_bgm_player.stream_paused = false
+		print("BGM 已恢复")
+
+func set_bgm_volume(volume_db: float) -> void:
+	"""设置 BGM 音量"""
+	_bgm_volume_db = volume_db
+	if _bgm_player:
+		_bgm_player.volume_db = volume_db
+
+func set_bgm_pitch(pitch_scale: float) -> void:
+	"""设置 BGM 音调"""
+	_bgm_pitch_scale = pitch_scale
+	if _bgm_player:
+		_bgm_player.pitch_scale = pitch_scale

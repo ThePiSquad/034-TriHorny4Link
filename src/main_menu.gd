@@ -23,6 +23,9 @@ func _ready() -> void:
 	
 	# 确保鼠标可见
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	
+	# 播放 BGM
+	AudioManager.play_bgm()
 
 func _setup_buttons() -> void:
 	"""设置按钮样式和信号"""

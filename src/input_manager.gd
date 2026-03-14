@@ -109,10 +109,14 @@ func _toggle_pause() -> void:
 		# 恢复游戏
 		is_paused = false
 		get_tree().paused = false
+		# 恢复 BGM
+		AudioManager.resume_bgm()
 	else:
 		# 暂停游戏
 		is_paused = true
 		get_tree().paused = true
+		# 暂停 BGM
+		AudioManager.pause_bgm()
 		# 显示暂停菜单
 		_show_pause_menu()
 
