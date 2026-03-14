@@ -14,10 +14,12 @@ func _input(event: InputEvent) -> void:
 
 func _on_resume_button_pressed() -> void:
 	"""继续游戏"""
+	AudioManager.play_ui_click()
 	_close_pause_menu()
 
 func _on_main_menu_button_pressed() -> void:
 	"""返回主菜单"""
+	AudioManager.play_ui_click()
 	# 切换到主菜单场景
 	var transition_manager = TransitionManager.instance
 	get_tree().paused = false
@@ -33,3 +35,11 @@ func _close_pause_menu() -> void:
 	get_tree().paused = false
 	# 移除暂停菜单
 	queue_free()
+
+
+func _on_resume_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()
+
+
+func _on_main_menu_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()

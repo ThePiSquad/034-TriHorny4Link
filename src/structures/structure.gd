@@ -212,6 +212,7 @@ func _ready() -> void:
 		shape_drawer.fill_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
 		shape_drawer.stroke_color = shape_drawer.fill_color.lightened(0.3)
 	call_deferred("_setup_input_handling")
+	AudioManager.play_building_place()
 
 func _setup_input_handling() -> void:
 	if not shape_drawer:

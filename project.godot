@@ -23,6 +23,7 @@ boot_splash/minimum_display_time=1000
 [autoload]
 
 TransitionManager="*uid://bwvyqqyj0nv0h"
+AudioManager="*uid://bf7wfodbwd48m"
 
 [display]
 

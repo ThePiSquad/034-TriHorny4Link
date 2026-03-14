@@ -311,6 +311,7 @@ func _update_debug_display() -> void:
 		debug_score_display.add_child(total_label)
 
 func _on_restart_button_pressed() -> void:
+	AudioManager.play_ui_click()
 	"""重新开始游戏"""
 	# 重新加载当前场景
 	var transition_manager = TransitionManager.instance
@@ -320,6 +321,7 @@ func _on_restart_button_pressed() -> void:
 		get_tree().reload_current_scene()
 
 func _on_main_menu_button_pressed() -> void:
+	AudioManager.play_ui_click()
 	"""返回主菜单"""
 	# 切换到主菜单场景
 	var transition_manager = TransitionManager.instance
@@ -328,3 +330,11 @@ func _on_main_menu_button_pressed() -> void:
 	else:
 		# 如果管理器不存在，直接切换
 		get_tree().change_scene_to_file("res://src/main_menu.tscn")
+
+
+func _on_restart_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()
+
+
+func _on_main_menu_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()

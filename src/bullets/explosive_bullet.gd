@@ -39,7 +39,7 @@ func explode() -> void:
 	
 	# 触发范围伤害
 	_trigger_area_damage()
-	
+	AudioManager.play_bullet_hit("purple")
 	# 生成爆炸粒子效果
 	_create_explosion_effect()
 

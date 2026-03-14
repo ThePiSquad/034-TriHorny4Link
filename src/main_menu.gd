@@ -66,6 +66,7 @@ func _setup_animations() -> void:
 	tween.parallel().tween_property($CenterContainer, "modulate:a", 1.0, 0.5)
 
 func _on_start_button_pressed() -> void:
+	AudioManager.play_ui_click()
 	"""开始游戏按钮点击处理"""
 	# 禁用按钮防止重复点击
 	start_button.disabled = true
@@ -85,6 +86,7 @@ func _on_start_button_pressed() -> void:
 		get_tree().change_scene_to_file(GAME_SCENE_PATH)
 
 func _on_quit_button_pressed() -> void:
+	AudioManager.play_ui_click()
 	"""退出游戏按钮点击处理"""
 	# 播放按钮点击动画
 	var tween = create_tween()
@@ -107,3 +109,11 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if not quit_button.disabled:
 			_on_quit_button_pressed()
+
+
+func _on_start_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()
+
+
+func _on_quit_button_mouse_entered() -> void:
+	AudioManager.play_ui_hover()

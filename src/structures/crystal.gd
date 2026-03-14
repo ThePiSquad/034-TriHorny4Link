@@ -30,7 +30,7 @@ func on_health_depleted() -> void:
 	
 	# 播放死亡粒子特效
 	_spawn_broken_particle()
-	
+	AudioManager.play_sound("base_die")
 	# 结束游戏
 	_end_game()
 
@@ -59,3 +59,8 @@ func _end_game() -> void:
 		game_manager.end_game()
 	else:
 		push_warning("GameManager 实例不存在，无法结束游戏")
+
+
+func take_damage(amount: float, source: Node = null) -> void:
+	super.take_damage(amount, source)
+	AudioManager.play_base_attacked()

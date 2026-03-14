@@ -115,3 +115,7 @@ func set_homing_config(enabled: bool, range: float, turn: float) -> void:
 	homing_enabled = enabled
 	detection_range = range
 	turn_speed = turn
+
+func _on_hit_area_2d_area_entered(area: Area2D) -> void:
+	super._on_hit_area_2d_area_entered(area)
+	AudioManager.play_bullet_hit("green")

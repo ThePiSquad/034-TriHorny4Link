@@ -16,6 +16,7 @@ func _ready() -> void:
 
 
 func select_icon(_selected_icon) -> void:
+	AudioManager.play_ui_click()
 	# 检查是否点击了已选中的图标
 	if self.selected_icon == _selected_icon:
 		# 取消选择

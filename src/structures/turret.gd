@@ -258,8 +258,10 @@ func _fire_single_bullet(angle: float) -> void:
 	
 	if homing_enabled and homing_bullet_scene:
 		bullet = homing_bullet_scene.instantiate()
+		AudioManager.play_turret_shoot("green")
 	else:
 		bullet = bullet_scene.instantiate()
+		AudioManager.play_turret_shoot("blue")
 	
 	if not bullet:
 		return
@@ -278,6 +280,7 @@ func _fire_single_bullet(angle: float) -> void:
 	get_parent().add_child(bullet)
 
 func _fire_shotgun(base_angle: float) -> void:
+	AudioManager.play_turret_shoot("red")
 	var angle_spread_rad = deg_to_rad(shotgun_angle_spread)
 	var start_angle = base_angle - angle_spread_rad * (shotgun_count - 1) / 2.0
 	
@@ -286,6 +289,7 @@ func _fire_shotgun(base_angle: float) -> void:
 		_fire_single_bullet(angle)
 
 func _fire_magic_bullet() -> void:
+	AudioManager.play_turret_shoot("yellow")
 	if not target or not magic_bullet_scene:
 		return
 	
@@ -305,6 +309,7 @@ func _fire_magic_bullet() -> void:
 	get_parent().add_child(bullet)
 
 func _fire_lightning_bullet() -> void:
+	AudioManager.play_turret_shoot("orange")
 	if not target or not lightning_bullet_scene:
 		return
 	
@@ -324,6 +329,7 @@ func _fire_lightning_bullet() -> void:
 	get_parent().add_child(bullet)
 
 func _fire_explosive_bullet(angle: float) -> void:
+	AudioManager.play_turret_shoot("purple")
 	if not explosive_bullet_scene:
 		return
 	

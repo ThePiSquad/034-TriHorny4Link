@@ -45,10 +45,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.078431375, 0.078431375, 0.11764706, 1)
 
-[node name="DynamicBackground" type="Node2D" parent="." unique_id=319258916 node_paths=PackedStringArray("structure_manager")]
+[node name="DynamicBackground" type="Node2D" parent="." unique_id=319258916]
 modulate = Color(1, 1, 1, 0.3)
 script = ExtResource("2_d3tmf")
-structure_manager = NodePath("StructureManager")
 
 [node name="StructureManager" type="Node2D" parent="DynamicBackground" unique_id=1839373388]
 script = ExtResource("3_1jpog")
@@ -104,5 +103,7 @@ theme_override_styles/hover = SubResource("StyleBoxLine_1jpog")
 icon = ExtResource("3_6w7d7")
 icon_alignment = 1
 
+[connection signal="mouse_entered" from="CenterContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_button_mouse_entered"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="mouse_entered" from="CenterContainer/VBoxContainer/ButtonContainer/QuitButton" to="." method="_on_quit_button_mouse_entered"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/QuitButton" to="." method="_on_quit_button_pressed"]

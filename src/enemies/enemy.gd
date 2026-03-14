@@ -314,7 +314,7 @@ func _on_hit(source: Node) -> void:
 	
 	# 立即开始闪烁
 	shape_drawer.fill_color = Color.WHITE
-	
+	AudioManager.play_enemy_hit()
 	# 如果是动能子弹，添加击退效果
 	if source is Bullet:
 		var bullet = source as Bullet

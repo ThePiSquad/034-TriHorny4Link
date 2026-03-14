@@ -144,6 +144,7 @@ func _find_chain_targets(current_target: Node2D, chain_index: int) -> void:
 		
 		# 造成伤害
 		if next_target.has_method("take_damage"):
+			AudioManager.play_bullet_hit("orange")
 			next_target.take_damage(int(damage), self)
 		
 		# 继续连锁
