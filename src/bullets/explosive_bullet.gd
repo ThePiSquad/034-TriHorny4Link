@@ -69,7 +69,3 @@ func _create_explosion_effect() -> void:
 	get_parent().add_child(particle_system)
 	particle_system.emitting = true
 	
-	# 自动清理
-	var tween = create_tween()
-	tween.tween_interval(explosion_particle_duration + 0.1)
-	tween.tween_callback(particle_system.queue_free)

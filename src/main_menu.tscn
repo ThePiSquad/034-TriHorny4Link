@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://b2xguk7hfd2xq"]
+
+[ext_resource type="Script" uid="uid://bt5i6tymu8adq" path="res://src/main_menu.gd" id="1_main"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_guuao"]
+bg_color = Color(0.2, 0.2, 0.3019608, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.5019608)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bq8pk"]
+bg_color = Color(0.3019608, 0.3019608, 0.4, 1)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+shadow_size = 4
+
+[node name="MainMenu" type="Control" unique_id=1419952103]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="." unique_id=219258915]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078431375, 0.078431375, 0.11764706, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1598196751]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2078519157]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="GameTitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1737729251]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 64
+text = "GameTitle"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1052656878]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7019608, 0.7019608, 0.7019608, 1)
+theme_override_font_sizes/font_size = 24
+text = "PiSquad
+"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer" unique_id=686879200]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="ButtonContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1208533855]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer" unique_id=250589258]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.3019608, 0.78431374, 1, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_guuao")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bq8pk")
+text = "Start"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer" unique_id=666597240]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(1, 0.5019608, 0.5019608, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_guuao")
+theme_override_styles/hover = SubResource("StyleBoxFlat_bq8pk")
+text = "Quit"
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContainer/QuitButton" to="." method="_on_quit_button_pressed"]

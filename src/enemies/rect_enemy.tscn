@@ -66,9 +66,9 @@ void fragment() {
     COLOR = tex;
 }"
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_qfp2t"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8e5cw"]
 shader = SubResource("Shader_gf85d")
-shader_parameter/shape_size = Vector2(64, 64)
+shader_parameter/shape_size = Vector2(128, 128)
 shader_parameter/progress = 0.0
 shader_parameter/noise_desnity = 60.0
 shader_parameter/beam_size = 0.15000000596046
@@ -83,7 +83,7 @@ script = ExtResource("2_gf85d")
 random_initial_rotation = true
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
-material = SubResource("ShaderMaterial_qfp2t")
+material = SubResource("ShaderMaterial_8e5cw")
 shape_type = 2
 corner_radius = 0.0
 fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)

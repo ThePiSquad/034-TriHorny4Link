@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://bwvyqqyj0nv0h"]
+
+[ext_resource type="Script" uid="uid://bc1dwjgbro2t4" path="res://src/managers/scene_transition_manager.gd" id="1_00ehs"]
+[ext_resource type="Shader" uid="uid://bre1qydieb2lt" path="res://src/shaders/transition_shader.gdshader" id="2_ioe7r"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mtm30"]
+shader = ExtResource("2_ioe7r")
+shader_parameter/in_color = Color(0, 0, 0, 1)
+shader_parameter/out_color = Color(0, 0, 0, 1)
+shader_parameter/in_out = 0.0
+shader_parameter/position = 0.856
+shader_parameter/size = Vector2(16, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_00ehs"]
+shader = ExtResource("2_ioe7r")
+shader_parameter/in_color = Color(0, 0, 0, 1)
+shader_parameter/out_color = Color(0, 0, 0, 1)
+shader_parameter/in_out = 0.0
+shader_parameter/position = -1.5
+shader_parameter/size = Vector2(128, 114)
+
+[node name="TransitionManager" type="CanvasLayer" unique_id=831622957]
+script = ExtResource("1_00ehs")
+transition_shader = SubResource("ShaderMaterial_mtm30")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1392808785]
+material = SubResource("ShaderMaterial_00ehs")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

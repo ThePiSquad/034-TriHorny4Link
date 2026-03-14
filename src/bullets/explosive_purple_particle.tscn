@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://d2eva3dcx7uki"]
 
+[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="1_55kp8"]
+
 [sub_resource type="Curve" id="Curve_n0fxo"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.13207543), 0.0, 0.0, 0, 0]
 point_count = 2
@@ -59,6 +61,7 @@ amount = 32
 sub_emitter = NodePath("GPUParticles2D")
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_85vue")
+script = ExtResource("1_55kp8")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=1895031107]
 emitting = false

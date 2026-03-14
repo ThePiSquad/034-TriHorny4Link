@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="034GamJam"
-run/main_scene="uid://b56p44rn05jrx"
+run/main_scene="uid://b2xguk7hfd2xq"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+TransitionManager="*uid://bwvyqqyj0nv0h"
 
 [display]
 

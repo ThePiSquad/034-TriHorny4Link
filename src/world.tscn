@@ -25,6 +25,7 @@ script = ExtResource("1_tp5op")
 state = SubResource("Resource_0qwtu")
 
 [node name="BackgroundManager" parent="." unique_id=1234567890 instance=ExtResource("14_bg")]
+background_color = Color(0.078431375, 0.078431375, 0.11764706, 1)
 
 [node name="ScreenShakeManager" type="Node" parent="." unique_id=2000000001 node_paths=PackedStringArray("camera")]
 script = ExtResource("15_shake")
