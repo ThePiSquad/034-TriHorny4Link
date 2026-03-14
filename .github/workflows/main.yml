@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:  # 添加这一行，允许手动触发
+  workflow_dispatch:
     inputs:
       version:
         description: '版本号 (例如: 1.0.0)'
@@ -33,34 +33,49 @@ jobs:
         id: extract
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # 手动触发时使用输入的版本号
             VERSION="${{ github.event.inputs.version }}"
           else
-            # 标签触发时从标签提取版本号
             VERSION=${GITHUB_REF#refs/tags/}
             VERSION=${VERSION#v}
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
-  build:
+  # 新增：确定要编译的平台
+  set-matrix:
+    runs-on: ubuntu-latest
     needs: get-version
+    outputs:
+      platform: ${{ steps.set-platform.outputs.platform }}
+    steps:
+      - id: set-platform
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PLATFORM_INPUT="${{ github.event.inputs.platform }}"
+            if [ "$PLATFORM_INPUT" == "all" ]; then
+              echo 'platform=["windows", "linux"]' >> $GITHUB_OUTPUT
+            else
+              echo "platform=[\"$PLATFORM_INPUT\"]" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo 'platform=["windows", "linux"]' >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: [get-version, set-matrix]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # 根据输入决定编译哪些平台
-        platform: ${{ fromJSON(
-          github.event_name == 'workflow_dispatch' && 
-          (github.event.inputs.platform == 'all' && '["windows", "linux"]' || format('["{0}"]', github.event.inputs.platform)) ||
-          '["windows", "linux"]'
-        ) }}
+        platform: ${{ fromJSON(needs.set-matrix.outputs.platform) }}
         include:
           - platform: windows
             export_preset: "Windows Desktop"
             export_path: "build/windows/TriHorny4Link.exe"
+            final_ext: "exe"
           - platform: linux
             export_preset: "Linux"
             export_path: "build/linux/034GameJam"
+            final_ext: "x86_64"
 
     steps:
       - uses: actions/checkout@v4
@@ -68,20 +83,18 @@ jobs:
           lfs: true
           fetch-depth: 0
 
-      - name: Set version environment
-        run: |
-          echo "VERSION=${{ needs.get-version.outputs.version }}" >> $GITHUB_ENV
-
       - name: Setup Godot 4.6.1
         run: |
-          wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
-          unzip Godot_v4.6.1-stable_linux.x86_64.zip
+          # 下载 Godot 4.6.1 编辑器
+          wget -q https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
+          unzip -q Godot_v4.6.1-stable_linux.x86_64.zip
           chmod +x Godot_v4.6.1-stable_linux.x86_64
           sudo mv Godot_v4.6.1-stable_linux.x86_64 /usr/local/bin/godot
           
+          # 下载并安装导出模板
           mkdir -p ~/.local/share/godot/export_templates/4.6.1.stable
-          wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
-          unzip Godot_v4.6.1-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.6.1.stable
+          wget -q https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
+          unzip -q Godot_v4.6.1-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.6.1.stable
           mv ~/.local/share/godot/export_templates/4.6.1.stable/templates/* ~/.local/share/godot/export_templates/4.6.1.stable/
           rm -f Godot_v4.6.1-stable_*.zip Godot_v4.6.1-stable_*.tpz
           
@@ -89,25 +102,43 @@ jobs:
 
       - name: Export for ${{ matrix.platform }}
         run: |
+          VERSION="${{ needs.get-version.outputs.version }}"
+          
+          # 创建导出目录
           mkdir -p build/${{ matrix.platform }}
+          
+          # 导出游戏
+          echo "Exporting for ${{ matrix.platform }}..."
           godot --headless --export-release "${{ matrix.export_preset }}" "${{ matrix.export_path }}"
           
-          if [ "${{ matrix.platform }}" == "windows" ] && [ -f "${{ matrix.export_path }}" ]; then
-            FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-windows.exe"
-            cp "${{ matrix.export_path }}" "$FINAL_NAME"
-          elif [ "${{ matrix.platform }}" == "linux" ]; then
+          # 处理导出文件
+          if [ "${{ matrix.platform }}" == "windows" ]; then
+            if [ -f "${{ matrix.export_path }}" ]; then
+              FINAL_NAME="TriHorny4Link-${VERSION}-windows.${{ matrix.final_ext }}"
+              cp "${{ matrix.export_path }}" "$FINAL_NAME"
+              echo "✅ Windows build: $FINAL_NAME"
+            else
+              echo "❌ Windows build failed: ${{ matrix.export_path }} not found"
+              exit 1
+            fi
+          else  # linux
             if [ -f "build/linux/034GameJam" ]; then
-              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.x86_64"
+              FINAL_NAME="TriHorny4Link-${VERSION}-linux.${{ matrix.final_ext }}"
               cp "build/linux/034GameJam" "$FINAL_NAME"
               chmod +x "$FINAL_NAME"
+              echo "✅ Linux build: $FINAL_NAME"
             elif [ -d "build/linux" ]; then
-              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.tar.gz"
+              FINAL_NAME="TriHorny4Link-${VERSION}-linux.tar.gz"
               tar -czf "$FINAL_NAME" -C build/linux .
+              echo "✅ Linux build packaged: $FINAL_NAME"
+            else
+              echo "❌ Linux build failed"
+              exit 1
             fi
           fi
           
           echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
-          echo "✅ Build complete: $FINAL_NAME"
+          ls -la "$FINAL_NAME"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -115,6 +146,7 @@ jobs:
           name: TriHorny4Link-${{ needs.get-version.outputs.version }}-${{ matrix.platform }}
           path: ${{ env.FINAL_NAME }}
           if-no-files-found: error
+          retention-days: 7
 
   release:
     needs: [get-version, build]
@@ -131,6 +163,9 @@ jobs:
         with:
           path: ./releases
           merge-multiple: true
+
+      - name: List downloaded files
+        run: ls -la releases/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
