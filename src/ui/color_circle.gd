@@ -39,12 +39,16 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	"""处理每帧的填充动画"""
+	# 如果在编辑器中运行，跳过动画逻辑
+	if Engine.is_editor_hint():
+		current_fill_ratio = target_fill_ratio
+		return
+	
 	# 检查动画是否启用
 	if not hud or not hud.has_method("is_animation_enabled") or not hud.is_animation_enabled():
 		# 如果动画禁用，直接设置值
 		current_fill_ratio = target_fill_ratio
 		return
-	
 	# 平滑过渡到目标值
 	if abs(current_fill_ratio - target_fill_ratio) > MIN_DIFFERENCE:
 		# 使用平滑插值
