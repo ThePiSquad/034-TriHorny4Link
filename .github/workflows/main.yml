@@ -3,12 +3,27 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:  # 添加这一行，允许手动触发
+    inputs:
+      version:
+        description: '版本号 (例如: 1.0.0)'
+        required: true
+        default: '1.0.0'
+        type: string
+      platform:
+        description: '编译平台'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - windows
+          - linux
 
 permissions:
   contents: write
 
 jobs:
-  # 先获取版本号
   get-version:
     runs-on: ubuntu-latest
     outputs:
@@ -17,8 +32,14 @@ jobs:
       - name: Extract version
         id: extract
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          VERSION=${VERSION#v}
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # 手动触发时使用输入的版本号
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # 标签触发时从标签提取版本号
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
@@ -27,7 +48,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [windows, linux]
+        # 根据输入决定编译哪些平台
+        platform: ${{ fromJSON(
+          github.event_name == 'workflow_dispatch' && 
+          (github.event.inputs.platform == 'all' && '["windows", "linux"]' || format('["{0}"]', github.event.inputs.platform)) ||
+          '["windows", "linux"]'
+        ) }}
         include:
           - platform: windows
             export_preset: "Windows Desktop"
@@ -48,13 +74,11 @@ jobs:
 
       - name: Setup Godot 4.6.1
         run: |
-          # 下载 Godot 4.6.1 编辑器
           wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
           unzip Godot_v4.6.1-stable_linux.x86_64.zip
           chmod +x Godot_v4.6.1-stable_linux.x86_64
           sudo mv Godot_v4.6.1-stable_linux.x86_64 /usr/local/bin/godot
           
-          # 下载并安装导出模板
           mkdir -p ~/.local/share/godot/export_templates/4.6.1.stable
           wget https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
           unzip Godot_v4.6.1-stable_export_templates.tpz -d ~/.local/share/godot/export_templates/4.6.1.stable
@@ -65,36 +89,25 @@ jobs:
 
       - name: Export for ${{ matrix.platform }}
         run: |
-          # 创建导出目录
           mkdir -p build/${{ matrix.platform }}
-          
-          # 导出游戏
           godot --headless --export-release "${{ matrix.export_preset }}" "${{ matrix.export_path }}"
           
-          # 重命名文件，添加版本号
-          if [ "${{ matrix.platform }}" == "windows" ]; then
-            if [ -f "${{ matrix.export_path }}" ]; then
-              FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-windows.exe"
-              cp "${{ matrix.export_path }}" "$FINAL_NAME"
-              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
-              echo "✅ Windows build: $FINAL_NAME"
-            fi
-          else
+          if [ "${{ matrix.platform }}" == "windows" ] && [ -f "${{ matrix.export_path }}" ]; then
+            FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-windows.exe"
+            cp "${{ matrix.export_path }}" "$FINAL_NAME"
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
             if [ -f "build/linux/034GameJam" ]; then
               FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.x86_64"
               cp "build/linux/034GameJam" "$FINAL_NAME"
               chmod +x "$FINAL_NAME"
-              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
-              echo "✅ Linux build: $FINAL_NAME"
             elif [ -d "build/linux" ]; then
               FINAL_NAME="TriHorny4Link-${{ needs.get-version.outputs.version }}-linux.tar.gz"
               tar -czf "$FINAL_NAME" -C build/linux .
-              echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
-              echo "✅ Linux build packaged: $FINAL_NAME"
             fi
           fi
           
-          ls -la
+          echo "FINAL_NAME=$FINAL_NAME" >> $GITHUB_ENV
+          echo "✅ Build complete: $FINAL_NAME"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -102,12 +115,12 @@ jobs:
           name: TriHorny4Link-${{ needs.get-version.outputs.version }}-${{ matrix.platform }}
           path: ${{ env.FINAL_NAME }}
           if-no-files-found: error
-          retention-days: 7
 
   release:
     needs: [get-version, build]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    # 只在标签触发时创建 Release
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,55 +132,11 @@ jobs:
           path: ./releases
           merge-multiple: true
 
-      - name: Generate release notes
-        id: release_notes
-        run: |
-          VERSION="${{ needs.get-version.outputs.version }}"
-          PREVIOUS_TAG=$(git tag --sort=-v:refname | head -n 2 | tail -n 1)
-          
-          cat > release_notes.md << EOF
-          # 🎮 TriHorny4Link $VERSION 发布
-          
-          ## ✨ 更新内容
-          
-          $(if [ -n "$PREVIOUS_TAG" ]; then
-            git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD
-          else
-            echo "- 首次发布"
-          fi)
-          
-          ## 📦 下载
-          
-          | 平台 | 文件 | 大小 |
-          |------|------|------|
-          | Windows | \`TriHorny4Link-$VERSION-windows.exe\` | $(ls -lh releases/TriHorny4Link-$VERSION-windows.exe 2>/dev/null | awk '{print $5}' || echo "N/A") |
-          | Linux | \`TriHorny4Link-$VERSION-linux.x86_64\` | $(ls -lh releases/TriHorny4Link-$VERSION-linux.x86_64 2>/dev/null | awk '{print $5}' || echo "N/A") |
-          
-          ## 🚀 安装说明
-          
-          ### Windows
-          直接运行 \`TriHorny4Link-$VERSION-windows.exe\`
-          
-          ### Linux
-          \`\`\`bash
-          chmod +x TriHorny4Link-$VERSION-linux.x86_64
-          ./TriHorny4Link-$VERSION-linux.x86_64
-          \`\`\`
-          
-          ## 🔄 完整变更
-          \${{ github.server_url }}/\${{ github.repository }}/compare/$PREVIOUS_TAG...${{ github.ref_name }}
-          EOF
-
-      - name: List downloaded files
-        run: ls -la releases/
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: releases/*
-          body_path: release_notes.md
+          generate_release_notes: true
           name: TriHorny4Link ${{ needs.get-version.outputs.version }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
