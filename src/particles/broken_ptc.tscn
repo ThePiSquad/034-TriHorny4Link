@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b8gan7yolydrq"]
 
 [ext_resource type="Texture2D" uid="uid://c6gd2nu1t2b15" path="res://assets/particles/rect_particle.png" id="1_f87rr"]
-[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="2_u6wyu"]
+[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="2_u6wyu"]
 
 [sub_resource type="Curve" id="Curve_jarja"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]

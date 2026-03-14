@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2eva3dcx7uki"]
 
-[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="1_55kp8"]
+[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="1_55kp8"]
 
 [sub_resource type="Curve" id="Curve_n0fxo"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.13207543), 0.0, 0.0, 0, 0]
