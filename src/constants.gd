@@ -91,6 +91,17 @@ class EnemyConstants:
 	const MAX_SIZE_UNLOCK_TIME: float = 100.0  # 完全解锁所有体型所需时间（秒）
 	const SPAWN_INTERVAL_MIN: float = 0.5  # 最小刷新间隔（秒）
 	const SPAWN_INTERVAL_MAX: float = 3.0  # 最大刷新间隔（秒）
+	
+	# 敌人分数映射表（体型越大分数越高）
+	static var ENEMY_SCORE_MAP = {
+		SIZE_LEVEL_1: 10,    # 最小体型：10 分
+		SIZE_LEVEL_2: 20,    # 20 分
+		SIZE_LEVEL_3: 35,    # 35 分
+		SIZE_LEVEL_4: 55,    # 55 分
+		SIZE_LEVEL_5: 80,    # 80 分
+		SIZE_LEVEL_6: 110,   # 110 分
+		SIZE_LEVEL_7: 150    # 最大体型：150 分
+	}
 
 # 碰撞层常量
 const STRUCTURE_LAYER: int = 2  # 结构层

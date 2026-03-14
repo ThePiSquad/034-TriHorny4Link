@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dm6f7gyxplmrf"]
+
+[ext_resource type="Script" path="res://src/ui/score_pattern_display.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://shapedrawer123" path="res://src/components/shape_drawer.tscn" id="2_drawer"]
+
+[node name="ScorePatternDisplay" type="PanelContainer"]
+custom_minimum_size = Vector2(50, 50)
+size_flags_horizontal = SIZE_SHRINK_CENTER
+script = ExtResource("1_script")
+
+[node name="ShapeDrawer" parent="." instance=ExtResource("2_drawer")]
+shape_size = Vector2(40, 40)
+fill_color = Color(1, 1, 1, 1)
+stroke_color = Color(0.8, 0.8, 0.8, 1)
+stroke_enabled = true

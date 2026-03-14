@@ -175,12 +175,27 @@ func _on_damageable_died(source: Node) -> void:
 	# 生成死亡粒子特效
 	_spawn_death_particle()
 	
+	# 添加敌人分数
+	_add_enemy_score()
+	
 	# 断开屏障的死亡信号连接
 	if _current_barrier and _current_barrier.has_signal("died"):
 		if _current_barrier.died.is_connected(_on_barrier_destroyed):
 			_current_barrier.died.disconnect(_on_barrier_destroyed)
 	
 	queue_free()
+
+func _add_enemy_score() -> void:
+	"""添加敌人分数到 GameManager"""
+	# 根据体型获取分数
+	var score = Constants.EnemyConstants.ENEMY_SCORE_MAP.get(size_level, 10)
+	
+	# 添加到 GameManager
+	var game_manager = GameManager.instance
+	if game_manager:
+		game_manager.add_enemy_score(score)
+	else:
+		push_warning("GameManager 实例不存在，无法添加分数")
 
 func _spawn_death_particle() -> void:
 	"""生成死亡粒子特效"""
