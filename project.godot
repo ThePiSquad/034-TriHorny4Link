@@ -10,10 +10,15 @@ config_version=5
 
 [application]
 
-config/name="034GamJam"
+config/name="TriHorny4Link"
+config/version="0.1"
 run/main_scene="uid://b2xguk7hfd2xq"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.078431375, 0.078431375, 0.11764706, 1)
+boot_splash/show_image=false
+config/icon="uid://tqyp7qdkj8t4"
+config/windows_native_icon="res://logo.ico"
+boot_splash/minimum_display_time=1000
 
 [autoload]
 
@@ -77,6 +82,10 @@ toggle_camera_mode={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":32,"key_label":0,"unicode":32,"location":0,"echo":false,"script":null)
 ]
 }
+
+[internationalization]
+
+locale/locale_filter_mode=0
 
 [layer_names]
 
