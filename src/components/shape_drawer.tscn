@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bw0e23cbak2ta"]
+
+[ext_resource type="Script" path="res://src/components/shape_drawer.gd" id="1_script"]
+
+[node name="ShapeDrawer" type="Node2D"]
+script = ExtResource("1_script")
+shape_type = 0
+shape_size = Vector2(40, 40)
+corner_radius = 8.0
+fill_color = Color(1, 0, 0, 1)
+fill_enabled = true
+stroke_color = Color(1, 1, 1, 1)
+stroke_width = 2.0
+stroke_enabled = true

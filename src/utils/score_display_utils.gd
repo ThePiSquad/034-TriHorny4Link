@@ -2,8 +2,8 @@ class_name ScoreDisplayUtils
 extends RefCounted
 
 # 基础图形分值
-const TRIANGLE_SCORE: int = 30
-const SQUARE_SCORE: int = 40
+const TRIANGLE_SCORE: int = 10
+const SQUARE_SCORE: int = 20
 const CIRCLE_SCORE: int = 50
 
 # 颜色倍率
@@ -92,14 +92,14 @@ static func decompose_score(total_score: int) -> Array[ScorePattern]:
 	# 定义所有可能的图案组合（按价值从高到低）
 	var all_patterns = [
 		ScorePattern.new(ShapeType.CIRCLE, ColorType.YELLOW),    # 5000
-		ScorePattern.new(ShapeType.SQUARE, ColorType.YELLOW),    # 4000
-		ScorePattern.new(ShapeType.TRIANGLE, ColorType.YELLOW),  # 3000
+		ScorePattern.new(ShapeType.SQUARE, ColorType.YELLOW),    # 2000
+		ScorePattern.new(ShapeType.TRIANGLE, ColorType.YELLOW),  # 1000
 		ScorePattern.new(ShapeType.CIRCLE, ColorType.BLUE),      # 500
-		ScorePattern.new(ShapeType.SQUARE, ColorType.BLUE),      # 400
-		ScorePattern.new(ShapeType.TRIANGLE, ColorType.BLUE),    # 300
+		ScorePattern.new(ShapeType.SQUARE, ColorType.BLUE),      # 200
+		ScorePattern.new(ShapeType.TRIANGLE, ColorType.BLUE),    # 100
 		ScorePattern.new(ShapeType.CIRCLE, ColorType.RED),       # 50
-		ScorePattern.new(ShapeType.SQUARE, ColorType.RED),       # 40
-		ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED),     # 30
+		ScorePattern.new(ShapeType.SQUARE, ColorType.RED),       # 20
+		ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED),     # 10
 	]
 	
 	# 贪心算法：从大到小选择图案
@@ -112,9 +112,9 @@ static func decompose_score(total_score: int) -> Array[ScorePattern]:
 	if remaining > 0:
 		# 尝试用红色图形组合表示剩余分数
 		var small_patterns = [
+			ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED), # 10
+			ScorePattern.new(ShapeType.SQUARE, ColorType.RED),   # 20
 			ScorePattern.new(ShapeType.CIRCLE, ColorType.RED),   # 50
-			ScorePattern.new(ShapeType.SQUARE, ColorType.RED),   # 40
-			ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED), # 30
 		]
 		
 		for pattern in small_patterns:
@@ -125,8 +125,7 @@ static func decompose_score(total_score: int) -> Array[ScorePattern]:
 		# 如果还有剩余，说明无法精确表示，向上取整
 		if remaining > 0:
 			# 添加一个三角形来表示余数
-			if remaining <= 10:
-				patterns.append(ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED))
+			patterns.append(ScorePattern.new(ShapeType.TRIANGLE, ColorType.RED))
 	
 	return patterns
 

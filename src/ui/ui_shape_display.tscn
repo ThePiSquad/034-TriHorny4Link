@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://c05phkave327o"]
+
+[ext_resource type="Script" path="res://src/ui/ui_shape_display.gd" id="1_script"]
+
+[node name="UIShapeDisplay" type="Control"]
+custom_minimum_size = Vector2(40, 40)
+script = ExtResource("1_script")

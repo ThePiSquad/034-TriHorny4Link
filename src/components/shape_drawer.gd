@@ -8,6 +8,7 @@ extends Node2D
 	set(s):
 		shape_type = s
 		_update_collision_shape()
+		queue_redraw()
 @export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size):
 	set(s):
 		shape_size = s
@@ -22,8 +23,7 @@ extends Node2D
 @export var fill_color: Color = Color.RED:
 	set(s):
 		fill_color = s
-		if is_inside_tree():
-			queue_redraw()
+		queue_redraw()
 @export var fill_enabled: bool = true
 
 # 描边配置
