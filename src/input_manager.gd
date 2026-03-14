@@ -69,8 +69,11 @@ func _process(delta: float) -> void:
 	# 处理相机移动
 	_handle_camera_movement(delta)
 	
+	# 始终更新相机拖动（任何模式都可以拖动）
+	_update_camera_drag()
+	
 	if current_mode == InputMode.CAMERA:
-		_update_camera_drag()
+		pass
 	else:
 		_update_placement_preview()
 		_handle_continuous_placement(delta)
@@ -137,6 +140,12 @@ func _update_mode() -> void:
 func _handle_camera_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			# 左键拖动 - 在相机模式下始终允许
+			_camera_dragging = event.pressed
+			if event.pressed:
+				_last_mouse_position = event.position
+		elif event.button_index == MOUSE_BUTTON_MIDDLE:
+			# 中键拖动 - 在任何模式下都允许
 			_camera_dragging = event.pressed
 			if event.pressed:
 				_last_mouse_position = event.position
@@ -170,14 +179,30 @@ func _zoom_camera(zoom_factor: float) -> void:
 
 func _handle_placement_input(event: InputEvent) -> void:
 	var hovered_control = get_viewport().gui_get_hovered_control()
-	if hovered_control != null:
-		return
 	
 	if event is InputEventMouseButton:
+		# 中键拖动 - 在任何情况下都允许（包括鼠标在 UI 上）
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
+			_camera_dragging = event.pressed
+			if event.pressed:
+				_last_mouse_position = event.position
+			return
+		
+		# 如果鼠标在 UI 上，忽略其他输入
+		if hovered_control != null:
+			return
+		
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			_is_placing = event.pressed
-			if event.pressed and _is_selection_active():
-				_try_place()
+			# 左键 - 选中时放置，未选中时拖动场景
+			if _is_selection_active():
+				_is_placing = event.pressed
+				if event.pressed:
+					_try_place()
+			else:
+				# 未选中任何建造时，左键拖动场景
+				_camera_dragging = event.pressed
+				if event.pressed:
+					_last_mouse_position = event.position
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_is_removing = event.pressed
 			if event.pressed:
@@ -188,18 +213,23 @@ func _update_placement_preview() -> void:
 	
 	if hovered_control != null:
 		_preview_should_be_visible = true
-		placement_preview.hide_preview()
+		if placement_preview:
+			placement_preview.hide_preview()
 		return
 	
-	if not placement_preview or not _is_selection_active():
+	if not placement_preview:
 		return
 	
-	if _preview_should_be_visible:
-		placement_preview.show_preview()
-		_preview_should_be_visible = false
-	
+	# 更新预览位置，无论是否选中建造
 	var mouse_pos = get_global_mouse_position()
 	placement_preview.update_position(mouse_pos)
+	
+	if _is_selection_active():
+		if _preview_should_be_visible:
+			placement_preview.show_preview()
+			_preview_should_be_visible = false
+	else:
+		placement_preview.hide_preview()
 
 func _handle_continuous_placement(delta: float) -> void:
 	if _is_placing and _is_selection_active():
