@@ -251,11 +251,17 @@ static var COLOR_MAP = {
 	Enums.ColorType.WHITE: Color("#CCCCCCFF"),
 	Enums.ColorType.BLACK: Color("#444444ff"),
 	Enums.ColorType.RED: Color("#ff4545ff"),
-	Enums.ColorType.BLUE: Color("#4587ffff"),
-	Enums.ColorType.YELLOW: Color("#ffde45ff"),
-	Enums.ColorType.GREEN: Color("#62B245ff"),
+	Enums.ColorType.ORANGE_RED: Color("#FF6C35ff"),
 	Enums.ColorType.ORANGE: Color("#FF9225ff"),
+	Enums.ColorType.ORANGE_YELLOW: Color("#FFB835ff"),
+	Enums.ColorType.YELLOW: Color("#ffde45ff"),
+	Enums.ColorType.GREEN_YELLOW: Color("#B1C845ff"),
+	Enums.ColorType.GREEN: Color("#62B245ff"),
+	Enums.ColorType.GREEN_BLUE: Color("#549DA2ff"),
+	Enums.ColorType.BLUE: Color("#4587ffff"),
+	Enums.ColorType.PURPLE_BLUE: Color("#7466D1ff"),
 	Enums.ColorType.PURPLE: Color("#A245A2ff"),
+	Enums.ColorType.PURPLE_RED: Color("#D14574ff"),
 }
 
 static func get_color(type: Enums.ColorType) -> Color:

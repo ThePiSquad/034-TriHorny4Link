@@ -17,6 +17,12 @@ enum ColorType {
 	GREEN,
 	ORANGE,
 	PURPLE,
+	GREEN_BLUE,
+	GREEN_YELLOW,
+	ORANGE_RED,
+	ORANGE_YELLOW,
+	PURPLE_RED,
+	PURPLE_BLUE,
 }
 
 enum BulletAttributes {
