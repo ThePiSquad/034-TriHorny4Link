@@ -84,6 +84,11 @@ toggle_camera_mode={
 ]
 }
 
+[input_devices]
+
+pointing/android/enable_long_press_as_right_click=true
+pointing/android/enable_pan_and_scale_gestures=true
+
 [internationalization]
 
 locale/locale_filter_mode=0
@@ -101,3 +106,4 @@ locale/locale_filter_mode=0
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+textures/vram_compression/import_etc2_astc=true
