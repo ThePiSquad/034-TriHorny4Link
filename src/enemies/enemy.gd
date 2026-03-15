@@ -8,6 +8,7 @@ extends Damageable
 @export var attack_damage: float = 10.0
 @export var enemy_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size)
 @export var size_level: int = Constants.EnemyConstants.SIZE_LEVEL_1
+@export var score_value: int = 10  # 击败敌人获得的分数
 
 # 基础属性值（由场景设置，用于体型计算）
 var _base_move_speed: float = 0.0

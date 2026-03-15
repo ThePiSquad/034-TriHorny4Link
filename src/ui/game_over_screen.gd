@@ -4,6 +4,10 @@ class_name GameOverScreen
 # Debug 模式开关
 const DEBUG_MODE: bool = false  # 设置为 true 启用 debug 模式
 
+# 图案显示场景
+const PATTERN_DISPLAY_SCENE_PATH = "res://src/ui/score_pattern_display.tscn"
+var pattern_display_scene: PackedScene
+
 # 分数显示容器
 @onready var score_container: VBoxContainer = $MarginContainer/VBoxContainer/ScoreContainer
 @onready var restart_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/RestartButton
@@ -14,10 +18,7 @@ const DEBUG_MODE: bool = false  # 设置为 true 启用 debug 模式
 var survival_time: float = 0.0
 var enemy_score: int = 0
 var total_score: int = 0
-
-# 图案显示场景
-const PATTERN_DISPLAY_SCENE_PATH = "res://src/ui/score_pattern_display.tscn"
-var pattern_display_scene: PackedScene
+var is_victory: bool = false  # 是否是胜利结局（击败 Boss）
 
 func _ready() -> void:
 	# 连接按钮信号
@@ -41,6 +42,10 @@ func _ready() -> void:
 		survival_time = game_manager.survival_time
 		enemy_score = game_manager.enemy_score
 		total_score = game_manager.total_score
+		# 检查是否是胜利结局（所有波次完成）
+		var enemy_manager = get_tree().get_root().get_node_or_null("World/EnemyManager")
+		if enemy_manager and enemy_manager.wave_system:
+			is_victory = enemy_manager.wave_system.is_all_waves_completed()
 	
 	# 显示分数
 	_display_scores()
@@ -150,9 +155,13 @@ func _display_total_score() -> void:
 	
 	# 添加标签（突出显示）
 	var label = Label.new()
-	label.text = "总分数: " + str(total_score) + " 分"
+	if is_victory:
+		label.text = "胜利！总分数：" + str(total_score) + " 分"
+		label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))  # 绿色
+	else:
+		label.text = "总分数：" + str(total_score) + " 分"
+		label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))  # 金黄色
 	label.add_theme_font_size_override("font_size", 24)
-	label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.3))  # 金黄色
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.visible = false
 	label.name = "TotalScoreLabel"

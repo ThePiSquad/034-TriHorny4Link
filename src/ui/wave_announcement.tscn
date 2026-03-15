@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://wave_announcement"]
+
+[ext_resource type="Script" path="res://src/ui/wave_announcement.gd" id="1_wave"]
+
+[node name="WaveAnnouncement" type="CanvasLayer"]
+layer = 10
+
+[node name="WaveAnnouncementPanel" type="Panel" parent="."]
+layout_mode = 0
+anchors_preset = 7
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.3
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = -200.0
+offset_right = 200.0
+offset_top = -50.0
+offset_bottom = 50.0
+
+[node name="WaveLabel" type="Label" parent="WaveAnnouncementPanel"]
+layout_mode = 1
+offset_left = 10.0
+offset_top = -20.0
+offset_right = 390.0
+offset_bottom = 30.0
+text = "WAVE 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 0
+clip_text = true
+
+[node name="PreparationLabel" type="Label" parent="WaveAnnouncementPanel"]
+layout_mode = 1
+offset_left = 10.0
+offset_top = 30.0
+offset_right = 390.0
+offset_bottom = 60.0
+text = "准备战斗！"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 0
+
+[connection signal="ready" from="." to="." method="_ready"]
+[connection signal="process" from="." to="." method="_process"]

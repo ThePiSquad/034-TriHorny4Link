@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://b226ukyquly1l" path="res://src/input_manager.gd" id="9_input"]
 [ext_resource type="PackedScene" uid="uid://b105um8got3cl" path="res://src/enemies/triangle_enemy.tscn" id="10_eemcn"]
 [ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="10_preview"]
+[ext_resource type="PackedScene" uid="uid://p6dmw7sokfm4" path="res://src/enemies/circle_enemy.tscn" id="11_circle"]
 [ext_resource type="Script" uid="uid://bh7o0ibko5x6i" path="res://src/managers/resource_manager.gd" id="13_njovb"]
 [ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="14_bg"]
 [ext_resource type="Script" uid="uid://dj73u0t4nipjs" path="res://src/managers/screen_shake_manager.gd" id="15_shake"]
@@ -59,7 +60,7 @@ play_sound = true
 [node name="EnemyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
 script = ExtResource("8_53egh")
 enemy_list = Array[PackedScene]([ExtResource("9_eemcn"), ExtResource("10_eemcn")])
-spawn_interval = 1.0
+boss_enemy_scene = ExtResource("11_circle")
 
 [node name="InputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera", "resource_manager")]
 script = ExtResource("9_input")

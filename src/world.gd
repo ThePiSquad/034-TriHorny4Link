@@ -56,6 +56,11 @@ func _initialize_game_manager() -> void:
 		game_manager.start_game()
 		print("GameManager 初始化完成")
 	
+	# 启动 EnemyManager 的波次系统
+	var enemy_manager = $WorldPainter/EnemyManager
+	if enemy_manager and enemy_manager.has_method("start_game"):
+		enemy_manager.start_game()
+	
 	# 监听游戏结束事件
 	if not game_manager.game_over_signal.is_connected(_on_game_over):
 		game_manager.game_over_signal.connect(_on_game_over)

@@ -46,8 +46,8 @@ func end_game() -> void:
 		return
 	
 	current_state = GameManager.GameState.GAME_OVER
-	# 计算总分：生存时间（取整）+ 敌人分数
-	total_score = int(survival_time) + enemy_score
+	# 修改：总分仅统计敌人分数，不包含生存时间
+	total_score = enemy_score
 	print("游戏结束")
 	print("生存时间：", survival_time, " 秒")
 	print("敌人分数：", enemy_score)

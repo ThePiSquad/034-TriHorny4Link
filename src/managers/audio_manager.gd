@@ -29,8 +29,10 @@ const SOUND_PATHS = {
 	"bullet_hit_purple": "res://assets/audio/etfx_explosion_plasma_0.ogg",
 	"bullet_hit_orange": "res://assets/audio/etfx_explosion_storm.ogg",
 	"enemy_hit": "res://assets/audio/怪物受击.ogg",
-	"base_attacked": "res://assets/audio/玩家受击(猫叫）.ogg",
+	"base_attacked": "res://assets/audio/玩家受击 (猫叫）.ogg",
 	"base_die": "res://assets/audio/fx_effect_explosion.ogg",
+	"wave_start_normal": "res://assets/audio/fx_du.ogg",
+	"wave_start_boss": "res://assets/audio/fx_effect_explosion.ogg",
 }
 
 # BGM 文件路径
@@ -169,6 +171,16 @@ func play_base_attacked() -> void:
 func play_enemy_hit() -> void:
 	"""播放敌人被攻击音效"""
 	play_sound("enemy_hit", -8.0)
+
+func play_wave_start(type: String) -> void:
+	"""播放波次开始音效"""
+	play_sound("wave_start_" + type, -5.0)
+
+func play_boss_music() -> void:
+	"""播放 Boss 战音乐（可选）"""
+	# 这里可以播放特殊的 Boss 战 BGM
+	# 暂时使用普通 BGM
+	pass
 
 func set_master_volume(volume_db: float) -> void:
 	"""设置主音量"""
