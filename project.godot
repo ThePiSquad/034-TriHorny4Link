@@ -41,6 +41,9 @@ folder_colors={
 "res://src/components/": "green",
 "res://src/data/": "yellow",
 "res://src/enemies/": "red",
+"res://src/managers/": "gray",
+"res://src/particles/": "pink",
+"res://src/shaders/": "purple",
 "res://src/structures/": "teal",
 "res://src/ui/": "blue"
 }
