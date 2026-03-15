@@ -16,6 +16,7 @@ size = Vector2(64, 64)
 script = ExtResource("2_q8vcm")
 is_barrier = true
 structure_type = 3
+play_sound = true
 max_health = 30.0
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
@@ -44,5 +45,9 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BarrierArea" index="0" unique_id=529104689]
 shape = SubResource("RectangleShape2D_xmqai")
+
+[node name="NavigationObstacle2D" type="NavigationObstacle2D" parent="." index="5" unique_id=443796158]
+vertices = PackedVector2Array(-32, 32, 32, 32, 32, -32, -32, -32)
+affect_navigation_mesh = true
 
 [connection signal="area_entered" from="BarrierArea" to="." method="_on_barrier_area_entered"]

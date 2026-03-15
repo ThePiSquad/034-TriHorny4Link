@@ -181,6 +181,10 @@ func _try_spawn_enemy() -> void:
 	if enemy:
 		enemy.global_position = spawn_position
 		
+		# 设置基地位置
+		if enemy.has_method("set_base_position"):
+			enemy.set_base_position(_crystal_position)
+		
 		# 设置敌人体型
 		if enemy.has_method("set_size_level"):
 			enemy.set_size_level(size_level)

@@ -82,9 +82,6 @@ attack_damage = 10.0
 enemy_size = Vector2(64, 64)
 size_level = 1
 random_initial_rotation = false
-check_distance = 256.0
-max_avoid_attempts = 3
-show_path_visualization = false
 
 [node name="ShapeDrawer" type="Node2D" parent="." index="0" unique_id=590652366]
 material = SubResource("ShaderMaterial_abny1")
@@ -100,4 +97,9 @@ collision_mask = 2
 collision_layer = 4
 collision_mask = 3
 
-[connection signal="area_entered" from="HitboxArea" to="." method="_on_hitbox_area_entered"]
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." index="3" unique_id=1874111476]
+simplify_path = true
+avoidance_enabled = false
+debug_enabled = true
+
+[connection signal="area_entered" from="HitboxArea" to="." method="_on_hitbox_area_area_entered"]

@@ -10,9 +10,14 @@ extends Node2D
 @onready var resource_manager: ResourceManager = $ResourceManager
 @onready var screen_shake_manager: ScreenShakeManager = $ScreenShakeManager
 @onready var crystal: Node2D = $WorldPainter/StructureManager/Crystal
+@onready var navigation_region: NavigationRegion2D = $NavigationRegion2D
 
 # 游戏结束场景
 var game_over_scene: PackedScene = preload("res://src/ui/game_over_screen.tscn")
+
+# 导航网格更新相关
+var _navigation_update_queued: bool = false
+var _conduits_positions: Array = []  # 存储所有 Conduit 的位置
 
 func _ready() -> void:
 	# 连接 InputManager 的引用
@@ -91,3 +96,64 @@ func _center_camera_on_crystal() -> void:
 		# 设置摄像机的位置为 Crystal 的位置
 		camera.global_position = crystal_global_position
 		print("摄像机已居中到 Crystal，位置：", crystal_global_position)
+
+func _process(delta: float) -> void:
+	# 更新导航障碍物（当 Conduit 变化时）
+	_check_navigation_update_needed()
+
+func _check_navigation_update_needed() -> void:
+	"""检查是否需要更新导航网格"""
+	# 获取所有 Conduit
+	var conduits = get_tree().get_nodes_in_group("structure")
+	var current_positions: Array = []
+	
+	for conduit in conduits:
+		if conduit and is_instance_valid(conduit) and conduit.has_method("get_structure_type"):
+			var structure_type = conduit.get_structure_type()
+			if structure_type == Enums.StructureType.CONDUIT:
+				current_positions.append(conduit.position)
+	
+	# 检查 Conduit 位置是否发生变化
+	if current_positions != _conduits_positions:
+		_conduits_positions = current_positions
+		if not _navigation_update_queued:
+			_navigation_update_queued = true
+			# 延迟一帧更新，避免频繁调用
+			await get_tree().process_frame
+			_update_navigation_mesh()
+			_navigation_update_queued = false
+
+func _update_navigation_mesh() -> void:
+	"""动态更新导航网格以反映障碍物的位置"""
+	if not navigation_region:
+		return
+	
+	# 获取当前的导航多边形
+	var nav_poly = navigation_region.navigation_polygon
+	if not nav_poly:
+		return
+	
+	# 使用 NavigationServer2D 重新烘焙导航网格
+	var source_geometry = NavigationMeshSourceGeometryData2D.new()
+	
+	# 解析源几何数据
+	NavigationServer2D.parse_source_geometry_data(nav_poly, source_geometry, self)
+	
+	# 添加 Conduit 作为障碍物
+	for pos in _conduits_positions:
+		var half_size = Constants.grid_size / 2.0
+		var obstacle_vertices = PackedVector2Array([
+			pos + Vector2(-half_size, -half_size),
+			pos + Vector2(-half_size, half_size),
+			pos + Vector2(half_size, half_size),
+			pos + Vector2(half_size, -half_size)
+		])
+		source_geometry.add_projected_obstruction(obstacle_vertices, true)
+	
+	# 从源几何数据烘焙导航网格
+	NavigationServer2D.bake_from_source_geometry_data(nav_poly, source_geometry)
+	
+	# 通知导航区域更新
+	navigation_region.navigation_polygon = nav_poly
+	
+	print("导航网格已更新，障碍物数量：", _conduits_positions.size())
