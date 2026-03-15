@@ -25,6 +25,9 @@ const PADDING: float = 4.0
 
 @onready var hud: CanvasLayer = $"../../.."
 
+var _last_trigger_time: float = 0.0
+const TRIGGER_COOLDOWN: float = 0.1
+
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(64, 64)
@@ -85,6 +88,11 @@ func _draw_selection_triangle(center: Vector2, shape_size: float) -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if _is_selection_trigger(event):
+		var current_time = Time.get_ticks_msec() / 1000.0
+		if current_time - _last_trigger_time < TRIGGER_COOLDOWN:
+			return
+		
+		_last_trigger_time = current_time
 		if hud and hud.has_method("select_icon"):
 			hud.select_icon(self)
 		else:
@@ -99,7 +107,6 @@ func _is_selection_trigger(event: InputEvent) -> bool:
 	return false
 
 func _mouse_entered() -> void:
-	"""鼠标进入时的效果"""
 	if not is_selected and hud and hud.has_method("is_animation_enabled") and hud.is_animation_enabled():
 		var tween = create_tween()
 		tween.set_trans(Tween.TRANS_BACK)
@@ -107,7 +114,6 @@ func _mouse_entered() -> void:
 		tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.2)
 
 func _mouse_exited() -> void:
-	"""鼠标离开时的效果"""
 	if not is_selected and hud and hud.has_method("is_animation_enabled") and hud.is_animation_enabled():
 		var tween = create_tween()
 		tween.set_trans(Tween.TRANS_BACK)

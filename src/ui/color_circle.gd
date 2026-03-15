@@ -29,6 +29,9 @@ var current_fill_ratio: float = 0.5:
 		current_fill_ratio = value
 		queue_redraw()
 
+var _last_trigger_time: float = 0.0
+const TRIGGER_COOLDOWN: float = 0.1
+
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(64, 64)
@@ -112,6 +115,11 @@ func _draw_fill(center: Vector2, radius: float, ratio: float) -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if _is_selection_trigger(event):
+		var current_time = Time.get_ticks_msec() / 1000.0
+		if current_time - _last_trigger_time < TRIGGER_COOLDOWN:
+			return
+		
+		_last_trigger_time = current_time
 		if hud and hud.has_method("select_icon"):
 			hud.select_icon(self)
 		else:
