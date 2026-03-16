@@ -105,6 +105,20 @@ func set_size_level(level: int) -> void:
 	# 更新形状（只在shape_drawer可用时）
 	if shape_drawer:
 		_initialize_shape()
+
+func apply_multipliers(health_mult: float, speed_mult: float, damage_mult: float) -> void:
+	"""应用敌人级别的属性倍数"""
+	if not _is_base_values_set:
+		_base_move_speed = move_speed
+		_base_max_health = max_health
+		_base_attack_damage = attack_damage
+		_is_base_values_set = true
+	
+	# 应用倍数
+	max_health = int(_base_max_health * health_mult)
+	current_health = max_health
+	move_speed = _base_move_speed * speed_mult
+	attack_damage = _base_attack_damage * damage_mult
 	
 	# print("敌人体型设置为等级 ", size_level, "，尺寸: ", enemy_size, "，血量: ", max_health, "，速度: ", move_speed, "，攻击力: ", attack_damage)
 

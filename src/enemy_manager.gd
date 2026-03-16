@@ -118,9 +118,40 @@ func _spawn_normal_enemy(size_level: int) -> void:
 		push_warning("EnemyManager: 敌人列表为空！")
 		return
 	
-	# 随机选择敌人类型
-	var enemy_index = randi() % enemy_list.size()
-	var enemy_scene = enemy_list[enemy_index]
+	# 获取当前波次的敌人配置
+	var wave_info = wave_system.get_current_wave_info()
+	var enemy_configs = wave_info.get("enemy_configs", [])
+	
+	# 选择敌人场景和配置
+	var enemy_scene = null
+	var enemy_config = null
+	
+	if not enemy_configs.is_empty():
+		# 根据权重选择敌人类型
+		var total_weight = 0.0
+		for config in enemy_configs:
+			total_weight += config.spawn_weight
+		
+		var random_value = randf() * total_weight
+		var current_weight = 0.0
+		
+		for config in enemy_configs:
+			current_weight += config.spawn_weight
+			if random_value <= current_weight:
+				enemy_config = config
+				var scene = config.load_enemy_scene()
+				if scene:
+					enemy_scene = scene
+					break
+		
+		# 如果没有找到合适的场景，使用默认列表
+		if not enemy_scene:
+			var enemy_index = randi() % enemy_list.size()
+			enemy_scene = enemy_list[enemy_index]
+	else:
+		# 没有配置，使用默认列表
+		var enemy_index = randi() % enemy_list.size()
+		enemy_scene = enemy_list[enemy_index]
 	
 	var enemy = enemy_scene.instantiate()
 	if enemy:
@@ -134,6 +165,14 @@ func _spawn_normal_enemy(size_level: int) -> void:
 		# 设置敌人体型
 		if enemy.has_method("set_size_level"):
 			enemy.set_size_level(size_level)
+		
+		# 应用敌人级别的倍数
+		if enemy_config and enemy.has_method("apply_multipliers"):
+			enemy.apply_multipliers(
+				enemy_config.health_multiplier,
+				enemy_config.speed_multiplier,
+				enemy_config.damage_multiplier
+			)
 		
 		add_child(enemy)
 	else:

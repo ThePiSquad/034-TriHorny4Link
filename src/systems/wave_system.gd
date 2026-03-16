@@ -169,7 +169,8 @@ func get_current_wave_info() -> Dictionary:
 				"spawn_interval": wave_data.spawn_interval,
 				"wave_interval": wave_data.wave_interval,
 				"require_clear_previous": wave_data.require_clear_previous,
-				"min_enemies_alive": wave_data.min_enemies_alive
+				"min_enemies_alive": wave_data.min_enemies_alive,
+				"enemy_configs": wave_data.enemy_configs
 			}
 	
 	# 使用默认配置
