@@ -55,6 +55,17 @@ func start_game() -> void:
 	# 确保水晶位置已设置
 	_find_crystal_position()
 	
+	# 获取选中的关卡
+	var level_id = "level_1"  # 默认关卡
+	if GameManager.instance:
+		level_id = GameManager.instance.selected_level
+	
+	# 加载关卡配置
+	if wave_system:
+		var load_success = wave_system.load_level(level_id)
+		if not load_success:
+			print("警告：关卡加载失败，使用默认配置")
+	
 	game_started = true
 	wave_system.reset()
 	# 开始第一波
@@ -114,24 +125,30 @@ func _spawn_boss_enemy() -> void:
 	if not boss_to_spawn:
 		# 如果没有指定 Boss 场景，使用第一个敌人
 		boss_to_spawn = enemy_list[0] if not enemy_list.is_empty() else null
-	
+
 	if not boss_to_spawn:
 		push_error("EnemyManager: Boss 场景未设置！")
 		return
-	
+
+	# 获取当前波次信息
+	var wave_info = wave_system.get_current_wave_info()
+	var boss_size_level = 20  # 默认体型等级
+	if wave_info.size > 0:
+		boss_size_level = wave_info.size
+
 	var boss = boss_to_spawn.instantiate()
 	if boss:
 		# Boss 生成在边缘
-		var spawn_position = _generate_spawn_position_for_size(20)
+		var spawn_position = _generate_spawn_position_for_size(boss_size_level)
 		boss.global_position = spawn_position
 		
 		# 设置基地位置
 		if boss.has_method("set_base_position"):
 			boss.set_base_position(_crystal_position)
 		
-		# 设置 Boss 体型 (256x256)
+		# 设置 Boss 体型
 		if boss.has_method("set_size_level"):
-			boss.set_size_level(20)
+			boss.set_size_level(boss_size_level)
 		
 		add_child(boss)
 		
