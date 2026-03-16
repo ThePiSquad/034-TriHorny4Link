@@ -54,10 +54,8 @@ func _initialize_game_manager() -> void:
 		print("已清除关卡缓存，将重新加载最新配置")
 	
 	var game_manager = GameManager.instance
-	if not game_manager:
-		# 创建 GameManager 节点
-		game_manager = GameManager.new()
-		add_child(game_manager)
+	if game_manager:
+		# 重置游戏状态
 		game_manager.start_game()
 		print("GameManager 初始化完成")
 	
@@ -67,7 +65,7 @@ func _initialize_game_manager() -> void:
 		enemy_manager.start_game()
 	
 	# 监听游戏结束事件
-	if not game_manager.game_over_signal.is_connected(_on_game_over):
+	if game_manager and not game_manager.game_over_signal.is_connected(_on_game_over):
 		game_manager.game_over_signal.connect(_on_game_over)
 
 func _on_game_over() -> void:

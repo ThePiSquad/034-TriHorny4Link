@@ -25,6 +25,7 @@ boot_splash/minimum_display_time=1000
 TransitionManager="*uid://bwvyqqyj0nv0h"
 AudioManager="*uid://bf7wfodbwd48m"
 ResourceManager="*uid://bh7o0ibko5x6i"
+GameManager="res://src/managers/game_manager.gd"
 
 [display]
 

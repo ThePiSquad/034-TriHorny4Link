@@ -24,15 +24,7 @@ var selected_level: String = "level_1"  # 选中的关卡
 var game_timer: float = 0.0
 
 func _ready() -> void:
-	# 确保单例
-	if instance == null:
-		instance = self
-	else:
-		queue_free()
-		return
-	
-	# 不自动移除，保持跨场景存在
-	# add_to_group("game_manager")
+	instance = self
 
 func start_game() -> void:
 	current_state = GameManager.GameState.PLAYING
