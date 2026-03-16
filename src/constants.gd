@@ -288,5 +288,35 @@ static var TURRET_CONFIG = {
 		"bullet_damage": 10.0,
 		"detection_range": 4 * grid_size,
 		"bullet_lifetime": 3.0
+	},
+	Enums.ColorType.GREEN_BLUE: {
+		"fire_rate": 1.2,
+		"bullet_speed": 750.0,
+		"bullet_damage": 20.0,
+		"detection_range": 14 * grid_size,
+		"bullet_lifetime": 1.8,
+		"splitting_homing_enabled": true,
+		"splitting_homing_detection_range": 5 * grid_size,
+		"splitting_homing_turn_speed": 10.0,
+		"splitting_count": 5,
+		"splitting_angle_spread": 45.0,
+		"splitting_bullet_damage": 15.0,
+		"splitting_bullet_lifetime": 0.8,
+		"splitting_bullet_homing_detection_range": 5 * grid_size,
+		"splitting_bullet_homing_turn_speed": 10.0,
+		"splitting_bullet_attack_delay": 0.15
+	},
+	Enums.ColorType.GREEN_YELLOW: {
+		"fire_rate": 1.3,
+		"bullet_speed": 1900.0,
+		"bullet_damage": 28.0,
+		"detection_range": 15 * grid_size,
+		"bullet_lifetime": 1.75,
+		"penetrating_enabled": true,
+		"penetrating_homing_enabled": true,
+		"penetrating_homing_detection_range": 5 * grid_size,
+		"penetrating_homing_turn_speed": 5.0,
+		"penetrating_max_targets": 4,
+		"penetrating_damage_decay": 0.85
 	}
 }

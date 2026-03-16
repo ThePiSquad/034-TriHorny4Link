@@ -12,7 +12,7 @@ attributes = Array[int]([0])
 
 [node name="ShapeDrawer" type="Node2D" parent="." unique_id=1558529561]
 script = ExtResource("2_drawer")
-shape_size = Vector2(8, 8)
+shape_size = Vector2(10, 10)
 fill_color = Color(0, 1, 0.5, 1)
 stroke_enabled = false
 

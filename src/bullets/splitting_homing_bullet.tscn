@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bu6h7wtujeg75"]
+
+[ext_resource type="PackedScene" uid="uid://bdppmknohvybk" path="res://src/bullets/bullet.tscn" id="1_n7wpx"]
+[ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="2_jd5cn"]
+[ext_resource type="Script" uid="uid://dqt4y2peqdkm6" path="res://src/bullets/splitting_homing_bullet.gd" id="2_vj3n4"]
+
+[sub_resource type="Gradient" id="Gradient_jd5cn"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_vj3n4"]
+gradient = SubResource("Gradient_jd5cn")
+
+[sub_resource type="Curve" id="Curve_vj3n4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_pgjoq"]
+curve = SubResource("Curve_vj3n4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0cets"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 6.0
+initial_velocity_max = 11.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.049999997
+scale_max = 0.049999997
+scale_curve = SubResource("CurveTexture_pgjoq")
+color = Color(0.25882354, 0.6901961, 0.74509805, 1)
+color_initial_ramp = SubResource("GradientTexture1D_vj3n4")
+
+[node name="SplittingHomingBullet" unique_id=1846070966 instance=ExtResource("1_n7wpx")]
+script = ExtResource("2_vj3n4")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." index="0" unique_id=817111054]
+amount = 24
+texture = ExtResource("2_jd5cn")
+process_material = SubResource("ParticleProcessMaterial_0cets")
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=698014297]
+shape_size = Vector2(12, 12)
+fill_color = Color(0.4486574, 0.7539236, 0.7748777, 1)

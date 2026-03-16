@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bydwnn7lfagfg"]
+
+[ext_resource type="PackedScene" uid="uid://bdppmknohvybk" path="res://src/bullets/bullet.tscn" id="1_y00cx"]
+[ext_resource type="Script" uid="uid://blq6yqt00408" path="res://src/bullets/penetrating_bullet.gd" id="2_6vvsb"]
+
+[node name="PenetratingBullet" unique_id=1846070966 instance=ExtResource("1_y00cx")]
+script = ExtResource("2_6vvsb")
+
+[node name="ShapeDrawer" parent="." index="0" unique_id=698014297]
+shape_size = Vector2(10, 10)
+fill_color = Color(0.69411767, 0.78431374, 0.27058825, 1)

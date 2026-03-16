@@ -42,10 +42,8 @@ func decay(distance: int = 1) -> EnergyLevel:
 	
 	return result
 
-
 func equal(other: EnergyLevel) -> bool:
 	return blue == other.blue and red == other.red and yellow == other.yellow
-
 
 func get_color() -> Enums.ColorType:
 	# 所有颜色都为0，返回白色
@@ -56,32 +54,82 @@ func get_color() -> Enums.ColorType:
 	if blue == red and blue == yellow and blue > 0:
 		return Enums.ColorType.BLACK
 
-	# 混色逻辑：两个颜色数值相同且都大于第三个颜色时进行混色
-	# 红色 + 蓝色 = 紫色（红色和蓝色数值相同且都大于黄色）
-	if red == blue and red > yellow and red > 0:
-		return Enums.ColorType.PURPLE
-
-	# 红色 + 黄色 = 橙色（红色和黄色数值相同且都大于蓝色）
-	if red == yellow and red > blue and red > 0:
-		return Enums.ColorType.ORANGE
-
-	# 蓝色 + 黄色 = 绿色（蓝色和黄色数值相同且都大于红色）
-	if blue == yellow and blue > red and blue > 0:
-		return Enums.ColorType.GREEN
-
-	# 单一颜色判断
-	# 只有红色最大
-	if red > max(blue, yellow):
-		return Enums.ColorType.RED
-
-	# 只有蓝色最大
-	if blue > max(red, yellow):
-		return Enums.ColorType.BLUE
-
-	# 只有黄色最大
-	if yellow > max(blue, red):
-		return Enums.ColorType.YELLOW
-
+	# 找出三个颜色的最大值和次大值
+	var colors = [
+		{"type": Enums.ColorType.RED, "value": red},
+		{"type": Enums.ColorType.BLUE, "value": blue},
+		{"type": Enums.ColorType.YELLOW, "value": yellow}
+	]
+	
+	# 按数值降序排序
+	colors.sort_custom(func(a, b): return a["value"] > b["value"])
+	
+	var first = colors[0]
+	var second = colors[1]
+	var third = colors[2]
+	
+	# 如果最大值是0，返回白色
+	if first["value"] == 0:
+		return Enums.ColorType.WHITE
+	
+	# 特殊情况：次强和第三相等，且都大于最强的一半
+	var threshold = first["value"] / 2.0
+	if second["value"] == third["value"] and second["value"] > threshold:
+		return Enums.ColorType.BLACK
+	
+	# 找出所有"有效"颜色（值 > 最强的一半）
+	var effective_colors = []
+	for c in colors:
+		if c["value"] > threshold:
+			effective_colors.append(c)
+	
+	# 情况1：只有一种有效颜色
+	if effective_colors.size() == 1:
+		return effective_colors[0]["type"]
+	
+	# 情况2：两种有效颜色
+	if effective_colors.size() == 2:
+		var c1 = effective_colors[0]
+		var c2 = effective_colors[1]
+		
+		# 如果两色相等，返回普通混色
+		if abs(c1["value"] - c2["value"]) < 0.1:
+			match [c1["type"], c2["type"]]:
+				[Enums.ColorType.RED, Enums.ColorType.BLUE], [Enums.ColorType.BLUE, Enums.ColorType.RED]:
+					return Enums.ColorType.PURPLE
+				[Enums.ColorType.RED, Enums.ColorType.YELLOW], [Enums.ColorType.YELLOW, Enums.ColorType.RED]:
+					return Enums.ColorType.ORANGE
+				[Enums.ColorType.BLUE, Enums.ColorType.YELLOW], [Enums.ColorType.YELLOW, Enums.ColorType.BLUE]:
+					return Enums.ColorType.GREEN
+		
+		# 否则返回偏向强色的混合色
+		match [c1["type"], c2["type"]]:
+			[Enums.ColorType.RED, Enums.ColorType.BLUE]:
+				return Enums.ColorType.PURPLE_RED
+			[Enums.ColorType.BLUE, Enums.ColorType.RED]:
+				return Enums.ColorType.PURPLE_BLUE
+			[Enums.ColorType.RED, Enums.ColorType.YELLOW]:
+				return Enums.ColorType.ORANGE_RED
+			[Enums.ColorType.YELLOW, Enums.ColorType.RED]:
+				return Enums.ColorType.ORANGE_YELLOW
+			[Enums.ColorType.BLUE, Enums.ColorType.YELLOW]:
+				return Enums.ColorType.GREEN_BLUE
+			[Enums.ColorType.YELLOW, Enums.ColorType.BLUE]:
+				return Enums.ColorType.GREEN_YELLOW
+	
+	# 情况3：三种有效颜色
+	if effective_colors.size() == 3:
+		# 检查是否两色相等
+		if first["value"] == second["value"]:
+			if first["type"] == Enums.ColorType.RED and second["type"] == Enums.ColorType.BLUE:
+				return Enums.ColorType.PURPLE
+			if first["type"] == Enums.ColorType.RED and second["type"] == Enums.ColorType.YELLOW:
+				return Enums.ColorType.ORANGE
+			if first["type"] == Enums.ColorType.BLUE and second["type"] == Enums.ColorType.YELLOW:
+				return Enums.ColorType.GREEN
+		# 否则返回最强色
+		return first["type"]
+	
 	# 默认返回白色
 	return Enums.ColorType.WHITE
 

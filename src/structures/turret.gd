@@ -6,6 +6,8 @@ var homing_bullet_scene: PackedScene = preload("res://src/bullets/homing_bullet.
 var magic_bullet_scene: PackedScene = preload("res://src/bullets/magic_bullet.tscn")
 var lightning_bullet_scene: PackedScene = preload("res://src/bullets/lightning_bullet.tscn")
 var explosive_bullet_scene: PackedScene = preload("res://src/bullets/explosive_bullet.tscn")
+var splitting_homing_bullet_scene: PackedScene = preload("res://src/bullets/splitting_homing_bullet.tscn")
+var penetrating_bullet_scene: PackedScene = preload("res://src/bullets/penetrating_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -39,6 +41,23 @@ var lightning_max_chain: int = 3
 var explosive_enabled: bool = false
 var explosion_radius: float = 200.0
 var explosion_particle_duration: float = 1.0
+
+# 追踪分裂子弹配置
+var splitting_homing_enabled: bool = false
+var splitting_homing_detection_range: float = 150.0
+var splitting_homing_turn_speed: float = 5.0
+var splitting_count: int = 5
+var splitting_angle_spread: float = 45.0
+var splitting_bullet_damage: float = 15.0
+var splitting_bullet_lifetime: float = 0.8
+
+# 穿透子弹配置
+var penetrating_enabled: bool = false
+var penetrating_homing_enabled: bool = false
+var penetrating_homing_detection_range: float = 150.0
+var penetrating_homing_turn_speed: float = 5.0
+var penetrating_max_targets: int = 4
+var penetrating_damage_decay: float = 0.85
 
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
@@ -224,6 +243,10 @@ func shot() -> void:
 		_fire_lightning_bullet()
 	elif explosive_enabled:
 		_fire_explosive_bullet(base_angle)
+	elif splitting_homing_enabled and target:
+		_fire_splitting_homing_bullet()
+	elif penetrating_enabled:
+		_fire_penetrating_bullet(base_angle)
 	elif shotgun_enabled and shotgun_count > 1:
 		_fire_shotgun(base_angle)
 	else:
@@ -352,6 +375,53 @@ func _fire_explosive_bullet(angle: float) -> void:
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
 	get_parent().add_child(bullet)
 
+func _fire_splitting_homing_bullet() -> void:
+	AudioManager.play_turret_shoot("green")
+	if not target or not splitting_homing_bullet_scene:
+		return
+	
+	var bullet = splitting_homing_bullet_scene.instantiate()
+	if not bullet or not bullet is SplittingHomingBullet:
+		return
+	
+	var angle = _get_angle_to_target(target.global_position) - PI / 2
+	var direction = Vector2(cos(angle), sin(angle))
+	var start_pos = global_position + direction * 32
+	
+	bullet.global_position = start_pos
+	bullet.init(direction * bullet_speed, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_homing_config(true, splitting_homing_detection_range, splitting_homing_turn_speed)
+	bullet.set_splitting_config(splitting_count, splitting_angle_spread, splitting_bullet_damage, splitting_bullet_lifetime)
+	
+	var splitting_bullet_homing_detection_range = Constants.TURRET_CONFIG.get(color, {}).get("splitting_bullet_homing_detection_range", 5 * Constants.grid_size)
+	var splitting_bullet_homing_turn_speed = Constants.TURRET_CONFIG.get(color, {}).get("splitting_bullet_homing_turn_speed", 10.0)
+	var splitting_bullet_attack_delay = Constants.TURRET_CONFIG.get(color, {}).get("splitting_bullet_attack_delay", 0.15)
+	bullet.set_splitting_bullet_homing_config(splitting_bullet_homing_detection_range, splitting_bullet_homing_turn_speed, splitting_bullet_attack_delay)
+	
+	get_parent().add_child(bullet)
+
+func _fire_penetrating_bullet(angle: float) -> void:
+	AudioManager.play_turret_shoot("green")
+	if not penetrating_bullet_scene:
+		return
+	
+	var bullet = penetrating_bullet_scene.instantiate()
+	if not bullet or not bullet is PenetratingBullet:
+		return
+	
+	var direction = Vector2(cos(angle), sin(angle))
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	
+	if penetrating_homing_enabled:
+		bullet.set_homing_config(true, penetrating_homing_detection_range, penetrating_homing_turn_speed)
+	
+	bullet.set_penetrating_config(penetrating_max_targets, penetrating_damage_decay)
+	
+	get_parent().add_child(bullet)
+
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
 	fire_rate = config.get("fire_rate", 1.0)
@@ -379,6 +449,21 @@ func _update_turret_attributes() -> void:
 	explosive_enabled = config.get("explosive_enabled", false)
 	explosion_radius = config.get("explosion_radius", 200.0)
 	explosion_particle_duration = config.get("explosion_particle_duration", 1.0)
+	
+	splitting_homing_enabled = config.get("splitting_homing_enabled", false)
+	splitting_homing_detection_range = config.get("splitting_homing_detection_range", 150.0)
+	splitting_homing_turn_speed = config.get("splitting_homing_turn_speed", 5.0)
+	splitting_count = config.get("splitting_count", 5)
+	splitting_angle_spread = config.get("splitting_angle_spread", 45.0)
+	splitting_bullet_damage = config.get("splitting_bullet_damage", 15.0)
+	splitting_bullet_lifetime = config.get("splitting_bullet_lifetime", 0.8)
+	
+	penetrating_enabled = config.get("penetrating_enabled", false)
+	penetrating_homing_enabled = config.get("penetrating_homing_enabled", false)
+	penetrating_homing_detection_range = config.get("penetrating_homing_detection_range", 150.0)
+	penetrating_homing_turn_speed = config.get("penetrating_homing_turn_speed", 5.0)
+	penetrating_max_targets = config.get("penetrating_max_targets", 4)
+	penetrating_damage_decay = config.get("penetrating_damage_decay", 0.85)
 	
 	_update_detection_range()
 
