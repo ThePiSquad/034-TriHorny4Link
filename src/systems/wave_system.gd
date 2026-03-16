@@ -108,7 +108,6 @@ func update(delta: float) -> void:
 				# 准备时间结束，进入生成阶段
 				current_state = WaveState.SPAWNING
 				spawn_timer = 0.0
-				print("波次 ", current_wave, " 准备完成，开始生成敌人！")
 				wave_started.emit(current_wave)
 		
 		WaveState.SPAWNING:
@@ -123,11 +122,9 @@ func update(delta: float) -> void:
 				# 检查是否已完成当前波次的所有敌人生成
 				if current_wave_progress < wave_config.count:
 					current_wave_progress += 1
-					print("生成第 ", current_wave_progress, "/", wave_config.count, " 个敌人")
 				else:
 					# 当前波次完成
 					current_state = WaveState.COMPLETED
-					print("波次 ", current_wave, " 完成！")
 					wave_completed.emit(current_wave)
 					
 					# Boss 波完成后等待 Boss 真正被击败才触发胜利

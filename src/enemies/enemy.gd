@@ -183,16 +183,10 @@ func _add_enemy_score() -> void:
 	# 根据体型获取分数
 	var score = Constants.EnemyConstants.ENEMY_SCORE_MAP.get(size_level, 10)
 	
-	# Boss 特殊处理
-	if size_level >= 20:
-		print("=== Boss 被击败 ===")
-		print("Boss 体型等级=", size_level, " 应得分数=", score)
-	
 	# 添加到 GameManager
 	var game_manager = GameManager.instance
 	if game_manager:
 		game_manager.add_enemy_score(score)
-		print("击败敌人，获得分数：", score, "，累计敌人分数：", game_manager.enemy_score)
 	else:
 		push_warning("GameManager 实例不存在，无法添加分数")
 

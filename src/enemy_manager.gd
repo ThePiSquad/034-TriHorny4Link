@@ -34,8 +34,6 @@ func _ready() -> void:
 	wave_system.all_waves_completed.connect(_on_all_waves_completed)
 	wave_system.boss_wave_started.connect(_on_boss_wave_started)
 	wave_system.boss_defeated.connect(_on_boss_defeated)
-	
-	print("EnemyManager 初始化完成")
 
 func _process(delta: float) -> void:
 	if not game_started:
@@ -50,8 +48,6 @@ func _process(delta: float) -> void:
 			_spawn_timer += delta
 			if _spawn_timer >= wave_system.wave_intervals.spawn_interval:
 				_spawn_timer = 0.0
-				var wave_info = wave_system.get_current_wave_info()
-				print("尝试生成敌人：波次=", wave_info.wave_number, " 已生成=", wave_info.spawned_count, "/", wave_info.total_count)
 				_spawn_wave_enemy()
 
 func start_game() -> void:
@@ -63,7 +59,6 @@ func start_game() -> void:
 	wave_system.reset()
 	# 开始第一波
 	wave_system.advance_to_next_wave()
-	print("EnemyManager: 游戏开始！敌人列表大小=", enemy_list.size(), " Boss 场景=", boss_enemy_scene != null)
 
 func _spawn_wave_enemy() -> void:
 	"""生成波次敌人"""
@@ -78,15 +73,12 @@ func _spawn_wave_enemy() -> void:
 	
 	# 检查是否已经生成了足够的敌人
 	if wave_info.spawned_count >= wave_info.total_count:
-		print("敌人生成完成：已生成 ", wave_info.spawned_count, "/", wave_info.total_count)
 		return
 	
 	# Boss 波次特殊处理
 	if wave_info.is_boss:
-		print("生成 Boss 敌人")
 		_spawn_boss_enemy()
 	else:
-		print("生成普通敌人，体型等级=", wave_info.size)
 		_spawn_normal_enemy(wave_info.size)
 
 func _spawn_normal_enemy(size_level: int) -> void:
@@ -98,8 +90,6 @@ func _spawn_normal_enemy(size_level: int) -> void:
 	# 随机选择敌人类型
 	var enemy_index = randi() % enemy_list.size()
 	var enemy_scene = enemy_list[enemy_index]
-	
-	print("尝试生成敌人：类型索引=", enemy_index, " 体型等级=", size_level)
 	
 	var enemy = enemy_scene.instantiate()
 	if enemy:
@@ -115,7 +105,6 @@ func _spawn_normal_enemy(size_level: int) -> void:
 			enemy.set_size_level(size_level)
 		
 		add_child(enemy)
-		print("敌人生成成功！位置=", spawn_position, " 类型=", enemy.get_class())
 	else:
 		push_error("EnemyManager: 敌人实例化失败")
 
@@ -140,25 +129,20 @@ func _spawn_boss_enemy() -> void:
 		if boss.has_method("set_base_position"):
 			boss.set_base_position(_crystal_position)
 		
-		# 设置 Boss 体型 (256x256) - 确保在添加到场景树之前设置
+		# 设置 Boss 体型 (256x256)
 		if boss.has_method("set_size_level"):
 			boss.set_size_level(20)
-			print("Boss 设置体型等级=20，当前 size_level=", boss.size_level)
 		
 		add_child(boss)
 		
 		# 连接 Boss 死亡信号
 		if boss.has_signal("died"):
 			boss.died.connect(_on_boss_died)
-			print("Boss 死亡信号已连接")
-		
-		print("Boss 生成成功！位置=", spawn_position, " 体型=", boss.enemy_size, " 血量=", boss.max_health)
 	else:
 		push_error("EnemyManager: Boss 实例化失败")
 
 func _on_boss_died(_source: Node) -> void:
 	"""Boss 被击败"""
-	print("=== Boss 真正被击败！触发胜利 ===")
 	# 更新波次系统状态为所有波次完成
 	if wave_system:
 		wave_system.current_wave = wave_system.total_wave_count + wave_system.boss_wave_count
@@ -170,7 +154,6 @@ func _find_crystal_position() -> void:
 	var crystals = get_tree().get_nodes_in_group("crystal")
 	if crystals.size() > 0:
 		_crystal_position = crystals[0].global_position
-		print("EnemyManager: 水晶位置=", _crystal_position)
 	else:
 		_crystal_position = Vector2.ZERO
 		push_warning("未找到水晶，将使用默认位置 (0, 0)")
@@ -191,8 +174,6 @@ func _generate_spawn_position_for_size(size_level: int) -> Vector2:
 	
 	max_dist = max(max_dist, min_dist * 1.5)
 	
-	print("生成位置：体型等级=", size_level, " 最小距离=", min_dist, " 最大距离=", max_dist, " 水晶位置=", _crystal_position)
-	
 	while attempts < _max_spawn_attempts:
 		var distance_bias = pow(randf(), Constants.EnemyConstants.SPAWN_DISTANCE_BIAS)
 		var spawn_distance = lerp(min_dist, max_dist, distance_bias)
@@ -209,13 +190,11 @@ func _generate_spawn_position_for_size(size_level: int) -> Vector2:
 		   spawn_position.x <= Constants.CameraConstants.MAX_X and \
 		   spawn_position.y >= Constants.CameraConstants.MIN_Y and \
 		   spawn_position.y <= Constants.CameraConstants.MAX_Y:
-			print("位置有效：", spawn_position)
 			return spawn_position
 		
 		attempts += 1
 	
 	# 如果多次尝试都失败，使用备选方案：在最小距离处生成
-	print("警告：所有位置尝试失败，使用备选位置")
 	var fallback_angle = randf() * 2.0 * PI
 	spawn_position = _crystal_position + Vector2(
 		cos(fallback_angle) * min_dist,
@@ -240,7 +219,6 @@ func _on_wave_started(wave_number: int) -> void:
 func _on_wave_completed(wave_number: int) -> void:
 	"""波次完成"""
 	print("第 ", wave_number, " 波完成！")
-	
 	# Boss 波次完成后等待 Boss 被击败
 	if wave_number >= 11:
 		print("Boss 波次完成，等待 Boss 被击败...")

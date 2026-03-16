@@ -64,7 +64,6 @@ func _process(delta: float) -> void:
 
 func add_enemy_score(score: int) -> void:
 	enemy_score += score
-	print("击败敌人，获得分数：", score, "，累计敌人分数：", enemy_score)
 
 func _on_game_over() -> void:
 	# 游戏结束后的处理逻辑

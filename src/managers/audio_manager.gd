@@ -142,6 +142,11 @@ func _get_available_player() -> AudioStreamPlayer:
 		if not player.playing:
 			return player
 	
+	# 如果所有播放器都在播放，回收最早的那个
+	if _audio_players.size() > 0:
+		push_warning("所有音效播放器都在使用中，回收最早的播放器")
+		return _audio_players[0]
+	
 	return null
 
 func play_ui_click() -> void:
