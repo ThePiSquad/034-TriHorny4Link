@@ -216,33 +216,21 @@ func update(delta: float) -> void:
 				wave_started.emit(current_preparing_wave)
 		
 		WaveState.SPAWNING:
-			# 检查是否应该生成下一个敌人
-			var spawn_interval = _get_spawn_interval()
-			spawn_timer += delta
-			if spawn_timer >= spawn_interval:
-				spawn_timer = 0.0
-				
-				# 获取当前波次配置
-				if current_level_data:
-					var wave_data = current_level_data.get_wave(current_preparing_wave)
-					if wave_data:
-						# 检查是否已完成当前波次的所有敌人生成
-						if current_wave_progress < wave_data.get_total_enemy_count():
-							current_wave_progress += 1
-						else:
-							# 当前波次完成
-							current_state = WaveState.COMPLETED
-							wave_completed.emit(current_preparing_wave)
-				else:
-					# 使用默认配置
-					var wave_config = wave_intervals.waves.get(current_preparing_wave, {})
-					var total_count = wave_config.get("count", 0)
-					if current_wave_progress < total_count:
-						current_wave_progress += 1
-					else:
-						# 当前波次完成
-						current_state = WaveState.COMPLETED
-						wave_completed.emit(current_preparing_wave)
+			# 敌人生成由 EnemyManager 负责，这里只负责状态管理
+			# 检查波次是否应该完成
+			if current_level_data:
+				var wave_data = current_level_data.get_wave(current_preparing_wave)
+				if wave_data and current_wave_progress >= wave_data.get_total_enemy_count():
+					# 当前波次完成
+					current_state = WaveState.COMPLETED
+					wave_completed.emit(current_preparing_wave)
+			else:
+				var wave_config = wave_intervals.waves.get(current_preparing_wave, {})
+				var total_count = wave_config.get("count", 0)
+				if current_wave_progress >= total_count:
+					# 当前波次完成
+					current_state = WaveState.COMPLETED
+					wave_completed.emit(current_preparing_wave)
 		
 		WaveState.COMPLETED:
 			# 等待进入下一波
@@ -257,12 +245,16 @@ func _get_preparation_time() -> float:
 	return wave_intervals.preparation_time
 
 ## 获取生成间隔
-func _get_spawn_interval() -> float:
+func get_spawn_interval() -> float:
 	if current_level_data:
 		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		if wave_data:
 			return wave_data.spawn_interval
 	return wave_intervals.spawn_interval
+
+## 获取生成间隔（内部使用）
+func _get_spawn_interval() -> float:
+	return get_spawn_interval()
 
 ## 检查当前波次是否完成
 func is_current_wave_completed() -> bool:
@@ -285,6 +277,10 @@ func is_all_waves_completed() -> bool:
 		return current_wave >= current_level_data.get_wave_count() and current_state == WaveState.COMPLETED
 	else:
 		return current_wave >= total_wave_count + boss_wave_count and current_state == WaveState.COMPLETED
+
+## 增加波次进度
+func increment_wave_progress() -> void:
+	current_wave_progress += 1
 
 ## 获取关卡数据
 func get_level_data() -> LevelData:

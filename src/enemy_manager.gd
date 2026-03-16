@@ -46,7 +46,8 @@ func _process(delta: float) -> void:
 		# 如果波次系统正在生成敌人
 		if wave_system.current_state == WaveSystem.WaveState.SPAWNING:
 			_spawn_timer += delta
-			if _spawn_timer >= wave_system.wave_intervals.spawn_interval:
+			var spawn_interval = wave_system.get_spawn_interval()
+			if _spawn_timer >= spawn_interval:
 				_spawn_timer = 0.0
 				_spawn_wave_enemy()
 
@@ -96,15 +97,23 @@ func _spawn_wave_enemy() -> void:
 		push_warning("EnemyManager: wave_info 为空！")
 		return
 	
+	print("调试：spawned_count=", wave_info.spawned_count, ", total_count=", wave_info.total_count, ", is_boss=", wave_info.is_boss)
+	
 	# 检查是否已经生成了足够的敌人
 	if wave_info.spawned_count >= wave_info.total_count:
+		print("调试：已生成足够敌人，跳过")
 		return
 	
 	# Boss 波次特殊处理
 	if wave_info.is_boss:
+		print("Boss 波次，准备生成 Boss...")
 		_spawn_boss_enemy()
+		# 更新波次进度
+		wave_system.increment_wave_progress()
 	else:
 		_spawn_normal_enemy(wave_info.size)
+		# 更新波次进度
+		wave_system.increment_wave_progress()
 
 func _spawn_normal_enemy(size_level: int) -> void:
 	"""生成普通敌人"""
@@ -135,8 +144,10 @@ func _spawn_normal_enemy(size_level: int) -> void:
 
 func _spawn_boss_enemy() -> void:
 	"""生成 Boss 敌人"""
+	print("开始生成 Boss...")
 	var boss_to_spawn = boss_enemy_scene
 	if not boss_to_spawn:
+		print("警告：Boss 场景未设置，尝试使用第一个敌人")
 		# 如果没有指定 Boss 场景，使用第一个敌人
 		boss_to_spawn = enemy_list[0] if not enemy_list.is_empty() else null
 
@@ -146,6 +157,10 @@ func _spawn_boss_enemy() -> void:
 
 	# 获取当前波次信息
 	var wave_info = wave_system.get_current_wave_info()
+	if wave_info.is_empty():
+		push_error("EnemyManager: wave_info 为空！")
+		return
+	
 	var boss_size_level = 20  # 默认体型等级
 	if wave_info.size > 0:
 		boss_size_level = wave_info.size
@@ -157,6 +172,7 @@ func _spawn_boss_enemy() -> void:
 		# Boss 生成在边缘
 		var spawn_position = _generate_spawn_position_for_size(boss_size_level)
 		boss.global_position = spawn_position
+		print("Boss 生成位置：", spawn_position)
 		
 		# 设置基地位置
 		if boss.has_method("set_base_position"):
@@ -168,10 +184,14 @@ func _spawn_boss_enemy() -> void:
 			print("Boss 体型等级已设置为：", boss_size_level)
 		
 		add_child(boss)
+		print("Boss 已添加到场景")
 		
 		# 连接 Boss 死亡信号
 		if boss.has_signal("died"):
 			boss.died.connect(_on_boss_died)
+			print("Boss 死亡信号已连接")
+		else:
+			print("警告：Boss 没有 died 信号")
 	else:
 		push_error("EnemyManager: Boss 实例化失败")
 
@@ -237,10 +257,18 @@ func _generate_spawn_position_for_size(size_level: int) -> Vector2:
 	return spawn_position
 
 func _on_wave_preparing(wave_number: int) -> void:
-	"""波次准备开始"""
+	"""波次准备中"""
 	print("第 ", wave_number, " 波准备中...")
+	
+	# 检查当前波次是否是 Boss 波
+	var is_boss = false
+	if wave_system.current_level_data:
+		var wave_data = wave_system.current_level_data.get_wave(wave_number)
+		if wave_data:
+			is_boss = wave_data.is_boss_wave
+	
 	# 播放准备音效
-	if wave_number > 10:
+	if is_boss:
 		AudioManager.play_wave_start("boss")
 	else:
 		AudioManager.play_wave_start("normal")
@@ -253,8 +281,16 @@ func _on_wave_started(wave_number: int) -> void:
 func _on_wave_completed(wave_number: int) -> void:
 	"""波次完成"""
 	print("第 ", wave_number, " 波完成！")
+	
+	# 检查当前波次是否是 Boss 波
+	var is_boss = false
+	if wave_system.current_level_data:
+		var wave_data = wave_system.current_level_data.get_wave(wave_number)
+		if wave_data:
+			is_boss = wave_data.is_boss_wave
+	
 	# Boss 波次完成后等待 Boss 被击败
-	if wave_number >= 11:
+	if is_boss:
 		print("Boss 波次完成，等待 Boss 被击败...")
 		return
 	
