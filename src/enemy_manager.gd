@@ -50,6 +50,8 @@ func _process(delta: float) -> void:
 			_spawn_timer += delta
 			if _spawn_timer >= wave_system.wave_intervals.spawn_interval:
 				_spawn_timer = 0.0
+				var wave_info = wave_system.get_current_wave_info()
+				print("尝试生成敌人：波次=", wave_info.wave_number, " 已生成=", wave_info.spawned_count, "/", wave_info.total_count)
 				_spawn_wave_enemy()
 
 func start_game() -> void:
@@ -66,20 +68,25 @@ func start_game() -> void:
 func _spawn_wave_enemy() -> void:
 	"""生成波次敌人"""
 	if not wave_system:
+		push_warning("EnemyManager: wave_system 为空！")
 		return
 	
 	var wave_info = wave_system.get_current_wave_info()
 	if wave_info.is_empty():
+		push_warning("EnemyManager: wave_info 为空！")
 		return
 	
 	# 检查是否已经生成了足够的敌人
 	if wave_info.spawned_count >= wave_info.total_count:
+		print("敌人生成完成：已生成 ", wave_info.spawned_count, "/", wave_info.total_count)
 		return
 	
 	# Boss 波次特殊处理
 	if wave_info.is_boss:
+		print("生成 Boss 敌人")
 		_spawn_boss_enemy()
 	else:
+		print("生成普通敌人，体型等级=", wave_info.size)
 		_spawn_normal_enemy(wave_info.size)
 
 func _spawn_normal_enemy(size_level: int) -> void:
@@ -120,6 +127,7 @@ func _spawn_boss_enemy() -> void:
 		boss_to_spawn = enemy_list[0] if not enemy_list.is_empty() else null
 	
 	if not boss_to_spawn:
+		push_error("EnemyManager: Boss 场景未设置！")
 		return
 	
 	var boss = boss_to_spawn.instantiate()
@@ -132,12 +140,30 @@ func _spawn_boss_enemy() -> void:
 		if boss.has_method("set_base_position"):
 			boss.set_base_position(_crystal_position)
 		
-		# 设置 Boss 体型 (256x256)
+		# 设置 Boss 体型 (256x256) - 确保在添加到场景树之前设置
 		if boss.has_method("set_size_level"):
 			boss.set_size_level(20)
+			print("Boss 设置体型等级=20，当前 size_level=", boss.size_level)
 		
 		add_child(boss)
-		print("Boss 生成！")
+		
+		# 连接 Boss 死亡信号
+		if boss.has_signal("died"):
+			boss.died.connect(_on_boss_died)
+			print("Boss 死亡信号已连接")
+		
+		print("Boss 生成成功！位置=", spawn_position, " 体型=", boss.enemy_size, " 血量=", boss.max_health)
+	else:
+		push_error("EnemyManager: Boss 实例化失败")
+
+func _on_boss_died(_source: Node) -> void:
+	"""Boss 被击败"""
+	print("=== Boss 真正被击败！触发胜利 ===")
+	# 更新波次系统状态为所有波次完成
+	if wave_system:
+		wave_system.current_wave = wave_system.total_wave_count + wave_system.boss_wave_count
+		wave_system.current_state = WaveSystem.WaveState.COMPLETED
+		wave_system.boss_defeated.emit()
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
@@ -214,10 +240,23 @@ func _on_wave_started(wave_number: int) -> void:
 func _on_wave_completed(wave_number: int) -> void:
 	"""波次完成"""
 	print("第 ", wave_number, " 波完成！")
+	
+	# Boss 波次完成后等待 Boss 被击败
+	if wave_number >= 11:
+		print("Boss 波次完成，等待 Boss 被击败...")
+		return
+	
 	# 延迟进入下一波
 	await get_tree().create_timer(2.0).timeout
 	if wave_system and not wave_system.is_all_waves_completed():
 		wave_system.advance_to_next_wave()
+
+func _on_boss_defeated() -> void:
+	"""Boss 被击败"""
+	print("Boss 被击败！游戏胜利！")
+	# 触发游戏胜利逻辑
+	if GameManager.instance:
+		GameManager.instance.end_game()
 
 func _on_all_waves_completed() -> void:
 	"""所有波次完成（胜利）"""
@@ -232,14 +271,6 @@ func _on_boss_wave_started() -> void:
 	print("Boss 波次开始！")
 	# 播放 Boss 战音乐
 	AudioManager.play_wave_start("boss")
-
-func _on_boss_defeated() -> void:
-	"""Boss 被击败"""
-	print("Boss 被击败！游戏胜利！")
-	# 触发游戏胜利
-	var game_manager = GameManager.instance
-	if game_manager:
-		game_manager.end_game()
 
 func _generate_spawn_position() -> Vector2:
 	"""生成随机位置，敌人在远处生成，从四面八方涌来"""

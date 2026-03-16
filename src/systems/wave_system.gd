@@ -130,9 +130,8 @@ func update(delta: float) -> void:
 					print("波次 ", current_wave, " 完成！")
 					wave_completed.emit(current_wave)
 					
-					# 如果是 Boss 波且被击败
-					if is_boss_wave():
-						boss_defeated.emit()
+					# Boss 波完成后等待 Boss 真正被击败才触发胜利
+					# boss_defeated 信号由 EnemyManager 在 Boss 死亡时触发
 		
 		WaveState.COMPLETED:
 			# 等待进入下一波
