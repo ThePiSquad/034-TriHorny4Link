@@ -24,8 +24,10 @@ func _ready() -> void:
 	# 连接按钮信号
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_button_pressed)
+		_add_hover_effect(restart_button)
 	if main_menu_button:
 		main_menu_button.pressed.connect(_on_main_menu_button_pressed)
+		_add_hover_effect(main_menu_button)
 	
 	# 预加载图案显示场景
 	pattern_display_scene = load(PATTERN_DISPLAY_SCENE_PATH)
@@ -52,6 +54,39 @@ func _ready() -> void:
 	
 	# 显示 debug 信息（如果启用）
 	_update_debug_display()
+	
+	# 设置入场动画
+	_setup_animations()
+
+func _add_hover_effect(button: Button) -> void:
+	"""为按钮添加悬停动画效果"""
+	button.mouse_entered.connect(func():
+		AudioManager.play_ui_hover()
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_BACK)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(button, "scale", Vector2(1.05, 1.05), 0.3)
+	)
+	
+	button.mouse_exited.connect(func():
+		var tween = create_tween()
+		tween.set_trans(Tween.TRANS_BACK)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(button, "scale", Vector2(1.0, 1.0), 0.3)
+	)
+
+func _setup_animations() -> void:
+	"""设置入场动画"""
+	# 初始缩放
+	$MarginContainer.scale = Vector2(0.8, 0.8)
+	$MarginContainer.modulate.a = 0.0
+	
+	# 播放入场动画
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property($MarginContainer, "scale", Vector2(1.0, 1.0), 0.8)
+	tween.parallel().tween_property($MarginContainer, "modulate:a", 1.0, 0.5)
 
 func _display_scores() -> void:
 	"""显示所有分数信息"""
@@ -320,8 +355,10 @@ func _update_debug_display() -> void:
 		debug_score_display.add_child(total_label)
 
 func _on_restart_button_pressed() -> void:
-	AudioManager.play_ui_click()
 	"""重新开始游戏"""
+	_play_button_click_animation(restart_button)
+	await get_tree().create_timer(0.2).timeout
+	
 	# 重新加载当前场景
 	var transition_manager = TransitionManager.instance
 	if transition_manager:
@@ -330,8 +367,10 @@ func _on_restart_button_pressed() -> void:
 		get_tree().reload_current_scene()
 
 func _on_main_menu_button_pressed() -> void:
-	AudioManager.play_ui_click()
 	"""返回主菜单"""
+	_play_button_click_animation(main_menu_button)
+	await get_tree().create_timer(0.2).timeout
+	
 	# 切换到主菜单场景
 	var transition_manager = TransitionManager.instance
 	if transition_manager:
@@ -340,10 +379,10 @@ func _on_main_menu_button_pressed() -> void:
 		# 如果管理器不存在，直接切换
 		get_tree().change_scene_to_file("res://src/main_menu.tscn")
 
-
-func _on_restart_button_mouse_entered() -> void:
-	AudioManager.play_ui_hover()
-
-
-func _on_main_menu_button_mouse_entered() -> void:
-	AudioManager.play_ui_hover()
+func _play_button_click_animation(button: Button) -> void:
+	"""播放按钮点击动画"""
+	AudioManager.play_ui_click()
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.tween_property(button, "scale", Vector2(0.95, 0.95), 0.1)
+	tween.tween_property(button, "scale", Vector2(1.0, 1.0), 0.1)
