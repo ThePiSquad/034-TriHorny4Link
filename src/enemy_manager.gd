@@ -97,11 +97,8 @@ func _spawn_wave_enemy() -> void:
 		push_warning("EnemyManager: wave_info 为空！")
 		return
 	
-	print("调试：spawned_count=", wave_info.spawned_count, ", total_count=", wave_info.total_count, ", is_boss=", wave_info.is_boss)
-	
 	# 检查是否已经生成了足够的敌人
 	if wave_info.spawned_count >= wave_info.total_count:
-		print("调试：已生成足够敌人，跳过")
 		return
 	
 	# Boss 波次特殊处理
