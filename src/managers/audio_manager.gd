@@ -134,20 +134,26 @@ func play_sound(sound_name: String, volume_db: float = 0.0, pitch_scale: float =
 
 func _get_available_player() -> AudioStreamPlayer:
 	"""获取一个可用的音效播放器"""
+	# 优先从可用池中获取
 	if _available_players.size() > 0:
 		return _available_players.pop_back()
 	
-	# 如果没有可用播放器，找一个已经停止的
+	# 找一个已经停止的播放器
 	for player in _audio_players:
 		if not player.playing:
+			if not _available_players.has(player):
+				_available_players.append(player)
 			return player
 	
-	# 如果所有播放器都在播放，回收最早的那个
-	if _audio_players.size() > 0:
-		push_warning("所有音效播放器都在使用中，回收最早的播放器")
-		return _audio_players[0]
+	# 如果所有播放器都在播放，创建一个新的临时播放器
+	var new_player = AudioStreamPlayer.new()
+	new_player.name = "AudioPlayer_Temp_" + str(_audio_players.size())
+	add_child(new_player)
+	new_player.finished.connect(_on_player_finished.bind(new_player))
+	_audio_players.append(new_player)
 	
-	return null
+	print("创建临时音效播放器，当前总数：", _audio_players.size())
+	return new_player
 
 func play_ui_click() -> void:
 	"""播放UI点击音效"""
