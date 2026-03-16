@@ -15,6 +15,7 @@ enum WaveState {
 var current_wave: int = 0
 var current_state: WaveState = WaveState.IDLE
 var current_wave_progress: int = 0  # 当前波次已生成的敌人数量
+var current_preparing_wave: int = 0  # 当前正在准备的波次（用于信号传递）
 var total_wave_count: int = 10      # 常规波次数
 var boss_wave_count: int = 1        # Boss 波次数
 
@@ -60,20 +61,25 @@ func _init() -> void:
 ## level_id: 关卡唯一标识符
 ## 返回: 是否加载成功
 func load_level(level_id: String) -> bool:
+	print("WaveSystem: 开始加载关卡 ", level_id)
+	print("ResourceManager.instance 是否存在：", ResourceManager.instance != null)
+	
 	if not ResourceManager.instance:
 		push_error("ResourceManager 实例不存在")
 		return false
 	
 	var level_data = ResourceManager.instance.load_level(level_id)
+	print("level_data 是否为空：", level_data == null)
+	
 	if not level_data:
-		push_error("关卡加载失败: " + level_id)
+		push_error("关卡加载失败：" + level_id)
 		return false
 	
 	current_level_data = level_data
 	total_wave_count = level_data.get_wave_count()
 	boss_wave_count = 1 if level_data.has_boss_wave() else 0
 	
-	print("关卡加载成功: ", level_data.level_name, " (", total_wave_count, " 波)")
+	print("关卡加载成功：", level_data.level_name, " (", total_wave_count, " 波)")
 	return true
 
 ## 重置波次系统
@@ -92,13 +98,19 @@ func advance_to_next_wave() -> bool:
 		if current_wave >= current_level_data.get_wave_count():
 			return false
 		
-		current_wave += 1
+		# 保存当前正在准备的波次
+		current_preparing_wave = current_wave
+		
+		# 进入准备状态
 		current_state = WaveState.PREPARING
 		preparation_timer = 0.0
 		current_wave_progress = 0
 		
 		# 发射准备信号
-		wave_preparing.emit(current_wave)
+		wave_preparing.emit(current_preparing_wave)
+		
+		# 增加波次号
+		current_wave += 1
 		
 		if current_level_data.has_boss_wave() and current_wave > current_level_data.boss_wave_index:
 			boss_wave_started.emit()
@@ -109,13 +121,19 @@ func advance_to_next_wave() -> bool:
 		if current_wave >= total_wave_count + boss_wave_count:
 			return false
 		
-		current_wave += 1
+		# 保存当前正在准备的波次
+		current_preparing_wave = current_wave
+		
+		# 进入准备状态
 		current_state = WaveState.PREPARING
 		preparation_timer = 0.0
 		current_wave_progress = 0
 		
 		# 发射准备信号
-		wave_preparing.emit(current_wave)
+		wave_preparing.emit(current_preparing_wave)
+		
+		# 增加波次号
+		current_wave += 1
 		
 		if current_wave > total_wave_count:
 			boss_wave_started.emit()
@@ -129,18 +147,18 @@ func is_wave_active() -> bool:
 ## 检查是否是 Boss 波
 func is_boss_wave() -> bool:
 	if current_level_data:
-		var wave_data = current_level_data.get_wave(current_wave)
+		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		return wave_data != null and wave_data.is_boss_wave
 	else:
-		return current_wave > total_wave_count
+		return current_preparing_wave > total_wave_count
 
 ## 获取当前波次信息
 func get_current_wave_info() -> Dictionary:
 	if current_level_data:
-		var wave_data = current_level_data.get_wave(current_wave)
+		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		if wave_data:
 			return {
-				"wave_number": current_wave,
+				"wave_number": current_preparing_wave,
 				"wave_name": wave_data.wave_name,
 				"size": _get_wave_size_level(wave_data),
 				"total_count": wave_data.get_total_enemy_count(),
@@ -155,13 +173,13 @@ func get_current_wave_info() -> Dictionary:
 			}
 	
 	# 使用默认配置
-	if current_wave <= 0 or current_wave > total_wave_count + boss_wave_count:
+	if current_preparing_wave <= 0 or current_preparing_wave > total_wave_count + boss_wave_count:
 		return {}
 	
-	var wave_config = wave_intervals.waves.get(current_wave, {})
+	var wave_config = wave_intervals.waves.get(current_preparing_wave, {})
 	return {
-		"wave_number": current_wave,
-		"wave_name": "第 " + str(current_wave) + " 波",
+		"wave_number": current_preparing_wave,
+		"wave_name": "第 " + str(current_preparing_wave) + " 波",
 		"size": wave_config.get("size", 1),
 		"total_count": wave_config.get("count", 0),
 		"spawned_count": current_wave_progress,
@@ -195,7 +213,7 @@ func update(delta: float) -> void:
 				# 准备时间结束，进入生成阶段
 				current_state = WaveState.SPAWNING
 				spawn_timer = 0.0
-				wave_started.emit(current_wave)
+				wave_started.emit(current_preparing_wave)
 		
 		WaveState.SPAWNING:
 			# 检查是否应该生成下一个敌人
@@ -206,7 +224,7 @@ func update(delta: float) -> void:
 				
 				# 获取当前波次配置
 				if current_level_data:
-					var wave_data = current_level_data.get_wave(current_wave)
+					var wave_data = current_level_data.get_wave(current_preparing_wave)
 					if wave_data:
 						# 检查是否已完成当前波次的所有敌人生成
 						if current_wave_progress < wave_data.get_total_enemy_count():
@@ -214,17 +232,17 @@ func update(delta: float) -> void:
 						else:
 							# 当前波次完成
 							current_state = WaveState.COMPLETED
-							wave_completed.emit(current_wave)
+							wave_completed.emit(current_preparing_wave)
 				else:
 					# 使用默认配置
-					var wave_config = wave_intervals.waves.get(current_wave, {})
+					var wave_config = wave_intervals.waves.get(current_preparing_wave, {})
 					var total_count = wave_config.get("count", 0)
 					if current_wave_progress < total_count:
 						current_wave_progress += 1
 					else:
 						# 当前波次完成
 						current_state = WaveState.COMPLETED
-						wave_completed.emit(current_wave)
+						wave_completed.emit(current_preparing_wave)
 		
 		WaveState.COMPLETED:
 			# 等待进入下一波
@@ -233,7 +251,7 @@ func update(delta: float) -> void:
 ## 获取准备时间
 func _get_preparation_time() -> float:
 	if current_level_data:
-		var wave_data = current_level_data.get_wave(current_wave)
+		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		if wave_data:
 			return wave_data.preparation_time
 	return wave_intervals.preparation_time
@@ -241,24 +259,24 @@ func _get_preparation_time() -> float:
 ## 获取生成间隔
 func _get_spawn_interval() -> float:
 	if current_level_data:
-		var wave_data = current_level_data.get_wave(current_wave)
+		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		if wave_data:
 			return wave_data.spawn_interval
 	return wave_intervals.spawn_interval
 
 ## 检查当前波次是否完成
 func is_current_wave_completed() -> bool:
-	if current_wave <= 0:
+	if current_preparing_wave <= 0:
 		return false
 	
 	if current_level_data:
-		var wave_data = current_level_data.get_wave(current_wave)
+		var wave_data = current_level_data.get_wave(current_preparing_wave)
 		if wave_data:
 			return current_wave_progress >= wave_data.get_total_enemy_count() and current_state == WaveState.COMPLETED
 		else:
 			return false
 	else:
-		var wave_config = wave_intervals.waves.get(current_wave, {})
+		var wave_config = wave_intervals.waves.get(current_preparing_wave, {})
 		return current_wave_progress >= wave_config.get("count", 0) and current_state == WaveState.COMPLETED
 
 ## 检查是否所有波次都已完成

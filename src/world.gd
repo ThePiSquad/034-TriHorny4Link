@@ -48,6 +48,11 @@ func _ready() -> void:
 
 func _initialize_game_manager() -> void:
 	"""初始化游戏管理器"""
+	# 开发阶段：清除关卡缓存以确保加载最新配置
+	if ResourceManager.instance:
+		ResourceManager.instance.clear_level_cache()
+		print("已清除关卡缓存，将重新加载最新配置")
+	
 	var game_manager = GameManager.instance
 	if not game_manager:
 		# 创建 GameManager 节点

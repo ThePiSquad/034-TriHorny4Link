@@ -1,4 +1,4 @@
-class_name ResourceManager extends Node
+extends Node
 
 ## 资源管理器
 ## 负责加载、缓存和管理关卡及波次配置资源
@@ -22,7 +22,7 @@ signal cache_cleared()
 func _ready() -> void:
 	# 设置单例
 	if instance == null:
-		instance = self
+		instance = ResourceManager
 	else:
 		queue_free()
 		return
@@ -42,13 +42,15 @@ func _preload_default_levels() -> void:
 ## force_reload: 是否强制重新加载（忽略缓存）
 ## 返回: LevelData 对象，失败返回 null
 func load_level(level_id: String, force_reload: bool = false) -> LevelData:
+	print("ResourceManager: 开始加载关卡 ", level_id)
+	var config_path = LEVEL_CONFIG_DIR + level_id + LEVEL_CONFIG_EXT
+	print("配置文件路径：", config_path)
+	print("文件是否存在：", FileAccess.file_exists(config_path))
+	
 	# 检查缓存
 	if not force_reload and _level_cache.has(level_id):
-		print("从缓存加载关卡: ", level_id)
+		print("从缓存加载关卡：", level_id)
 		return _level_cache[level_id]
-	
-	# 构建配置文件路径
-	var config_path = LEVEL_CONFIG_DIR + level_id + LEVEL_CONFIG_EXT
 	
 	# 检查文件是否存在
 	if not FileAccess.file_exists(config_path):
@@ -66,13 +68,17 @@ func load_level(level_id: String, force_reload: bool = false) -> LevelData:
 	var json_text = file.get_as_text()
 	file.close()
 	
+	print("JSON 文件长度：", json_text.length())
+	
 	var json = JSON.new()
 	var parse_result = json.parse(json_text)
 	
 	if parse_result != OK:
-		push_error("关卡配置 JSON 解析失败: " + json.get_error_message())
+		push_error("关卡配置 JSON 解析失败：" + json.get_error_message())
 		level_load_failed.emit(level_id, "JSON 解析失败")
 		return null
+	
+	print("JSON 解析成功，开始创建 LevelData")
 	
 	# 创建 LevelData 对象
 	var level_data = _parse_level_data(json.data, level_id)
@@ -80,9 +86,10 @@ func load_level(level_id: String, force_reload: bool = false) -> LevelData:
 	if level_data:
 		# 添加到缓存
 		_level_cache[level_id] = level_data
-		print("关卡加载成功: ", level_id, " (", level_data.waves.size(), " 个波次)")
+		print("关卡加载成功：", level_id, " (", level_data.waves.size(), " 个波次)")
 		level_loaded.emit(level_id)
 	else:
+		push_error("LevelData 解析失败")
 		level_load_failed.emit(level_id, "数据解析失败")
 	
 	return level_data

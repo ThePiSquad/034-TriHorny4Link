@@ -1,14 +1,60 @@
 [gd_scene format=3 uid="uid://ekoukkmxla1m"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_7dm0k"]
+[ext_resource type="Script" uid="uid://bh7o0ibko5x6i" path="res://src/ui/main_menu.gd" id="16_main_menu"]
+[ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="14_bg"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_titles"]
 font_size = 65
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_buttons"]
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+outline_size = 1
+outline_color = Color(0, 0, 0, 1)
 
 [node name="Main" type="Node2D" unique_id=797017076]
+script = ExtResource("16_main_menu")
 
-[node name="Label" type="Label" parent="." unique_id=1087334970]
-offset_right = 1152.0
-offset_bottom = 648.0
-text = "HELLO, WORLD!"
-label_settings = SubResource("LabelSettings_7dm0k")
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="BackgroundManager" parent="." unique_id=1234567890 instance=ExtResource("14_bg")]
+background_color = Color(0.078431375, 0.078431375, 0.11764706, 1)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=123456789]
+position = Vector2(576, 324)
+zoom = Vector2(0.5, 0.5)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1749754244]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=111222333]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/VBoxContainer" unique_id=1122275727]
+layout_mode = 2
+text = "塔防游戏"
+label_settings = SubResource("LabelSettings_titles")
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/VBoxContainer" unique_id=357907225]
+layout_mode = 2
+
+[node name="Buttons" type="VBoxContainer" parent="CanvasLayer/VBoxContainer" unique_id=357907226]
+layout_mode = 2
+h_size_flags = 4
+
+[node name="StartButton" type="Button" parent="CanvasLayer/VBoxContainer/Buttons" unique_id=357907227]
+layout_mode = 2
+text = "开始游戏"
+
+[node name="LevelSelectButton" type="Button" parent="CanvasLayer/VBoxContainer/Buttons" unique_id=357907228]
+layout_mode = 2
+text = "选择关卡"
+
+[node name="ExitButton" type="Button" parent="CanvasLayer/VBoxContainer/Buttons" unique_id=357907229]
+layout_mode = 2
+text = "退出游戏"

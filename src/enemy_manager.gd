@@ -60,11 +60,25 @@ func start_game() -> void:
 	if GameManager.instance:
 		level_id = GameManager.instance.selected_level
 	
+	print("正在加载关卡：", level_id)
+	
 	# 加载关卡配置
 	if wave_system:
 		var load_success = wave_system.load_level(level_id)
 		if not load_success:
 			print("警告：关卡加载失败，使用默认配置")
+		else:
+			# 验证 Boss 波的体型等级
+			var level_data = wave_system.get_level_data()
+			if level_data and level_data.has_boss_wave():
+				var boss_wave = level_data.get_boss_wave()
+				if boss_wave.enemy_configs.size() > 0:
+					var boss_config = boss_wave.enemy_configs[0]
+					print("Boss 配置验证:")
+					print("  - Boss 类型：", boss_config.enemy_type)
+					print("  - Boss size_level: ", boss_config.size_level)
+					print("  - Boss count: ", boss_config.count)
+					print("  - Boss is_boss: ", boss_config.is_boss)
 	
 	game_started = true
 	wave_system.reset()
@@ -135,6 +149,8 @@ func _spawn_boss_enemy() -> void:
 	var boss_size_level = 20  # 默认体型等级
 	if wave_info.size > 0:
 		boss_size_level = wave_info.size
+	
+	print("生成 Boss，体型等级：", boss_size_level)
 
 	var boss = boss_to_spawn.instantiate()
 	if boss:
@@ -149,6 +165,7 @@ func _spawn_boss_enemy() -> void:
 		# 设置 Boss 体型
 		if boss.has_method("set_size_level"):
 			boss.set_size_level(boss_size_level)
+			print("Boss 体型等级已设置为：", boss_size_level)
 		
 		add_child(boss)
 		

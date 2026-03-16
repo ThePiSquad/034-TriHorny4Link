@@ -9,7 +9,7 @@ extends Control
 var transition_manager = TransitionManager
 
 # 游戏场景路径
-const GAME_SCENE_PATH = "res://src/world.tscn"
+const GAME_SCENE_PATH = "res://src/ui/level_select_screen.tscn"
 
 func _ready() -> void:
 	# 初始化动态背景

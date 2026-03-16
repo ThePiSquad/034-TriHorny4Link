@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://cyspu3j7w0vjj"]
+
+[ext_resource type="Script" uid="uid://n3kx5bpfsfuv" path="res://src/ui/level_select_screen.gd" id="1_vsi4e"]
+[ext_resource type="Script" uid="uid://dr8dw3x2usgbd" path="res://src/ui/dynamic_background.gd" id="2_su76r"]
+[ext_resource type="Texture2D" uid="uid://bx3chuthcjhdr" path="res://assets/particles/t_solid_particle.png" id="2_wfe3n"]
+[ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="3_ebab3"]
+[ext_resource type="Texture2D" uid="uid://cnl40ovncq4hq" path="res://assets/ui/t_solid_left.png" id="5_ebab3"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_su76r"]
+color = Color(0.6528635, 0.6528636, 0.6528636, 1)
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_w7ph5"]
+thickness = 0
+vertical = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_su76r"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_ebab3"]
+thickness = 0
+vertical = true
+
+[node name="LevelSelectScreen" type="Control" unique_id=1157207512]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vsi4e")
+metadata/_edit_vertical_guides_ = [0.0]
+
+[node name="Background" type="ColorRect" parent="." unique_id=1325010735]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.078431375, 0.078431375, 0.11764706, 1)
+
+[node name="DynamicBackground" type="Node2D" parent="." unique_id=765517180]
+modulate = Color(1, 1, 1, 0.3)
+script = ExtResource("2_su76r")
+
+[node name="StructureManager" type="Node2D" parent="DynamicBackground" unique_id=300268668]
+script = ExtResource("3_ebab3")
+
+[node name="CanvasLayer" type="CenterContainer" parent="." unique_id=450456548]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=658620451]
+custom_minimum_size = Vector2(689, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer" unique_id=1763684093]
+layout_mode = 2
+theme_override_font_sizes/font_size = 81
+text = "Level"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/VBoxContainer" unique_id=1540344919]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/VBoxContainer" unique_id=273564660]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+theme_override_styles/separator = SubResource("StyleBoxLine_su76r")
+
+[node name="LevelButtons" type="GridContainer" parent="CanvasLayer/VBoxContainer" unique_id=2075691478]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 64
+theme_override_constants/v_separation = 64
+
+[node name="Level1Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=223076887]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level2Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=1398724431]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level3Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=552834299]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="BackButton" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1489794349]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(1, 0.5019608, 0.5019608, 1)
+theme_override_colors/icon_pressed_color = Color(0.73333335, 0, 0.16470589, 1)
+theme_override_colors/icon_hover_color = Color(1, 0.5019608, 0.5019608, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("5_ebab3")
+vertical_icon_alignment = 2
+expand_icon = true
