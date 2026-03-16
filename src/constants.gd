@@ -228,7 +228,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.RED: {
 		"fire_rate": 0.75,
 		"bullet_speed": 550.0,
-		"bullet_damage": 30.0,
+		"bullet_damage": 20.0,
 		"detection_range": 10 * grid_size,
 		"bullet_lifetime": 2.0,
 		"shotgun_enabled": true,
@@ -238,14 +238,14 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.BLUE: {
 		"fire_rate": 2.0,
 		"bullet_speed": 1100.0,
-		"bullet_damage": 30.0,
+		"bullet_damage": 20.0,
 		"detection_range": 12 * grid_size,
 		"bullet_lifetime": 1.2
 	},
 	Enums.ColorType.YELLOW: {
 		"fire_rate": 1.0,
 		"bullet_speed": 800.0,
-		"bullet_damage": 32.5,
+		"bullet_damage": 22.5,
 		"detection_range": 16 * grid_size,
 		"bullet_lifetime": 0.5,
 		"magic_enabled": true,
@@ -255,7 +255,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.GREEN: {
 		"fire_rate": 1.5,
 		"bullet_speed": 850.0,
-		"bullet_damage": 38.0,
+		"bullet_damage": 28.0,
 		"detection_range": 15 * grid_size,
 		"bullet_lifetime": 1.6,
 		"homing_enabled": true,
@@ -265,7 +265,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.ORANGE: {
 		"fire_rate": 0.75,
 		"bullet_speed": 550.0,
-		"bullet_damage": 36.0,
+		"bullet_damage": 26.0,
 		"detection_range": 13 * grid_size,
 		"bullet_lifetime": 0.6,
 		"lightning_enabled": true,
@@ -275,7 +275,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.PURPLE: {
 		"fire_rate": 0.5,
 		"bullet_speed": 600.0,
-		"bullet_damage": 60.0,
+		"bullet_damage": 50.0,
 		"detection_range": 8 * grid_size,
 		"bullet_lifetime": 2.0,
 		"explosive_enabled": true,
