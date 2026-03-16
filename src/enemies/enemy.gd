@@ -168,8 +168,9 @@ func _on_damageable_died(source: Node) -> void:
 	# 生成死亡粒子特效
 	_spawn_death_particle()
 	
-	# 添加敌人分数
-	_add_enemy_score()
+	# 只有被炮塔击败时才计分（source 不是自己）
+	if source and source != self:
+		_add_enemy_score()
 	
 	# 断开屏障的死亡信号连接
 	if _current_barrier and _current_barrier.has_signal("died"):
