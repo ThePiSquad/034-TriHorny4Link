@@ -1,8 +1,8 @@
 extends Control
 class_name PauseMenu
 
-@onready var resume_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/ResumeButton
-@onready var main_menu_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/MainMenuButton
+@onready var resume_button: Button = $CanvasLayer/CenterContainer/VBoxContainer/ButtonContainer/ResumeButton
+@onready var main_menu_button: Button = $CanvasLayer/CenterContainer/VBoxContainer/ButtonContainer/MainMenuButton
 
 var input_manager: InputManager
 
