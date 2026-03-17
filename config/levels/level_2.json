@@ -323,7 +323,7 @@
 			"wave_name": "Boss 战：数量之王",
 			"is_boss_wave": true,
 			"preparation_time": 5.0,
-			"spawn_interval": 0.0,
+			"spawn_interval": 0.3,
 			"wave_interval": 0.0,
 			"require_clear_previous": false,
 			"min_enemies_alive": 0,
@@ -346,6 +346,32 @@
 					"spawn_weight": 1.0,
 					"is_elite": false,
 					"is_boss": true
+				},
+				{
+					"enemy_type": "rect_enemy",
+					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"count": 20,
+					"size_level": 6,
+					"health_multiplier": 0.8,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 5,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 15,
+					"size_level": 6,
+					"health_multiplier": 0.8,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 5,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
 				}
 			]
 		}
