@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="TriHorny4Link"
-config/version="0.2.0"
+config/version="0.3.0"
 run/main_scene="uid://b2xguk7hfd2xq"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/bg_color=Color(0.078431375, 0.078431375, 0.11764706, 1)
