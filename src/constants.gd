@@ -22,11 +22,11 @@ const MAX_ENERGY_RANGE: int = 10
 
 # 资源系统常量
 class ResourceConstants:
-	const PRODUCTION_RATE: float = 1.0  # 每秒生产资源量
+	const PRODUCTION_RATE: float = 2.0  # 每秒生产资源量
 	const MAX_STORAGE: int = 50  # 最大存储上限
-	const MONO_CRYSTAL_COST: int = 10  # 单色水晶消耗
-	const CONDUIT_COST: int = 2  # 导管消耗（每种颜色）
-	const TURRET_COST: int = 3  # 炮塔消耗（每种颜色）
+	const MONO_CRYSTAL_COST: int = 5  # 单色水晶消耗
+	const CONDUIT_COST: int = 1  # 导管消耗（每种颜色）
+	const TURRET_COST: int = 2  # 炮塔消耗（每种颜色）
 
 # 相机相关常量
 class CameraConstants:

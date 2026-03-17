@@ -90,6 +90,15 @@ func _on_player_finished(player: AudioStreamPlayer) -> void:
 	"""播放器播放完成，归还到可用池"""
 	if not _available_players.has(player):
 		_available_players.append(player)
+	
+	# 检查是否是临时播放器，如果是则清理
+	if player.name.begins_with("AudioPlayer_Temp_"):
+		# 从播放器列表中移除
+		_audio_players.erase(player)
+		# 从可用列表中移除
+		_available_players.erase(player)
+		# 释放播放器
+		player.queue_free()
 
 func play_sound(sound_name: String, volume_db: float = 0.0, pitch_scale: float = 1.0) -> void:
 	"""播放指定音效

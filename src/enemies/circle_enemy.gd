@@ -173,9 +173,6 @@ func take_damage(amount: float, source: Node = null) -> void:
 	var reduction_rate = _calculate_damage_reduction()
 	var reduced_damage = amount * (1.0 - reduction_rate)
 	
-	# 输出调试信息
-	print("DEBUG: 圆形敌人受到伤害 - 原始：", amount, "，减免率：", reduction_rate * 100, "%，最终：", reduced_damage)
-	
 	# 调用父类的伤害接收函数
 	super.take_damage(reduced_damage, source)
 	
