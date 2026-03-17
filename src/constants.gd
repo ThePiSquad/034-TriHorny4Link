@@ -292,7 +292,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.GREEN_BLUE: {
 		"fire_rate": 1.2,
 		"bullet_speed": 750.0,
-		"bullet_damage": 20.0,
+		"bullet_damage": 18.0,
 		"detection_range": 14 * grid_size,
 		"bullet_lifetime": 1.8,
 		"splitting_homing_enabled": true,
@@ -300,7 +300,7 @@ static var TURRET_CONFIG = {
 		"splitting_homing_turn_speed": 10.0,
 		"splitting_count": 5,
 		"splitting_angle_spread": 45.0,
-		"splitting_bullet_damage": 15.0,
+		"splitting_bullet_damage": 12.0,
 		"splitting_bullet_lifetime": 0.8,
 		"splitting_bullet_homing_detection_range": 5 * grid_size,
 		"splitting_bullet_homing_turn_speed": 10.0,
@@ -318,5 +318,28 @@ static var TURRET_CONFIG = {
 		"penetrating_homing_turn_speed": 5.0,
 		"penetrating_max_targets": 4,
 		"penetrating_damage_decay": 0.85
+	},
+	Enums.ColorType.ORANGE_RED: {
+		"fire_rate": 0.8,
+		"bullet_speed": 1600.0,
+		"bullet_damage": 28.0,
+		"detection_range": 14 * grid_size,
+		"bullet_lifetime": 2.5,
+		"bouncing_lightning_enabled": true,
+		"bouncing_lightning_chain_range": 8 * grid_size,
+		"bouncing_lightning_max_bounces": 5,
+		"bouncing_lightning_damage_decay": 0.2
+	},
+	Enums.ColorType.ORANGE_YELLOW: {
+		"fire_rate": 0.5,
+		"bullet_speed": 800.0,
+		"bullet_damage": 15.0,
+		"detection_range": 16 * grid_size,
+		"bullet_lifetime": 0.8,
+		"charging_laser_enabled": true,
+		"charging_laser_beam_width": 3.0,
+		"charging_laser_beam_duration": 0.3,
+		"charging_laser_damage_increment": 3.0,
+		"charging_laser_max_damage_multiplier": 3.0
 	}
 }

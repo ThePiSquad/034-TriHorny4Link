@@ -8,6 +8,8 @@ var lightning_bullet_scene: PackedScene = preload("res://src/bullets/lightning_b
 var explosive_bullet_scene: PackedScene = preload("res://src/bullets/explosive_bullet.tscn")
 var splitting_homing_bullet_scene: PackedScene = preload("res://src/bullets/splitting_homing_bullet.tscn")
 var penetrating_bullet_scene: PackedScene = preload("res://src/bullets/penetrating_bullet.tscn")
+var bouncing_lightning_bullet_scene: PackedScene = preload("res://src/bullets/bouncing_lightning_bullet.tscn")
+var charging_laser_bullet_scene: PackedScene = preload("res://src/bullets/charging_laser_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -58,6 +60,26 @@ var penetrating_homing_detection_range: float = 150.0
 var penetrating_homing_turn_speed: float = 5.0
 var penetrating_max_targets: int = 4
 var penetrating_damage_decay: float = 0.85
+
+# 弹跳闪电配置
+var bouncing_lightning_enabled: bool = false
+var bouncing_lightning_chain_range: float = 384.0
+var bouncing_lightning_max_bounces: int = 5
+var bouncing_lightning_damage_decay: float = 0.9
+var bouncing_lightning_burst_count: int = 2
+var bouncing_lightning_burst_delay: float = 0.2
+var bouncing_lightning_current_burst: int = 0
+var bouncing_lightning_burst_timer: float = 0.0
+
+# 蓄能激光配置
+var charging_laser_enabled: bool = false
+var charging_laser_beam_width: float = 6.0
+var charging_laser_beam_duration: float = 0.3
+var charging_laser_damage_increment: float = 3.0
+var charging_laser_max_damage_multiplier: float = 3.0
+var charging_laser_current_damage: float = 0.0
+var charging_laser_last_target: Node2D = null
+var charging_laser_current_bullet: ChargingLaserBullet = null
 
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
@@ -122,6 +144,12 @@ func _init() -> void:
 func _process(delta: float) -> void:
 	_update_fire_timer(delta)
 	_check_activation_status()
+	
+	# 处理弹跳闪电连发计时
+	if bouncing_lightning_enabled and bouncing_lightning_current_burst > 0:
+		bouncing_lightning_burst_timer -= delta
+		if bouncing_lightning_burst_timer <= 0:
+			_fire_bouncing_lightning_bullet()
 	
 	# 定期清理无效敌人
 	_enemy_cleanup_timer += delta
@@ -197,11 +225,23 @@ func _update_fire_timer(delta: float) -> void:
 func _update_target() -> void:
 	if enemies_in_range.is_empty():
 		target = null
+		charging_laser_last_target = null
+		charging_laser_current_damage = 0.0
+		if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
+			charging_laser_current_bullet.stop_continuous()
+			charging_laser_current_bullet = null
 		return
 	
 	# 如果当前目标仍然有效且可以锁定，继续锁定
 	if is_instance_valid(target) and target.can_be_targeted():
 		return
+	
+	# 目标切换，重置蓄能激光伤害
+	charging_laser_last_target = null
+	charging_laser_current_damage = 0.0
+	if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
+		charging_laser_current_bullet.stop_continuous()
+		charging_laser_current_bullet = null
 	
 	# 选择最近的敌人
 	enemies_in_range.sort_custom(_compare_distance)
@@ -237,6 +277,11 @@ func _get_angle_to_target(target_position: Vector2) -> float:
 func shot() -> void:
 	var base_angle = _get_angle_to_target(target.global_position) - PI / 2
 	
+	# 重置弹跳闪电连发计数
+	if bouncing_lightning_enabled and target:
+		bouncing_lightning_current_burst = 0
+		bouncing_lightning_burst_timer = 0.0
+	
 	if magic_enabled and target:
 		_fire_magic_bullet()
 	elif lightning_enabled and target:
@@ -247,6 +292,10 @@ func shot() -> void:
 		_fire_splitting_homing_bullet()
 	elif penetrating_enabled:
 		_fire_penetrating_bullet(base_angle)
+	elif bouncing_lightning_enabled and target:
+		_fire_bouncing_lightning_bullet()
+	elif charging_laser_enabled and target:
+		_fire_charging_laser_bullet()
 	elif shotgun_enabled and shotgun_count > 1:
 		_fire_shotgun(base_angle)
 	else:
@@ -330,7 +379,7 @@ func _fire_magic_bullet() -> void:
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
 	var direction = Vector2(cos(angle), sin(angle))
-	var start_pos = global_position + direction * 32
+	var start_pos = global_position + direction * 16
 	var target_pos = target.global_position
 	
 	bullet.set_target(target, start_pos, target_pos)
@@ -350,7 +399,7 @@ func _fire_lightning_bullet() -> void:
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
 	var direction = Vector2(cos(angle), sin(angle))
-	var start_pos = global_position + direction * 32
+	var start_pos = global_position + direction * 16
 	var target_pos = target.global_position
 	
 	bullet.set_target(target, start_pos, target_pos)
@@ -422,6 +471,69 @@ func _fire_penetrating_bullet(angle: float) -> void:
 	
 	get_parent().add_child(bullet)
 
+func _fire_bouncing_lightning_bullet() -> void:
+	if not target or not bouncing_lightning_bullet_scene:
+		return
+	
+	if bouncing_lightning_current_burst >= bouncing_lightning_burst_count:
+		return
+	
+	AudioManager.play_turret_shoot("orange")
+	
+	var bullet = bouncing_lightning_bullet_scene.instantiate()
+	if not bullet or not bullet is BouncingLightningBullet:
+		return
+	
+	var direction = (target.global_position - global_position).normalized()
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_bouncing_config(bouncing_lightning_chain_range, bouncing_lightning_max_bounces, bouncing_lightning_damage_decay)
+	
+	get_parent().add_child(bullet)
+	
+	bouncing_lightning_current_burst += 1
+	bouncing_lightning_burst_timer = bouncing_lightning_burst_delay
+
+func _fire_charging_laser_bullet() -> void:
+	if not target or not charging_laser_bullet_scene:
+		return
+	
+	if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
+		if charging_laser_last_target == target:
+			charging_laser_current_damage += charging_laser_damage_increment
+			var max_damage = bullet_damage * charging_laser_max_damage_multiplier
+			charging_laser_current_damage = min(charging_laser_current_damage, max_damage)
+			charging_laser_current_bullet._current_damage = charging_laser_current_damage
+			return
+		else:
+			charging_laser_current_bullet.stop_continuous()
+			charging_laser_current_bullet = null
+	
+	AudioManager.play_turret_shoot("orange")
+	
+	var bullet = charging_laser_bullet_scene.instantiate()
+	if not bullet or not bullet is ChargingLaserBullet:
+		return
+	
+	var angle = _get_angle_to_target(target.global_position) - PI / 2
+	var direction = Vector2(cos(angle), sin(angle))
+	var start_pos = global_position + direction * 1
+	var target_pos = target.global_position
+	
+	charging_laser_current_damage = bullet_damage
+	charging_laser_last_target = target
+	charging_laser_current_bullet = bullet
+	
+	bullet.global_position = start_pos
+	bullet.init(Vector2.ZERO, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_target(target, start_pos, target_pos, charging_laser_current_damage)
+	bullet.set_charging_config(charging_laser_damage_increment, charging_laser_max_damage_multiplier)
+	bullet.set_beam_width(charging_laser_beam_width)
+	bullet.global_position = Vector2.ZERO
+	get_parent().add_child(bullet)
+
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
 	fire_rate = config.get("fire_rate", 1.0)
@@ -465,6 +577,17 @@ func _update_turret_attributes() -> void:
 	penetrating_max_targets = config.get("penetrating_max_targets", 4)
 	penetrating_damage_decay = config.get("penetrating_damage_decay", 0.85)
 	
+	bouncing_lightning_enabled = config.get("bouncing_lightning_enabled", false)
+	bouncing_lightning_chain_range = config.get("bouncing_lightning_chain_range", 384.0)
+	bouncing_lightning_max_bounces = config.get("bouncing_lightning_max_bounces", 5)
+	bouncing_lightning_damage_decay = config.get("bouncing_lightning_damage_decay", 0.9)
+	
+	charging_laser_enabled = config.get("charging_laser_enabled", false)
+	charging_laser_beam_width = config.get("charging_laser_beam_width", 6.0)
+	charging_laser_beam_duration = config.get("charging_laser_beam_duration", 0.3)
+	charging_laser_damage_increment = config.get("charging_laser_damage_increment", 3.0)
+	charging_laser_max_damage_multiplier = config.get("charging_laser_max_damage_multiplier", 3.0)
+	
 	_update_detection_range()
 
 func _update_detection_range() -> void:
@@ -492,3 +615,8 @@ func _on_detection_area_area_exited(area: Area2D) -> void:
 		# 如果当前目标是离开的敌人，立即清除
 		if target == enemy:
 			target = null
+			charging_laser_last_target = null
+			charging_laser_current_damage = 0.0
+			if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
+				charging_laser_current_bullet.stop_continuous()
+				charging_laser_current_bullet = null

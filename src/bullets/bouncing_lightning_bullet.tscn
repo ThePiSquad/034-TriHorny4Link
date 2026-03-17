@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://c7616botpgrk0"]
+
+[ext_resource type="PackedScene" uid="uid://bdppmknohvybk" path="res://src/bullets/bullet.tscn" id="1_v3wus"]
+[ext_resource type="Script" uid="uid://b38ndha6gaag2" path="res://src/bullets/bouncing_lightning_bullet.gd" id="2_ndibt"]
+[ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="3_ndibt"]
+[ext_resource type="Texture2D" uid="uid://b3a04uumb4v6q" path="res://assets/particles/rect_solid_particle.png" id="4_hqml0"]
+
+[sub_resource type="Gradient" id="Gradient_kmvjg"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_3atf5"]
+gradient = SubResource("Gradient_kmvjg")
+
+[sub_resource type="Curve" id="Curve_31nbq"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_r5yxh"]
+curve = SubResource("Curve_31nbq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_4uiex"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 14.0
+angle_min = -44.99999
+angle_max = 45.00001
+direction = Vector3(0, 0, 0)
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.049999997
+scale_max = 0.099999994
+scale_curve = SubResource("CurveTexture_r5yxh")
+color = Color(1, 0.42352942, 0.20784314, 1)
+color_ramp = SubResource("GradientTexture1D_3atf5")
+
+[sub_resource type="Gradient" id="Gradient_hqml0"]
+colors = PackedColorArray(0.5877506, 0.58775055, 0.5877505, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kmvjg"]
+gradient = SubResource("Gradient_hqml0")
+
+[sub_resource type="Curve" id="Curve_ndibt"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.46415097), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_hqml0"]
+curve = SubResource("Curve_ndibt")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3atf5"]
+particle_flag_disable_z = true
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 50.0
+initial_velocity_max = 75.0
+gravity = Vector3(0, 0, 0)
+radial_accel_min = -200.0
+radial_accel_max = -200.0
+tangential_accel_min = 19.999998
+tangential_accel_max = 29.999996
+scale_min = 0.099999994
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_hqml0")
+color = Color(1, 0.42352942, 0.20784314, 1)
+color_initial_ramp = SubResource("GradientTexture1D_kmvjg")
+
+[node name="BouncingLightningBullet" unique_id=1846070966 instance=ExtResource("1_v3wus")]
+script = ExtResource("2_ndibt")
+
+[node name="Trail_Particles" type="GPUParticles2D" parent="." index="0" unique_id=1837225979]
+position = Vector2(1, 0)
+amount = 32
+texture = ExtResource("4_hqml0")
+lifetime = 0.5
+process_material = SubResource("ParticleProcessMaterial_4uiex")
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=698014297]
+fill_color = Color(1, 0.42352942, 0.20784314, 1)
+
+[node name="Aura_Particles" type="GPUParticles2D" parent="." index="2" unique_id=1365951765]
+amount = 18
+texture = ExtResource("3_ndibt")
+lifetime = 2.0
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_3atf5")

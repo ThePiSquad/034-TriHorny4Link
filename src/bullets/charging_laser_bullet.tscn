@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bcd4hi1nht3np"]
+
+[ext_resource type="PackedScene" uid="uid://m15e2mxmnmiv" path="res://src/bullets/magic_bullet.tscn" id="1_bx2iw"]
+[ext_resource type="Script" uid="uid://dcqdcbmyh2l8s" path="res://src/bullets/charging_laser_bullet.gd" id="2_cc03l"]
+
+[node name="ChargingLaserBullet" unique_id=166809495 instance=ExtResource("1_bx2iw")]
+script = ExtResource("2_cc03l")

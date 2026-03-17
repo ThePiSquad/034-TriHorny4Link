@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="3_ljvgw"]
 
 [sub_resource type="Gradient" id="Gradient_pc3nv"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_vj3n4"]
 gradient = SubResource("Gradient_pc3nv")
@@ -31,11 +32,11 @@ color_initial_ramp = SubResource("GradientTexture1D_vj3n4")
 [node name="SplittingBullet" unique_id=1846070966 instance=ExtResource("1_a6djf")]
 script = ExtResource("2_1egww")
 
-[node name="GPUParticles2D" type="GPUParticles2D" parent="." index="0" unique_id=1288752613]
+[node name="ShapeDrawer" parent="." index="0" unique_id=698014297]
+shape_size = Vector2(8, 8)
+fill_color = Color(0.32941177, 0.6156863, 0.63529414, 1)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." index="1" unique_id=1288752613]
 amount = 24
 texture = ExtResource("3_ljvgw")
 process_material = SubResource("ParticleProcessMaterial_3no08")
-
-[node name="ShapeDrawer" parent="." index="1" unique_id=698014297]
-shape_size = Vector2(8, 8)
-fill_color = Color(0.32941177, 0.6156863, 0.63529414, 1)
