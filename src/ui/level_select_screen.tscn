@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://dr8dw3x2usgbd" path="res://src/ui/dynamic_background.gd" id="2_su76r"]
 [ext_resource type="Texture2D" uid="uid://bx3chuthcjhdr" path="res://assets/particles/t_solid_particle.png" id="2_wfe3n"]
 [ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="3_ebab3"]
-[ext_resource type="Texture2D" uid="uid://cnl40ovncq4hq" path="res://assets/ui/t_solid_left.png" id="5_ebab3"]
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_su76r"]
 color = Color(0.6528635, 0.6528636, 0.6528636, 1)
@@ -18,6 +17,9 @@ vertical = true
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_ebab3"]
 thickness = 0
 vertical = true
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_su76r"]
+load_path = "res://.godot/imported/t_solid_left.png-335bd535e1b7e5af94fc5db7d2c4b964.ctex"
 
 [node name="LevelSelectScreen" type="Control" unique_id=1157207512]
 layout_mode = 3
@@ -123,7 +125,7 @@ icon_alignment = 1
 
 [node name="BackButton" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1489794349]
 process_mode = 3
-custom_minimum_size = Vector2(250, 60)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_colors/font_hover_color = Color(1, 0.5019608, 0.5019608, 1)
 theme_override_colors/icon_pressed_color = Color(0.73333335, 0, 0.16470589, 1)
@@ -132,6 +134,5 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
-icon = ExtResource("5_ebab3")
+icon = SubResource("CompressedTexture2D_su76r")
 vertical_icon_alignment = 2
-expand_icon = true
