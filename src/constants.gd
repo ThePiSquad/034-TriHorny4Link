@@ -22,10 +22,10 @@ const MAX_ENERGY_RANGE: int = 10
 
 # 资源系统常量
 class ResourceConstants:
-	const PRODUCTION_RATE: float = 2.0  # 每秒生产资源量
-	const MAX_STORAGE: int = 100  # 最大存储上限
+	const PRODUCTION_RATE: float = 1.0  # 每秒生产资源量
+	const MAX_STORAGE: int = 50  # 最大存储上限
 	const MONO_CRYSTAL_COST: int = 10  # 单色水晶消耗
-	const CONDUIT_COST: int = 1  # 导管消耗（每种颜色）
+	const CONDUIT_COST: int = 2  # 导管消耗（每种颜色）
 	const TURRET_COST: int = 3  # 炮塔消耗（每种颜色）
 
 # 相机相关常量
@@ -256,7 +256,7 @@ static var TURRET_CONFIG = {
 		"fire_rate": 1.5,
 		"bullet_speed": 850.0,
 		"bullet_damage": 28.0,
-		"detection_range": 15 * grid_size,
+		"detection_range": 17 * grid_size,
 		"bullet_lifetime": 1.6,
 		"homing_enabled": true,
 		"homing_detection_range": 5 * grid_size,
@@ -292,17 +292,17 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.GREEN_BLUE: {
 		"fire_rate": 1.2,
 		"bullet_speed": 750.0,
-		"bullet_damage": 18.0,
+		"bullet_damage": 10.0,
 		"detection_range": 15 * grid_size,
 		"bullet_lifetime": 1.8,
 		"splitting_homing_enabled": true,
 		"splitting_homing_detection_range": 5 * grid_size,
-		"splitting_homing_turn_speed": 10.0,
+		"splitting_homing_turn_speed": 7.0,
 		"splitting_count": 5,
 		"splitting_angle_spread": 45.0,
 		"splitting_bullet_damage": 12.0,
-		"splitting_bullet_lifetime": 0.8,
-		"splitting_bullet_homing_detection_range": 5 * grid_size,
+		"splitting_bullet_lifetime": 1.8,
+		"splitting_bullet_homing_detection_range": 6 * grid_size,
 		"splitting_bullet_homing_turn_speed": 10.0,
 		"splitting_bullet_attack_delay": 0.15
 	},
@@ -311,7 +311,7 @@ static var TURRET_CONFIG = {
 		"bullet_speed": 1900.0,
 		"bullet_damage": 28.0,
 		"detection_range": 15 * grid_size,
-		"bullet_lifetime": 1.75,
+		"bullet_lifetime": 3.0,
 		"penetrating_enabled": true,
 		"penetrating_homing_enabled": true,
 		"penetrating_homing_detection_range": 5 * grid_size,

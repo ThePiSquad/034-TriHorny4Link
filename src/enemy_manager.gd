@@ -12,6 +12,7 @@ class_name EnemyManager extends Node2D
 var _spawn_timer: float = 0.0
 var _crystal_position: Vector2 = Vector2.ZERO
 var _max_spawn_attempts: int = 10
+var _check_game_over_timer: Timer = null
 
 # 波次系统
 var wave_system: WaveSystem = null
@@ -32,8 +33,13 @@ func _ready() -> void:
 	wave_system.wave_started.connect(_on_wave_started)
 	wave_system.wave_completed.connect(_on_wave_completed)
 	wave_system.all_waves_completed.connect(_on_all_waves_completed)
-	wave_system.boss_wave_started.connect(_on_boss_wave_started)
-	wave_system.boss_defeated.connect(_on_boss_defeated)
+	
+	# 创建定时器用于检查游戏结束
+	_check_game_over_timer = Timer.new()
+	_check_game_over_timer.wait_time = 0.5
+	_check_game_over_timer.autostart = false
+	_check_game_over_timer.timeout.connect(_check_game_over)
+	add_child(_check_game_over_timer)
 
 func _process(delta: float) -> void:
 	if not game_started:
@@ -103,8 +109,8 @@ func _spawn_wave_enemy() -> void:
 	
 	# Boss 波次特殊处理
 	if wave_info.is_boss:
-		print("Boss 波次，准备生成 Boss...")
-		_spawn_boss_enemy()
+		# Boss波次也像普通波次一样生成敌人
+		_spawn_normal_enemy(wave_info.size)
 		# 更新波次进度
 		wave_system.increment_wave_progress()
 	else:
@@ -174,70 +180,13 @@ func _spawn_normal_enemy(size_level: int) -> void:
 				enemy_config.damage_multiplier
 			)
 		
+		# 连接敌人死亡信号
+		if enemy.has_signal("died"):
+			enemy.died.connect(_on_enemy_died)
+		
 		add_child(enemy)
 	else:
 		push_error("EnemyManager: 敌人实例化失败")
-
-func _spawn_boss_enemy() -> void:
-	"""生成 Boss 敌人"""
-	print("开始生成 Boss...")
-	var boss_to_spawn = boss_enemy_scene
-	if not boss_to_spawn:
-		print("警告：Boss 场景未设置，尝试使用第一个敌人")
-		# 如果没有指定 Boss 场景，使用第一个敌人
-		boss_to_spawn = enemy_list[0] if not enemy_list.is_empty() else null
-
-	if not boss_to_spawn:
-		push_error("EnemyManager: Boss 场景未设置！")
-		return
-
-	# 获取当前波次信息
-	var wave_info = wave_system.get_current_wave_info()
-	if wave_info.is_empty():
-		push_error("EnemyManager: wave_info 为空！")
-		return
-	
-	var boss_size_level = 20  # 默认体型等级
-	if wave_info.size > 0:
-		boss_size_level = wave_info.size
-	
-	print("生成 Boss，体型等级：", boss_size_level)
-
-	var boss = boss_to_spawn.instantiate()
-	if boss:
-		# Boss 生成在边缘
-		var spawn_position = _generate_spawn_position_for_size(boss_size_level)
-		boss.global_position = spawn_position
-		print("Boss 生成位置：", spawn_position)
-		
-		# 设置基地位置
-		if boss.has_method("set_base_position"):
-			boss.set_base_position(_crystal_position)
-		
-		# 设置 Boss 体型
-		if boss.has_method("set_size_level"):
-			boss.set_size_level(boss_size_level)
-			print("Boss 体型等级已设置为：", boss_size_level)
-		
-		add_child(boss)
-		print("Boss 已添加到场景")
-		
-		# 连接 Boss 死亡信号
-		if boss.has_signal("died"):
-			boss.died.connect(_on_boss_died)
-			print("Boss 死亡信号已连接")
-		else:
-			print("警告：Boss 没有 died 信号")
-	else:
-		push_error("EnemyManager: Boss 实例化失败")
-
-func _on_boss_died(_source: Node) -> void:
-	"""Boss 被击败"""
-	# 更新波次系统状态为所有波次完成
-	if wave_system:
-		wave_system.current_wave = wave_system.total_wave_count + wave_system.boss_wave_count
-		wave_system.current_state = WaveSystem.WaveState.COMPLETED
-		wave_system.boss_defeated.emit()
 
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
@@ -318,29 +267,19 @@ func _on_wave_completed(wave_number: int) -> void:
 	"""波次完成"""
 	print("第 ", wave_number, " 波完成！")
 	
-	# 检查当前波次是否是 Boss 波
-	var is_boss = false
-	if wave_system.current_level_data:
-		var wave_data = wave_system.current_level_data.get_wave(wave_number)
-		if wave_data:
-			is_boss = wave_data.is_boss_wave
+	# 检查是否所有波次都已完成
+	var all_completed = wave_system.is_all_waves_completed()
+	print("DEBUG: 波次 ", wave_number, " 完成，所有波次是否完成：", all_completed)
 	
-	# Boss 波次完成后等待 Boss 被击败
-	if is_boss:
-		print("Boss 波次完成，等待 Boss 被击败...")
-		return
-	
-	# 延迟进入下一波
-	await get_tree().create_timer(2.0).timeout
-	if wave_system and not wave_system.is_all_waves_completed():
-		wave_system.advance_to_next_wave()
-
-func _on_boss_defeated() -> void:
-	"""Boss 被击败"""
-	print("Boss 被击败！游戏胜利！")
-	# 触发游戏胜利逻辑
-	if GameManager.instance:
-		GameManager.instance.end_game()
+	# 如果所有波次都已完成，启动定时器检查游戏结束
+	if all_completed:
+		print("DEBUG: 所有波次已完成，启动游戏结束检查定时器")
+		_check_game_over_timer.start()
+	else:
+		# 延迟进入下一波
+		await get_tree().create_timer(2.0).timeout
+		if wave_system and not wave_system.is_all_waves_completed():
+			wave_system.advance_to_next_wave()
 
 func _on_all_waves_completed() -> void:
 	"""所有波次完成（胜利）"""
@@ -350,11 +289,60 @@ func _on_all_waves_completed() -> void:
 	if game_manager:
 		game_manager.end_game()
 
-func _on_boss_wave_started() -> void:
-	"""Boss 波次开始"""
-	print("Boss 波次开始！")
-	# 播放 Boss 战音乐
-	AudioManager.play_wave_start("boss")
+func _check_game_over() -> void:
+	"""检查游戏是否结束（所有敌人被击败）"""
+	print("DEBUG: 检查游戏结束...")
+	
+	# 检查是否所有敌人都被击败
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	
+	# 过滤掉已经被标记为删除的节点
+	var alive_enemies = []
+	for e in enemies:
+		if not e.is_queued_for_deletion():
+			alive_enemies.append(e)
+	
+	print("DEBUG: 当前场景中敌人数量（包括已标记删除）：", enemies.size())
+	print("DEBUG: 当前场景中存活敌人数量：", alive_enemies.size())
+	
+	if alive_enemies.size() == 0:
+		print("最后一波所有敌人已被击败！游戏胜利！")
+		_check_game_over_timer.stop()
+		wave_system.all_waves_completed.emit()
+
+func _on_enemy_died(enemy: Node2D, _source: Node) -> void:
+	"""敌人死亡时的处理"""
+	print("DEBUG: 敌人死亡被触发，敌人：", enemy)
+	
+	if not wave_system:
+		print("DEBUG: wave_system 为空，返回")
+		return
+	
+	# 检查是否所有波次都已完成
+	var all_completed = wave_system.is_all_waves_completed()
+	print("DEBUG: 所有波次是否完成：", all_completed)
+	
+	if all_completed:
+		# 延迟一帧检查，确保敌人已经被删除
+		await get_tree().process_frame
+		
+		# 检查是否所有敌人都被击败
+		var enemies = get_tree().get_nodes_in_group("enemy")
+		
+		# 过滤掉已经被标记为删除的节点
+		var alive_enemies = []
+		for e in enemies:
+			if not e.is_queued_for_deletion():
+				alive_enemies.append(e)
+		
+		print("DEBUG: 当前场景中敌人数量（包括已标记删除）：", enemies.size())
+		print("DEBUG: 当前场景中存活敌人数量：", alive_enemies.size())
+		
+		if alive_enemies.size() == 0:
+			print("最后一波所有敌人已被击败！游戏胜利！")
+			wave_system.all_waves_completed.emit()
+		else:
+			print("DEBUG: 还有敌人活着，等待所有敌人被击败")
 
 func _generate_spawn_position() -> Vector2:
 	"""生成随机位置，敌人在远处生成，从四面八方涌来"""
