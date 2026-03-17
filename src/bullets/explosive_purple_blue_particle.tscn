@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://d2eva3dcx7uki"]
+[gd_scene format=3 uid="uid://b3403tnjm1n8p"]
 
-[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="1_55kp8"]
+[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="1_xe2ta"]
 
 [sub_resource type="Curve" id="Curve_n0fxo"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.13207543), 0.0, 0.0, 0, 0]
@@ -34,13 +34,13 @@ angle_min = 90.000015
 angle_max = 270.0
 spread = 180.0
 flatness = 1.0
-initial_velocity_min = 175.0
-initial_velocity_max = 225.0
+initial_velocity_min = 75.0
+initial_velocity_max = 125.0
 gravity = Vector3(0, 0, 0)
 scale_min = 4.0
 scale_max = 12.0
 scale_curve = SubResource("CurveTexture_8ms0f")
-color = Color(0.83061194, 0.02807274, 0.9045787, 1)
+color = Color(0.45490196, 0.4, 0.81960785, 1)
 color_initial_ramp = SubResource("GradientTexture1D_mt2r4")
 alpha_curve = SubResource("CurveTexture_55kp8")
 emission_curve = SubResource("CurveTexture_mt2r4")
@@ -70,15 +70,15 @@ color_ramp = SubResource("GradientTexture1D_58hct")
 emission_curve = SubResource("CurveTexture_mt2r4")
 
 [node name="ExplosivePurple" type="GPUParticles2D" unique_id=1147285789]
-amount = 32
+amount = 16
 sub_emitter = NodePath("GPUParticles2D")
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_85vue")
-script = ExtResource("1_55kp8")
+script = ExtResource("1_xe2ta")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=1895031107]
 emitting = false
-amount = 32
+amount = 16
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_0lnf3")

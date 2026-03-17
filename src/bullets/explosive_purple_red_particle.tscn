@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://d2eva3dcx7uki"]
+[gd_scene format=3 uid="uid://cxwo8fj45fetf"]
 
-[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="1_55kp8"]
+[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="1_vyja6"]
 
 [sub_resource type="Curve" id="Curve_n0fxo"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.13207543), 0.0, 0.0, 0, 0]
@@ -9,10 +9,11 @@ point_count = 2
 [sub_resource type="CurveTexture" id="CurveTexture_55kp8"]
 curve = SubResource("Curve_n0fxo")
 
-[sub_resource type="Gradient" id="Gradient_58hct"]
+[sub_resource type="Gradient" id="Gradient_vyja6"]
+colors = PackedColorArray(1, 1, 1, 1, 0.26050612, 0.26050615, 0.26050612, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_mt2r4"]
-gradient = SubResource("Gradient_58hct")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_yj1qs"]
+gradient = SubResource("Gradient_vyja6")
 
 [sub_resource type="Curve" id="Curve_58hct"]
 _data = [Vector2(0.018018007, 0.38867927), 0.0, 0.0, 0, 0, Vector2(0.9729729, 0), 0.0, 0.0, 0, 0]
@@ -34,47 +35,54 @@ angle_min = 90.000015
 angle_max = 270.0
 spread = 180.0
 flatness = 1.0
-initial_velocity_min = 175.0
-initial_velocity_max = 225.0
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
 gravity = Vector3(0, 0, 0)
+damping_min = 150.0
+damping_max = 250.00002
 scale_min = 4.0
 scale_max = 12.0
 scale_curve = SubResource("CurveTexture_8ms0f")
-color = Color(0.83061194, 0.02807274, 0.9045787, 1)
-color_initial_ramp = SubResource("GradientTexture1D_mt2r4")
+color = Color(0.81960785, 0.27058825, 0.45490196, 1)
+color_ramp = SubResource("GradientTexture1D_yj1qs")
 alpha_curve = SubResource("CurveTexture_55kp8")
 emission_curve = SubResource("CurveTexture_mt2r4")
 sub_emitter_mode = 4
 sub_emitter_amount_at_start = 32
 
-[sub_resource type="Gradient" id="Gradient_55kp8"]
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+[sub_resource type="Gradient" id="Gradient_j8nvp"]
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_58hct"]
-gradient = SubResource("Gradient_55kp8")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ffc21"]
+gradient = SubResource("Gradient_j8nvp")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0lnf3"]
 particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 32.0
 angle_min = 90.000015
 angle_max = 270.0
 spread = 180.0
 flatness = 1.0
-initial_velocity_min = 20.0
-initial_velocity_max = 80.0
+initial_velocity_min = 10.0
+initial_velocity_max = 110.0
 gravity = Vector3(0, 0, 0)
+tangential_accel_min = -500.0
+tangential_accel_max = 500.0
+damping_min = 20.0
+damping_max = 80.0
 scale_min = 4.0
 scale_max = 8.0
 scale_curve = SubResource("CurveTexture_8ms0f")
 color = Color(0.71850306, 0.2316458, 0.95664316, 1)
-color_ramp = SubResource("GradientTexture1D_58hct")
+color_initial_ramp = SubResource("GradientTexture1D_ffc21")
 emission_curve = SubResource("CurveTexture_mt2r4")
 
 [node name="ExplosivePurple" type="GPUParticles2D" unique_id=1147285789]
-amount = 32
+amount = 48
 sub_emitter = NodePath("GPUParticles2D")
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_85vue")
-script = ExtResource("1_55kp8")
+script = ExtResource("1_vyja6")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=1895031107]
 emitting = false
