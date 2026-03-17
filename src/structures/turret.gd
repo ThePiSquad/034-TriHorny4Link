@@ -10,6 +10,8 @@ var splitting_homing_bullet_scene: PackedScene = preload("res://src/bullets/spli
 var penetrating_bullet_scene: PackedScene = preload("res://src/bullets/penetrating_bullet.tscn")
 var bouncing_lightning_bullet_scene: PackedScene = preload("res://src/bullets/bouncing_lightning_bullet.tscn")
 var charging_laser_bullet_scene: PackedScene = preload("res://src/bullets/charging_laser_bullet.tscn")
+var cluster_bomb_bullet_scene: PackedScene = preload("res://src/bullets/cluster_bomb_bullet.tscn")
+var continuous_explosive_bullet_scene: PackedScene = preload("res://src/bullets/continuous_explosive_bullet.tscn")
 
 var fire_rate: float = 1.0
 var fire_timer: float = 0.0
@@ -81,6 +83,25 @@ var charging_laser_current_damage: float = 0.0
 var charging_laser_last_target: Node2D = null
 var charging_laser_current_bullet: ChargingLaserBullet = null
 
+# 集束炸弹配置
+var cluster_bomb_enabled: bool = false
+var cluster_bomb_explosion_radius: float = 200.0
+var cluster_bomb_cluster_count: int = 4
+var cluster_bomb_angle_spread: float = 15.0
+var cluster_bomb_bullet_damage: float = 15.0
+var cluster_bomb_bullet_lifetime: float = 0.8
+var cluster_bomb_bullet_speed: float = 600.0
+
+# 持续爆破配置
+var continuous_explosive_enabled: bool = false
+var continuous_explosive_explosion_radius: float = 200.0
+var continuous_explosive_slow_duration: float = 2.0
+var continuous_explosive_slow_multiplier: float = 0.5
+var continuous_explosive_fire_rate_boost: float = 0.2
+var continuous_explosive_max_fire_rate: float = 2.0
+var continuous_explosive_fire_rate_timer: float = 0.0
+var continuous_explosive_fire_rate_reset_time: float = 3.0
+
 var target: Node2D = null
 var enemies_in_range: Array[Node2D] = []
 var can_fire: bool = true
@@ -150,6 +171,12 @@ func _process(delta: float) -> void:
 		bouncing_lightning_burst_timer -= delta
 		if bouncing_lightning_burst_timer <= 0:
 			_fire_bouncing_lightning_bullet()
+	
+	# 处理持续爆破射速重置
+	if continuous_explosive_enabled and continuous_explosive_fire_rate_timer > 0:
+		continuous_explosive_fire_rate_timer -= delta
+		if continuous_explosive_fire_rate_timer <= 0:
+			_reset_fire_rate()
 	
 	# 定期清理无效敌人
 	_enemy_cleanup_timer += delta
@@ -282,6 +309,10 @@ func shot() -> void:
 		bouncing_lightning_current_burst = 0
 		bouncing_lightning_burst_timer = 0.0
 	
+	# 处理持续爆破射速提升
+	if continuous_explosive_enabled:
+		_boost_fire_rate()
+	
 	if magic_enabled and target:
 		_fire_magic_bullet()
 	elif lightning_enabled and target:
@@ -296,6 +327,10 @@ func shot() -> void:
 		_fire_bouncing_lightning_bullet()
 	elif charging_laser_enabled and target:
 		_fire_charging_laser_bullet()
+	elif cluster_bomb_enabled and target:
+		_fire_cluster_bomb_bullet()
+	elif continuous_explosive_enabled and target:
+		_fire_continuous_explosive_bullet()
 	elif shotgun_enabled and shotgun_count > 1:
 		_fire_shotgun(base_angle)
 	else:
@@ -387,6 +422,52 @@ func _fire_magic_bullet() -> void:
 	
 	bullet.global_position = Vector2.ZERO
 	get_parent().add_child(bullet)
+
+func _fire_cluster_bomb_bullet() -> void:
+	AudioManager.play_turret_shoot("purple")
+	if not target or not cluster_bomb_bullet_scene:
+		return
+	
+	var bullet = cluster_bomb_bullet_scene.instantiate()
+	if not bullet or not bullet is ClusterBombBullet:
+		return
+	
+	var direction = (target.global_position - global_position).normalized()
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_cluster_config(cluster_bomb_cluster_count, cluster_bomb_angle_spread, cluster_bomb_bullet_damage, cluster_bomb_bullet_lifetime, cluster_bomb_bullet_speed)
+	
+	get_parent().add_child(bullet)
+
+func _fire_continuous_explosive_bullet() -> void:
+	AudioManager.play_turret_shoot("purple")
+	if not target or not continuous_explosive_bullet_scene:
+		return
+	
+	var bullet = continuous_explosive_bullet_scene.instantiate()
+	if not bullet or not bullet is ContinuousExplosiveBullet:
+		return
+	
+	var direction = (target.global_position - global_position).normalized()
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	
+	get_parent().add_child(bullet)
+
+func _boost_fire_rate() -> void:
+	fire_rate += continuous_explosive_fire_rate_boost
+	fire_rate = min(fire_rate, continuous_explosive_max_fire_rate)
+	continuous_explosive_fire_rate_timer = continuous_explosive_fire_rate_reset_time
+
+func _reset_fire_rate() -> void:
+	var config = Constants.TURRET_CONFIG.get(color, {})
+	var base_fire_rate = config.get("fire_rate", 1.0)
+	fire_rate = base_fire_rate
+	continuous_explosive_fire_rate_timer = 0.0
 
 func _fire_lightning_bullet() -> void:
 	AudioManager.play_turret_shoot("orange")
@@ -587,6 +668,22 @@ func _update_turret_attributes() -> void:
 	charging_laser_beam_duration = config.get("charging_laser_beam_duration", 0.3)
 	charging_laser_damage_increment = config.get("charging_laser_damage_increment", 3.0)
 	charging_laser_max_damage_multiplier = config.get("charging_laser_max_damage_multiplier", 3.0)
+	
+	cluster_bomb_enabled = config.get("cluster_bomb_enabled", false)
+	cluster_bomb_explosion_radius = config.get("cluster_bomb_explosion_radius", 200.0)
+	cluster_bomb_cluster_count = config.get("cluster_bomb_cluster_count", 4)
+	cluster_bomb_angle_spread = config.get("cluster_bomb_angle_spread", 15.0)
+	cluster_bomb_bullet_damage = config.get("cluster_bomb_bullet_damage", 15.0)
+	cluster_bomb_bullet_lifetime = config.get("cluster_bomb_bullet_lifetime", 0.8)
+	cluster_bomb_bullet_speed = config.get("cluster_bomb_bullet_speed", 600.0)
+	
+	continuous_explosive_enabled = config.get("continuous_explosive_enabled", false)
+	continuous_explosive_explosion_radius = config.get("continuous_explosive_explosion_radius", 200.0)
+	continuous_explosive_slow_duration = config.get("continuous_explosive_slow_duration", 2.0)
+	continuous_explosive_slow_multiplier = config.get("continuous_explosive_slow_multiplier", 0.5)
+	continuous_explosive_fire_rate_boost = config.get("continuous_explosive_fire_rate_boost", 0.2)
+	continuous_explosive_max_fire_rate = config.get("continuous_explosive_max_fire_rate", 2.0)
+	continuous_explosive_fire_rate_reset_time = config.get("continuous_explosive_fire_rate_reset_time", 3.0)
 	
 	_update_detection_range()
 

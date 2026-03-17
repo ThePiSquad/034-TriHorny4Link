@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cd1jwahw1c5il"]
+
+[ext_resource type="PackedScene" uid="uid://bdppmknohvybk" path="res://src/bullets/bullet.tscn" id="1_g48u0"]
+[ext_resource type="Script" uid="uid://of2a1f53cs6y" path="res://src/bullets/cluster_bomb_bullet.gd" id="2_bed7n"]
+
+[node name="ClusterBombBullet" unique_id=1846070966 instance=ExtResource("1_g48u0")]
+script = ExtResource("2_bed7n")

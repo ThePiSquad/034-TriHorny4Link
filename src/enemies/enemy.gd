@@ -58,6 +58,13 @@ var _current_barrier: Node2D = null
 var _attack_interval: float = 1.0  # 攻击间隔（秒）
 var _attack_timer: float = 0.0
 
+# 减速debuff相关
+var _slow_debuff_active: bool = false
+var _slow_debuff_timer: float = 0.0
+var _slow_debuff_duration: float = 0.0
+var _slow_debuff_multiplier: float = 1.0
+var _original_move_speed: float = 0.0
+
 # 优先级管理
 var _attack_priority: bool = false  # 是否处于攻击优先状态
 var _priority_target: Node2D = null  # 优先级目标
@@ -253,6 +260,9 @@ func _process(delta: float) -> void:
 	
 	# 检查当前屏障是否仍然有效
 	_check_barrier_validity()
+	
+	# 更新减速debuff
+	_update_slow_debuff(delta)
 
 func _physics_process(delta: float) -> void:
 	# 如果正在传送，跳过其他逻辑
@@ -463,6 +473,55 @@ func _check_barrier_validity() -> void:
 			# 屏障已被删除，恢复移动
 			_current_barrier = null
 			_blocked_by_barrier = false
+
+func apply_slow_debuff(duration: float, multiplier: float) -> void:
+	"""应用减速debuff"""
+	if _slow_debuff_active:
+		_slow_debuff_timer = duration
+		_slow_debuff_multiplier = multiplier
+		_apply_slow_multiplier()
+		return
+	
+	_slow_debuff_active = true
+	_slow_debuff_duration = duration
+	_slow_debuff_multiplier = multiplier
+	_slow_debuff_timer = duration
+	
+	if _original_move_speed == 0.0:
+		_original_move_speed = move_speed
+	
+	_apply_slow_multiplier()
+
+func _update_slow_debuff(delta: float) -> void:
+	"""更新减速debuff计时器"""
+	if not _slow_debuff_active:
+		return
+	
+	_slow_debuff_timer -= delta
+	
+	if _slow_debuff_timer <= 0.0:
+		_remove_slow_debuff()
+
+func _apply_slow_multiplier() -> void:
+	"""应用减速倍数"""
+	if _original_move_speed == 0.0:
+		_original_move_speed = move_speed
+	
+	move_speed = _original_move_speed * _slow_debuff_multiplier
+	
+	if navigation_agent:
+		navigation_agent.max_speed = move_speed
+
+func _remove_slow_debuff() -> void:
+	"""移除减速debuff"""
+	_slow_debuff_active = false
+	_slow_debuff_timer = 0.0
+	
+	if _original_move_speed > 0.0:
+		move_speed = _original_move_speed
+		
+		if navigation_agent:
+			navigation_agent.max_speed = move_speed
 			# 攻击完成后恢复正常状态
 			_attack_priority = false
 			_priority_target = null

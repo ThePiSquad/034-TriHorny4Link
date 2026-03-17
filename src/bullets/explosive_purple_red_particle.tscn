@@ -78,8 +78,10 @@ color_initial_ramp = SubResource("GradientTexture1D_ffc21")
 emission_curve = SubResource("CurveTexture_mt2r4")
 
 [node name="ExplosivePurple" type="GPUParticles2D" unique_id=1147285789]
+emitting = false
 amount = 48
 sub_emitter = NodePath("GPUParticles2D")
+one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_85vue")
 script = ExtResource("1_vyja6")
