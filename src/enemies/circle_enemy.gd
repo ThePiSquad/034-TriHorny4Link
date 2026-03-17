@@ -160,19 +160,11 @@ func _update_connection_lines() -> void:
 
 func _calculate_damage_reduction() -> float:
 	"""计算伤害减免率"""
-	var n = _connected_enemies.size()
-	var reduction_rate: float = 0.0
+	# 最多连接5个敌人
+	var n = min(_connected_enemies.size(), 5)
 	
-	if n <= 5:
-		# n ≤ 5 时，减免率 = 10% × n
-		reduction_rate = 0.1 * n
-	else:
-		# n > 5 时，减免率 = 50% + 30% × (1 - e^(1-n/5))
-		var exponent = 1.0 - (n / 5.0)
-		reduction_rate = 0.5 + 0.3 * (1.0 - exp(exponent))
-	
-	# 确保减免率不超过80%
-	reduction_rate = min(reduction_rate, 0.8)
+	# 每个连接提供10%的减伤，最高50%
+	var reduction_rate: float = 0.1 * n
 	
 	return reduction_rate
 
