@@ -4,8 +4,14 @@ class_name PauseMenu
 @onready var resume_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/ResumeButton
 @onready var main_menu_button: Button = $CenterContainer/VBoxContainer/ButtonContainer/MainMenuButton
 
+var input_manager: InputManager
+
 func _ready() -> void:
-	pass
+	# 获取 InputManager 引用
+	input_manager = get_node_or_null("/root/InputManager")
+	if not input_manager:
+		# 尝试从当前场景获取
+		input_manager = get_tree().current_scene.get_node_or_null("InputManager")
 
 func _input(event: InputEvent) -> void:
 	# 按下 ESC 键关闭暂停菜单
@@ -35,6 +41,9 @@ func _close_pause_menu() -> void:
 	"""关闭暂停菜单并恢复游戏"""
 	# 恢复游戏
 	get_tree().paused = false
+	# 通知 InputManager 暂停菜单已关闭
+	if input_manager:
+		input_manager.resume_game()
 	# 移除暂停菜单
 	queue_free()
 

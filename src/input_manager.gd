@@ -46,6 +46,8 @@ var _camera_max_y: float = Constants.CameraConstants.MAX_Y
 var pause_menu_scene: PackedScene
 var is_paused: bool = false
 
+signal pause_menu_closed
+
 func _ready() -> void:
 	_update_mode()
 	if hud:
@@ -119,6 +121,13 @@ func _toggle_pause() -> void:
 		AudioManager.pause_bgm()
 		# 显示暂停菜单
 		_show_pause_menu()
+
+func resume_game() -> void:
+	"""恢复游戏状态（由暂停菜单调用）"""
+	is_paused = false
+	get_tree().paused = false
+	AudioManager.resume_bgm()
+	pause_menu_closed.emit()
 
 func _show_pause_menu() -> void:
 	"""显示暂停菜单"""
