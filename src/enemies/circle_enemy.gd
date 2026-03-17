@@ -85,6 +85,10 @@ func _update_connections() -> void:
 	var new_connections = []
 	
 	for enemy in all_enemies:
+		# 检查敌人是否仍然有效（没有被释放）
+		if not is_instance_valid(enemy) or not enemy.is_inside_tree():
+			continue
+		
 		# 跳过自己和圆形敌人
 		if enemy == self or enemy is CircleEnemy:
 			continue
@@ -104,7 +108,11 @@ func _update_connections() -> void:
 	
 	# 检查断开的连接
 	for enemy in _connected_enemies:
-		if not enemy in new_connections and enemy.is_inside_tree():
+		# 检查敌人是否仍然有效
+		if not is_instance_valid(enemy) or not enemy.is_inside_tree():
+			continue
+		
+		if not enemy in new_connections:
 			# 连接断开，启动淡出动画
 			if enemy in _connection_animations:
 				_connection_animations[enemy]["target_alpha"] = 0.0
@@ -141,6 +149,10 @@ func _update_connection_lines() -> void:
 	_connection_lines.clear_points()
 	
 	for enemy in _connected_enemies:
+		# 检查敌人是否仍然有效（没有被释放）
+		if not is_instance_valid(enemy) or not enemy.is_inside_tree():
+			continue
+		
 		# 添加起点（圆形敌人中心）
 		_connection_lines.add_point(Vector2.ZERO)
 		# 添加终点（连接敌人位置，相对于圆形敌人）

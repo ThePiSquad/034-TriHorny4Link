@@ -91,7 +91,7 @@ max_health = 120.0
 
 [node name="ConnectionLines" type="Line2D" parent="." index="0" unique_id=999999999]
 z_index = -1
-width = 3.0
+width = 8.0
 default_color = Color(0.2, 0.8, 0.2, 0.7)
 texture_mode = 1
 
