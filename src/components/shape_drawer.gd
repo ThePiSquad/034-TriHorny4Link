@@ -51,6 +51,14 @@ func _update_collision_shape() -> void:
 	for child in _input_area.get_children():
 		child.queue_free()
 	
+	# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
+	call_deferred("_add_new_collision_shape")
+
+func _add_new_collision_shape() -> void:
+	"""延迟添加新的碰撞形状"""
+	if not _input_area:
+		return
+	
 	var shape: Shape2D
 	match shape_type:
 		Enums.ShapeType.CIRCLE:

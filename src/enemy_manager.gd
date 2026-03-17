@@ -182,7 +182,7 @@ func _spawn_normal_enemy(size_level: int) -> void:
 		
 		# 连接敌人死亡信号
 		if enemy.has_signal("died"):
-			enemy.died.connect(_on_enemy_died)
+			enemy.died.connect(_on_enemy_died.bind(enemy))
 		
 		add_child(enemy)
 	else:
@@ -310,9 +310,9 @@ func _check_game_over() -> void:
 		_check_game_over_timer.stop()
 		wave_system.all_waves_completed.emit()
 
-func _on_enemy_died(enemy: Node2D, _source: Node) -> void:
+func _on_enemy_died(enemy: Node2D, source: Node) -> void:
 	"""敌人死亡时的处理"""
-	print("DEBUG: 敌人死亡被触发，敌人：", enemy)
+	print("DEBUG: 敌人死亡被触发，敌人：", enemy, "，伤害来源：", source)
 	
 	if not wave_system:
 		print("DEBUG: wave_system 为空，返回")

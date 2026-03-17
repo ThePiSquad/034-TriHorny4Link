@@ -68,7 +68,7 @@ void fragment() {
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_a7amd"]
 shader = SubResource("Shader_shxqu")
-shader_parameter/shape_size = Vector2(64, 64)
+shader_parameter/shape_size = Vector2(128, 128)
 shader_parameter/progress = 0.0
 shader_parameter/noise_desnity = 60.0
 shader_parameter/beam_size = 0.15000000596046
@@ -82,11 +82,20 @@ radius = 32.0
 
 [node name="CircleEnemy" unique_id=265451698 instance=ExtResource("1_kbicu")]
 script = ExtResource("2_shxqu")
+connection_radius = 1024.0
+connection_color = Color(0.5568628, 0, 0, 0.7019608)
 move_speed = 125.0
+score_value = 10
 random_initial_rotation = true
 max_health = 120.0
 
-[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
+[node name="ConnectionLines" type="Line2D" parent="." index="0" unique_id=999999999]
+z_index = -1
+width = 3.0
+default_color = Color(0.2, 0.8, 0.2, 0.7)
+texture_mode = 1
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=590652366]
 material = SubResource("ShaderMaterial_a7amd")
 fill_color = Color(0.17402825, 0.17402825, 0.17402825, 1)
 stroke_color = Color(0.68235296, 0, 0, 1)

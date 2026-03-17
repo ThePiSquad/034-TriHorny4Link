@@ -67,6 +67,11 @@ func _fire_splitting_bullet(angle: float, damage: float) -> void:
 	bullet.set_homing_config(true, splitting_bullet_homing_detection_range, splitting_bullet_homing_turn_speed)
 	bullet.set_attack_delay(splitting_bullet_attack_delay)
 	
+	# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
+	call_deferred("_add_bullet_to_scene", bullet)
+
+func _add_bullet_to_scene(bullet: Node) -> void:
+	"""延迟添加子弹到场景"""
 	get_tree().current_scene.add_child(bullet)
 
 func set_splitting_config(count: int, angle_spread: float, damage: float, lifetime: float) -> void:
