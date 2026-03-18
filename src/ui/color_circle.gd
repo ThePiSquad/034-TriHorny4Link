@@ -14,9 +14,27 @@ class_name ColorCircle
 @export var is_selected: bool = false:
 	set(value):
 		is_selected = value
+		# 如果被选中，停止高亮动画
+		if value and highlight_animation:
+			highlight_animation = false
 		queue_redraw()
 
 @export var selection_ring_color: Color = Color.WHITE
+
+@export var disabled: bool = false:
+	set(value):
+		disabled = value
+		queue_redraw()
+
+@export var highlight_animation: bool = false:
+	set(value):
+		highlight_animation = value
+		print("设置highlight_animation为：", value, "，节点是否准备好：", is_inside_tree())
+		if value:
+			# 等待下一帧再启动动画，确保节点已准备好
+			call_deferred("_start_highlight_animation")
+		else:
+			_stop_highlight_animation()
 
 const PADDING: float = 4.0
 const ANIMATION_SPEED: float = 2.0  # 降低动画速度，使其更平滑
@@ -29,6 +47,7 @@ var current_fill_ratio: float = 0.5:
 		current_fill_ratio = value
 		queue_redraw()
 
+var _highlight_tween: Tween
 var _last_trigger_time: float = 0.0
 const TRIGGER_COOLDOWN: float = 0.1
 
@@ -67,20 +86,25 @@ func _draw() -> void:
 	var center = size / 2
 	var radius = min(size.x, size.y) / 2 - PADDING
 	
+	# 如果禁用，显示灰色
+	var draw_color = circle_color
+	if disabled:
+		draw_color = Color(0.3, 0.3, 0.3, 0.5)
+	
 	if current_fill_ratio > 0.001:
-		_draw_fill(center, radius, current_fill_ratio)
+		_draw_fill(center, radius, current_fill_ratio, draw_color)
 	
 	var outline_width = 2.0
-	draw_arc(center, radius, 0, TAU, 64, circle_color, outline_width, true)
+	draw_arc(center, radius, 0, TAU, 64, draw_color, outline_width, true)
 	
 	if is_selected:
 		var selection_radius = radius + PADDING / 2
 		draw_arc(center, selection_radius, 0, TAU, 64, selection_ring_color, 3.0, true)
 
 
-func _draw_fill(center: Vector2, radius: float, ratio: float) -> void:
+func _draw_fill(center: Vector2, radius: float, ratio: float, color: Color = circle_color) -> void:
 	if ratio >= 1.0:
-		draw_circle(center, radius, circle_color)
+		draw_circle(center, radius, color)
 		return
 	
 	var fill_bottom = center.y + radius
@@ -109,11 +133,14 @@ func _draw_fill(center: Vector2, radius: float, ratio: float) -> void:
 		var colors = PackedColorArray()
 		colors.resize(points.size())
 		for i in range(points.size()):
-			colors[i] = circle_color
+			colors[i] = color
 		draw_polygon(points, colors)
 
 
 func _gui_input(event: InputEvent) -> void:
+	if disabled:
+		return
+	
 	if _is_selection_trigger(event):
 		var current_time = Time.get_ticks_msec() / 1000.0
 		if current_time - _last_trigger_time < TRIGGER_COOLDOWN:
@@ -148,3 +175,35 @@ func _is_selection_trigger(event: InputEvent) -> bool:
 	elif event is InputEventScreenTouch:
 		return event.pressed
 	return false
+
+func _start_highlight_animation() -> void:
+	"""开始循环的高亮动画"""
+	if _highlight_tween:
+		_highlight_tween.kill()
+	
+	_highlight_tween = create_tween()
+	
+	if not _highlight_tween:
+		print("错误：无法创建tween")
+		return
+	
+	# 设置无限循环
+	_highlight_tween.set_loops(0)
+	_highlight_tween.set_parallel(false)
+	_highlight_tween.set_trans(Tween.TRANS_SINE)
+	_highlight_tween.set_ease(Tween.EASE_IN_OUT)
+	
+	# 循环缩放动画：1.0 -> 1.2 -> 1.0
+	_highlight_tween.tween_property(self, "scale", Vector2(1.2, 1.2), 0.5)
+	_highlight_tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.5)
+	
+	print("开始高亮动画，tween已创建")
+
+func _stop_highlight_animation() -> void:
+	"""停止高亮动画"""
+	if _highlight_tween:
+		_highlight_tween.kill()
+		_highlight_tween = null
+	
+	# 回到原样
+	scale = Vector2(1.0, 1.0)

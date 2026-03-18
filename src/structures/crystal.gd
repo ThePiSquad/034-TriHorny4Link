@@ -1,5 +1,4 @@
-extends Structure
-class_name Crystal
+class_name Crystal extends Structure
 
 # 游戏开始时间
 var _game_start_time: float = 0.0
@@ -7,6 +6,9 @@ var _is_game_started: bool = false
 
 # 死亡粒子特效
 var broken_particle_scene: PackedScene = preload("res://src/particles/crystal_broken.tscn")
+
+# 水晶被攻击信号
+signal hit(source: Node)
 
 func _ready() -> void:
 	super._ready()
@@ -63,6 +65,7 @@ func _end_game() -> void:
 func _on_hit(source: Node) -> void:
 	print("Crystal: 被打了喵，只有",current_health,"血了")
 	AudioManager.play_base_attacked()
+	hit.emit(source)
 
 func take_damage(amount: float, source: Node = null) -> void:
 	super.take_damage(amount, source)

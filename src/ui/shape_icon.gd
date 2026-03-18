@@ -20,6 +20,11 @@ enum ShapeType { RECTANGLE, TRIANGLE }
 @export var inactive_color: Color = Color(0.4, 0.4, 0.45, 0.6)
 @export var selection_ring_color: Color = Color.WHITE
 
+@export var disabled: bool = false:
+	set(value):
+		disabled = value
+		queue_redraw()
+
 const SELECTION_RING_WIDTH: float = 3.0
 const PADDING: float = 4.0
 
@@ -38,11 +43,16 @@ func _draw() -> void:
 	var center = size / 2
 	var shape_size = min(size.x, size.y) - PADDING * 4
 	
+	# 如果禁用，显示灰色
+	var draw_color = inactive_color
+	if disabled:
+		draw_color = Color(0.3, 0.3, 0.3, 0.5)
+	
 	match shape_type:
 		ShapeType.RECTANGLE:
-			_draw_rectangle(center, shape_size)
+			_draw_rectangle(center, shape_size, draw_color)
 		ShapeType.TRIANGLE:
-			_draw_triangle(center, shape_size)
+			_draw_triangle(center, shape_size, draw_color)
 	
 	if is_selected:
 		match shape_type:
@@ -52,20 +62,19 @@ func _draw() -> void:
 				_draw_selection_triangle(center, shape_size + 4)
 
 
-func _draw_rectangle(center: Vector2, shape_size: float) -> void:
+func _draw_rectangle(center: Vector2, shape_size: float, color: Color = inactive_color) -> void:
 	var half_size = shape_size / 2
 	var rect = Rect2(center.x - half_size, center.y - half_size, shape_size, shape_size)
-	draw_rect(rect, inactive_color, true)
+	draw_rect(rect, color, true)
 
-
-func _draw_triangle(center: Vector2, shape_size: float) -> void:
+func _draw_triangle(center: Vector2, shape_size: float, color: Color = inactive_color) -> void:
 	var half_size = shape_size / 2
 	var height = shape_size * sqrt(3) / 2
 	var top = Vector2(center.x, center.y - height / 2)
 	var bottom_left = Vector2(center.x - half_size, center.y + height / 2)
 	var bottom_right = Vector2(center.x + half_size, center.y + height / 2)
 	var points = PackedVector2Array([top, bottom_right, bottom_left])
-	var colors = PackedColorArray([inactive_color, inactive_color, inactive_color])
+	var colors = PackedColorArray([color, color, color])
 	draw_polygon(points, colors)
 
 
@@ -87,6 +96,9 @@ func _draw_selection_triangle(center: Vector2, shape_size: float) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if disabled:
+		return
+	
 	if _is_selection_trigger(event):
 		var current_time = Time.get_ticks_msec() / 1000.0
 		if current_time - _last_trigger_time < TRIGGER_COOLDOWN:

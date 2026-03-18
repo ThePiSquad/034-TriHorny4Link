@@ -49,6 +49,15 @@ zoom = Vector2(0.5, 0.5)
 [node name="TutorialHUD" parent="." unique_id=387383325 instance=ExtResource("6_l1jh2")]
 script = ExtResource("7_gf2ub")
 
+[node name="RedCircle" parent="TutorialHUD/SelectionPanel/IconsContainer" parent_id_path=PackedInt32Array(387383325, 546135117) index="0" unique_id=563539740]
+disabled = null
+
+[node name="BlueCircle" parent="TutorialHUD/SelectionPanel/IconsContainer" parent_id_path=PackedInt32Array(387383325, 546135117) index="1" unique_id=969974474]
+disabled = null
+
+[node name="YellowCircle" parent="TutorialHUD/SelectionPanel/IconsContainer" parent_id_path=PackedInt32Array(387383325, 546135117) index="2" unique_id=20661991]
+disabled = null
+
 [node name="WorldPainter" type="Node2D" parent="." unique_id=997360994]
 script = ExtResource("7_4igdn")
 
