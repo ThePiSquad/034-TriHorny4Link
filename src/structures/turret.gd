@@ -131,10 +131,6 @@ func _ready() -> void:
 	# 连接颜色变化信号
 	color_changed.connect(_on_color_changed)
 	
-	# 连接检测区域信号
-	detection_area.area_entered.connect(_on_detection_area_area_entered)
-	detection_area.area_exited.connect(_on_detection_area_area_exited)
-	
 	# 初始颜色同步
 	_sync_visual_to_current_color()
 

@@ -25,6 +25,7 @@ enum TutorialState {
 @onready var enemy_manager: EnemyManager = $WorldPainter/EnemyManager
 @onready var crystal: Crystal = $WorldPainter/StructureManager/Crystal
 @onready var placement_preview: PlacementPreview = $PlacementPreview
+@onready var game_resource_manager: GameResourceManager = $GameResourceManager
 
 var current_step: TutorialStep = TutorialStep.STEP_0_ENEMY_ATTACK
 var current_state: TutorialState = TutorialState.WAITING
@@ -80,6 +81,18 @@ func _switch_to_game_over_scene() -> void:
 		if scene_tree:
 			scene_tree.change_scene_to_file("res://src/ui/game_over_screen.tscn")
 
+func _on_resource_changed() -> void:
+	_update_hud_resources()
+
+func _update_hud_resources() -> void:
+	if not game_resource_manager or not hud:
+		return
+	
+	var red_ratio = game_resource_manager.get_resource_ratio("red")
+	var blue_ratio = game_resource_manager.get_resource_ratio("blue")
+	var yellow_ratio = game_resource_manager.get_resource_ratio("yellow")
+	hud.set_resource_ratios(red_ratio, blue_ratio, yellow_ratio)
+
 func _ready() -> void:
 	_center_camera_on_crystal()
 	_initialize_tutorial()
@@ -94,6 +107,12 @@ func _initialize_tutorial() -> void:
 		input_manager.placement_preview = placement_preview
 		input_manager.hud = hud
 		input_manager.camera = camera
+		input_manager.game_resource_manager = game_resource_manager
+	
+	# 连接资源管理器到HUD
+	if game_resource_manager:
+		game_resource_manager.resource_changed.connect(_on_resource_changed)
+		_update_hud_resources()
 	
 	# 初始化GameManager
 	_initialize_game_manager()
