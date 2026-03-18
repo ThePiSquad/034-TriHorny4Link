@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://ds4d0ebsxelxd"]
+
+[ext_resource type="Script" uid="uid://dud202h01h6v7" path="res://src/tutorial_level/tutorial_level.gd" id="1_0fw02"]
+[ext_resource type="Script" uid="uid://bhae3srgte2jy" path="res://src/tutorial_level/tutorial_manager.gd" id="3_gf2ub"]
+[ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="3_ku2y3"]
+[ext_resource type="Script" uid="uid://dj73u0t4nipjs" path="res://src/managers/screen_shake_manager.gd" id="4_7stfk"]
+[ext_resource type="Script" uid="uid://cckyf835is82y" path="res://src/state_manager.gd" id="5_wmihr"]
+[ext_resource type="PackedScene" uid="uid://gpuql15c5pei" path="res://src/ui/hud.tscn" id="6_l1jh2"]
+[ext_resource type="Script" uid="uid://dredsd26xrygd" path="res://src/world_painter.gd" id="7_4igdn"]
+[ext_resource type="Script" uid="uid://mhjydthd6tt0" path="res://src/tutorial_level/tutorial_hud.gd" id="7_gf2ub"]
+[ext_resource type="Script" uid="uid://brga4uufq8t06" path="res://src/structure_manager.gd" id="8_vgftw"]
+[ext_resource type="PackedScene" uid="uid://vpbn24xyocc2" path="res://src/structures/crystal.tscn" id="9_dgjhb"]
+[ext_resource type="Script" uid="uid://cnbbj43fpxt1h" path="res://src/enemy_manager.gd" id="10_y0kw7"]
+[ext_resource type="PackedScene" uid="uid://ctq4hb8eu3wcc" path="res://src/enemies/rect_enemy.tscn" id="11_gqcuf"]
+[ext_resource type="PackedScene" uid="uid://b105um8got3cl" path="res://src/enemies/triangle_enemy.tscn" id="12_bt7dq"]
+[ext_resource type="PackedScene" uid="uid://p6dmw7sokfm4" path="res://src/enemies/circle_enemy.tscn" id="13_d3n3v"]
+[ext_resource type="PackedScene" uid="uid://c8m2q3r4n5x6p" path="res://src/placement_preview.tscn" id="15_bg30n"]
+[ext_resource type="Script" uid="uid://1gkv2f0l0ocr" path="res://src/tutorial_level/tutorial_wave_system.gd" id="15_ku2y3"]
+[ext_resource type="Script" uid="uid://bxfcopxexy1se" path="res://src/managers/game_resource_manager.gd" id="16_6t07v"]
+[ext_resource type="Script" uid="uid://r8pf7i8ngej6" path="res://src/tutorial_level/tutorial_input_manager.gd" id="16_ku2y3"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_a3wil"]
+vertices = PackedVector2Array(1995.0234, -1990.0234, 2003.9688, 1986.9609, -1981.0234, 1973.0313, -1989.9688, -1999.9688)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1991, 1983, 2014, 1997, 2005, -2000, -2000, -2010)])
+
+[node name="TutorialLevel" type="Node2D" unique_id=92352676]
+script = ExtResource("1_0fw02")
+
+[node name="BackgroundManager" parent="." unique_id=1234567890 instance=ExtResource("3_ku2y3")]
+z_index = -10
+background_color = Color(0.078431375, 0.078431375, 0.11764706, 1)
+
+[node name="TutorialManager" type="Node" parent="." unique_id=122228988]
+script = ExtResource("3_gf2ub")
+
+[node name="ScreenShakeManager" type="Node" parent="." unique_id=2000000001 node_paths=PackedStringArray("camera")]
+script = ExtResource("4_7stfk")
+camera = NodePath("../Camera2D")
+
+[node name="StateManager" type="Node" parent="." unique_id=1854887110]
+unique_name_in_owner = true
+script = ExtResource("5_wmihr")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=123456789]
+position = Vector2(576, 324)
+zoom = Vector2(0.5, 0.5)
+
+[node name="TutorialHUD" parent="." unique_id=387383325 instance=ExtResource("6_l1jh2")]
+script = ExtResource("7_gf2ub")
+
+[node name="WorldPainter" type="Node2D" parent="." unique_id=997360994]
+script = ExtResource("7_4igdn")
+
+[node name="StructureManager" type="Node2D" parent="WorldPainter" unique_id=671697620]
+script = ExtResource("8_vgftw")
+
+[node name="Crystal" parent="WorldPainter/StructureManager" unique_id=102321888 instance=ExtResource("9_dgjhb")]
+z_index = 5
+play_sound = true
+
+[node name="EnemyManager" type="Node2D" parent="WorldPainter" unique_id=1634875391]
+script = ExtResource("10_y0kw7")
+enemy_list = Array[PackedScene]([ExtResource("11_gqcuf"), ExtResource("12_bt7dq")])
+boss_enemy_scene = ExtResource("13_d3n3v")
+
+[node name="WaveSystem" type="Node" parent="WorldPainter/EnemyManager" unique_id=910048556]
+script = ExtResource("15_ku2y3")
+
+[node name="TutorialInputManager" type="Node2D" parent="." unique_id=1749754244 node_paths=PackedStringArray("structure_manager", "placement_preview", "hud", "camera", "game_resource_manager")]
+script = ExtResource("16_ku2y3")
+structure_manager = NodePath("../WorldPainter/StructureManager")
+placement_preview = NodePath("../PlacementPreview")
+hud = NodePath("../TutorialHUD")
+camera = NodePath("../Camera2D")
+game_resource_manager = NodePath("../GameResourceManager")
+
+[node name="PlacementPreview" parent="." unique_id=111222333 instance=ExtResource("15_bg30n")]
+
+[node name="GameResourceManager" type="Node" parent="." unique_id=1122275727]
+script = ExtResource("16_6t07v")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=357907225]
+navigation_polygon = SubResource("NavigationPolygon_a3wil")
+
+[node name="ObstaclesParent" type="Node2D" parent="." unique_id=357907226]
+
+[editable path="TutorialHUD"]
