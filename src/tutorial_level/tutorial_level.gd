@@ -44,6 +44,42 @@ func _center_camera_on_crystal() -> void:
 		camera.global_position = crystal_global_position
 		print("摄像机已居中到 Crystal，位置：", crystal_global_position)
 
+func _initialize_game_manager() -> void:
+	"""初始化游戏管理器"""
+	# 开发阶段：清除关卡缓存以确保加载最新配置
+	if ResourceManager.instance:
+		ResourceManager.instance.clear_level_cache()
+		print("已清除关卡缓存，将重新加载最新配置")
+	
+	var game_manager = GameManager.instance
+	if game_manager:
+		# 重置游戏状态
+		game_manager.start_game()
+		print("GameManager 初始化完成")
+	
+	# 监听游戏结束事件
+	if game_manager and not game_manager.game_over_signal.is_connected(_on_game_over):
+		game_manager.game_over_signal.connect(_on_game_over)
+
+func _on_game_over() -> void:
+	"""游戏结束时的处理"""
+	print("收到游戏结束事件，切换到结束页面")
+	# 延迟切换，确保粒子效果播放完成
+	await get_tree().create_timer(2.0).timeout
+	_switch_to_game_over_scene()
+
+func _switch_to_game_over_scene() -> void:
+	"""切换到游戏结束场景"""
+	var transition_manager = TransitionManager.instance
+	if transition_manager:
+		print("使用 TransitionManager 切换到游戏结束场景")
+		transition_manager.change_scene("res://src/ui/game_over_screen.tscn")
+	else:
+		print("警告：TransitionManager 实例不存在，使用默认场景切换")
+		var scene_tree = get_tree()
+		if scene_tree:
+			scene_tree.change_scene_to_file("res://src/ui/game_over_screen.tscn")
+
 func _ready() -> void:
 	_center_camera_on_crystal()
 	_initialize_tutorial()
@@ -59,6 +95,9 @@ func _initialize_tutorial() -> void:
 		input_manager.hud = hud
 		input_manager.camera = camera
 	
+	# 初始化GameManager
+	_initialize_game_manager()
+	
 	# 禁用玩家交互
 	_disable_player_interaction()
 	
@@ -73,8 +112,12 @@ func _enable_player_interaction() -> void:
 	if input_manager:
 		input_manager.set_input_enabled(true)
 	
-	# 教学模式下始终禁止删除建筑
-	_set_structures_deletable(false)
+	# 教学模式下禁止删除建筑
+	if current_state != TutorialState.COMPLETED:
+		_set_structures_deletable(false)
+	else:
+		# 教学完成后允许删除建筑
+		_set_structures_deletable(true)
 
 func _disable_player_interaction() -> void:
 	"""禁用玩家交互"""
@@ -103,6 +146,57 @@ func _show_hud() -> void:
 	"""显示HUD"""
 	if hud:
 		hud.show_hud()
+
+func _unlock_all_hud_features() -> void:
+	"""解锁HUD的全部功能"""
+	if not hud:
+		return
+	
+	# 获取所有图标
+	var red_circle = hud.get_node("SelectionPanel/IconsContainer/RedCircle")
+	var blue_circle = hud.get_node("SelectionPanel/IconsContainer/BlueCircle")
+	var yellow_circle = hud.get_node("SelectionPanel/IconsContainer/YellowCircle")
+	var rectangle_icon = hud.get_node("SelectionPanel/IconsContainer/RectangleIcon")
+	var triangle_icon = hud.get_node("SelectionPanel/IconsContainer/TriangleIcon")
+	
+	# 启用所有颜色圆圈
+	if red_circle:
+		red_circle.disabled = false
+	if blue_circle:
+		blue_circle.disabled = false
+	if yellow_circle:
+		yellow_circle.disabled = false
+	
+	# 启用矩形和三角形图标
+	if rectangle_icon:
+		rectangle_icon.disabled = false
+	if triangle_icon:
+		triangle_icon.disabled = false
+	
+	# 停止蓝色圆圈的高亮动画
+	if blue_circle:
+		blue_circle.highlight_animation = false
+	
+	# 移除输入限制
+	if input_manager:
+		input_manager.remove_restrictions()
+	
+	print("已解锁HUD的全部功能")
+
+func _start_normal_game() -> void:
+	"""启动正常的刷怪逻辑"""
+	if not enemy_manager:
+		print("错误：EnemyManager不存在")
+		return
+	
+	print("启动正常的刷怪逻辑")
+	
+	# 设置GameManager的选关为tutorial
+	if GameManager.instance:
+		GameManager.instance.selected_level = "tutorial"
+	
+	# 启动EnemyManager的游戏逻辑
+	enemy_manager.start_game()
 
 func _start_enemy_attack_demo() -> void:
 	"""开始敌人攻击演示"""
@@ -688,6 +782,18 @@ func _on_turret_activated() -> void:
 	
 	# 在炮塔方向远离Crystal的地方生成敌人
 	_spawn_enemy_for_turret()
+	
+	# 等待一段时间，让玩家看到炮塔攻击敌人
+	await get_tree().create_timer(3.0).timeout
+	
+	# 解锁HUD的全部功能
+	_unlock_all_hud_features()
+	
+	# 启用玩家交互
+	_enable_player_interaction()
+	
+	# 启动正常的刷怪逻辑
+	_start_normal_game()
 
 func _spawn_enemy_for_turret() -> void:
 	"""在炮塔方向远离Crystal的地方生成敌人"""

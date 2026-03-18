@@ -3,6 +3,7 @@ extends InputManager
 var input_enabled: bool = false
 var allowed_structure_type: Enums.StructureType = Enums.StructureType.MONO_CRYSTAL
 var allowed_color_type: Enums.ColorType = Enums.ColorType.BLUE
+var restrictions_enabled: bool = true  # 是否启用教学限制
 
 func set_input_enabled(enabled: bool) -> void:
 	"""设置输入是否启用"""
@@ -15,6 +16,11 @@ func set_allowed_structure_type(type: Enums.StructureType) -> void:
 func set_allowed_color_type(color: Enums.ColorType) -> void:
 	"""设置允许的颜色类型"""
 	allowed_color_type = color
+
+func remove_restrictions() -> void:
+	"""移除教学限制"""
+	restrictions_enabled = false
+	print("已移除教学输入限制")
 
 func _input(event: InputEvent) -> void:
 	"""重载输入处理函数"""
@@ -86,6 +92,11 @@ func _try_place() -> void:
 		print("教学：输入未启用，无法放置")
 		return
 	
+	# 如果限制已移除，使用默认逻辑
+	if not restrictions_enabled:
+		super._try_place()
+		return
+	
 	# 检查是否允许放置该类型
 	if selected_structure_type != allowed_structure_type:
 		print("教学：建筑类型不允许。当前：", selected_structure_type, "允许：", allowed_structure_type)
@@ -102,6 +113,11 @@ func _try_place() -> void:
 func _on_icon_selected(icon) -> void:
 	"""重载图标选择函数，添加教学限制"""
 	if not input_enabled:
+		return
+	
+	# 如果限制已移除，使用默认逻辑
+	if not restrictions_enabled:
+		super._on_icon_selected(icon)
 		return
 	
 	# 如果是颜色圆圈，检查颜色是否允许

@@ -1,0 +1,139 @@
+{
+	"level_id": "tutorial",
+	"level_name": "教学关卡",
+	"level_description": "学习游戏基本操作",
+	"difficulty": 1,
+	"recommended_level": 1,
+	"boss_wave_index": -1,
+	"waves": [
+		{
+			"wave_index": 0,
+			"wave_name": "第一波：小规模测试",
+			"is_boss_wave": false,
+			"preparation_time": 3.0,
+			"spawn_interval": 1.5,
+			"wave_interval": 5.0,
+			"require_clear_previous": true,
+			"min_enemies_alive": 0,
+			"spawn_center": [0, 0],
+			"min_spawn_radius": 400.0,
+			"max_spawn_radius": 800.0,
+			"difficulty_multiplier": 1.0,
+			"speed_multiplier": 1.0,
+			"health_multiplier": 1.0,
+			"enemies": [
+				{
+					"enemy_type": "rect_enemy",
+					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"count": 3,
+					"use_random_count": false,
+					"size_level": 1,
+					"use_random_size": false,
+					"health_multiplier": 1.0,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 0,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				}
+			]
+		},
+		{
+			"wave_index": 1,
+			"wave_name": "第二波：混合编队",
+			"is_boss_wave": false,
+			"preparation_time": 3.0,
+			"spawn_interval": 1.2,
+			"wave_interval": 5.0,
+			"require_clear_previous": true,
+			"min_enemies_alive": 0,
+			"spawn_center": [0, 0],
+			"min_spawn_radius": 450.0,
+			"max_spawn_radius": 850.0,
+			"difficulty_multiplier": 1.1,
+			"speed_multiplier": 1.0,
+			"health_multiplier": 1.0,
+			"enemies": [
+				{
+					"enemy_type": "rect_enemy",
+					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"count": 2,
+					"use_random_count": false,
+					"size_level": 2,
+					"use_random_size": false,
+					"health_multiplier": 1.0,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 0,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 2,
+					"use_random_count": false,
+					"size_level": 2,
+					"use_random_size": false,
+					"health_multiplier": 1.0,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 0,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				}
+			]
+		},
+		{
+			"wave_index": 2,
+			"wave_name": "第三波：加强攻势",
+			"is_boss_wave": false,
+			"preparation_time": 3.0,
+			"spawn_interval": 1.0,
+			"wave_interval": 5.0,
+			"require_clear_previous": true,
+			"min_enemies_alive": 0,
+			"spawn_center": [0, 0],
+			"min_spawn_radius": 500.0,
+			"max_spawn_radius": 900.0,
+			"difficulty_multiplier": 1.2,
+			"speed_multiplier": 1.0,
+			"health_multiplier": 1.0,
+			"enemies": [
+				{
+					"enemy_type": "rect_enemy",
+					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"count": 4,
+					"use_random_count": false,
+					"size_level": 3,
+					"use_random_size": false,
+					"health_multiplier": 1.0,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 0,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 4,
+					"use_random_count": false,
+					"size_level": 3,
+					"use_random_size": false,
+					"health_multiplier": 1.0,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.0,
+					"spawn_priority": 0,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				}
+			]
+		}
+	]
+}
