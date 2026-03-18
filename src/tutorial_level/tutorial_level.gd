@@ -30,6 +30,10 @@ var current_step: TutorialStep = TutorialStep.STEP_0_ENEMY_ATTACK
 var current_state: TutorialState = TutorialState.WAITING
 var tutorial_timer: float = 0.0
 
+var placed_mono_crystal: MonoCrystal = null
+var highlight_tiles: Array[Node2D] = []
+var highlight_tween: Tween = null
+
 func _center_camera_on_crystal() -> void:
 	"""将摄像机居中到 Crystal 对象"""
 	if crystal and camera:
@@ -151,6 +155,10 @@ func _start_place_crystal_tutorial() -> void:
 	if input_manager:
 		input_manager.set_allowed_structure_type(Enums.StructureType.MONO_CRYSTAL)
 		input_manager.set_allowed_color_type(Enums.ColorType.BLUE)
+		# 显式设置当前选中的建筑类型和颜色，确保预览正确
+		input_manager.set_selected_structure_type(Enums.StructureType.MONO_CRYSTAL)
+		# 强制设置当前颜色为蓝色
+		input_manager.selected_color_type = Enums.ColorType.BLUE
 	
 	# 等待1秒让玩家看清HUD
 	await get_tree().create_timer(1.0).timeout
@@ -213,6 +221,9 @@ func _on_structure_placed(node: Node) -> void:
 	
 	print("成功放置蓝色MonoCrystal")
 	
+	# 保存放置的MonoCrystal引用
+	placed_mono_crystal = mono_crystal
+	
 	# 停止蓝色圆圈的高亮动画
 	if hud:
 		var blue_circle = hud.get_node("SelectionPanel/IconsContainer/BlueCircle")
@@ -230,5 +241,207 @@ func _start_conduit_tutorial() -> void:
 	"""开始连接导管教学"""
 	print("步骤2：连接导管教学")
 	current_step = TutorialStep.STEP_2_CONNECT_CONDUIT
+	current_state = TutorialState.DEMONSTRATION
+	
+	# 禁止玩家放置任何东西
+	_disable_player_interaction()
+	
+	# 取消HUD选择
+	if hud:
+		hud._clear_selection()
+	
+	# 等待1秒
+	await get_tree().create_timer(1.0).timeout
+	
+	# 让HUD只允许选择矩形
+	_limit_selection_to_rectangle()
+	
+	# 启用玩家交互
+	_enable_player_interaction()
+	
+	# 进入交互状态
+	current_state = TutorialState.INTERACTION
+	
+	# 显示MonoCrystal周围可放置的地块
+	_show_highlight_tiles()
+	
+	# 监听导管放置事件
+	if structure_manager:
+		structure_manager.child_entered_tree.connect(_on_conduit_placed)
+	
+	print("请玩家在MonoCrystal旁边放置导管")
+
+func _limit_selection_to_rectangle() -> void:
+	"""限制只能选择矩形"""
+	if not hud:
+		return
+	
+	# 获取所有图标
+	var red_circle = hud.get_node("SelectionPanel/IconsContainer/RedCircle")
+	var blue_circle = hud.get_node("SelectionPanel/IconsContainer/BlueCircle")
+	var yellow_circle = hud.get_node("SelectionPanel/IconsContainer/YellowCircle")
+	var rectangle_icon = hud.get_node("SelectionPanel/IconsContainer/RectangleIcon")
+	var triangle_icon = hud.get_node("SelectionPanel/IconsContainer/TriangleIcon")
+	
+	# 禁用所有颜色圆圈
+	if red_circle:
+		red_circle.disabled = true
+	if blue_circle:
+		blue_circle.disabled = true
+	if yellow_circle:
+		yellow_circle.disabled = true
+	
+	# 禁用三角形图标
+	if triangle_icon:
+		triangle_icon.disabled = true
+	
+	# 确保矩形可用
+	if rectangle_icon:
+		rectangle_icon.disabled = false
+	
+	# 设置输入管理器允许放置导管
+	if input_manager:
+		input_manager.set_allowed_structure_type(Enums.StructureType.CONDUIT)
+		input_manager.set_allowed_color_type(Enums.ColorType.WHITE)
+	
+	print("已限制只能选择矩形")
+
+func _show_highlight_tiles() -> void:
+	"""显示MonoCrystal周围可放置的地块"""
+	if not placed_mono_crystal:
+		print("错误：placed_mono_crystal为空")
+		return
+	
+	# 清除之前的高亮
+	_clear_highlight_tiles()
+	
+	# 获取MonoCrystal的网格坐标
+	var crystal_pos = GridCoord.from_world_coord(Vector2i(placed_mono_crystal.global_position.x, placed_mono_crystal.global_position.y))
+	print("MonoCrystal网格坐标：", crystal_pos)
+	
+	# 获取周围4个方向的坐标（上下左右）
+	var directions = [
+		Vector2i(0, -1),   # 上
+		Vector2i(0, 1),    # 下
+		Vector2i(-1, 0),   # 左
+		Vector2i(1, 0)     # 右
+	]
+	
+	# 创建高亮地块
+	for dir in directions:
+		var neighbor_pos = GridCoord.new(crystal_pos.x + dir.x, crystal_pos.y + dir.y)
+		var world_pos = neighbor_pos.to_world_coord()
+		
+		print("检查位置：", neighbor_pos, "世界坐标：", world_pos)
+		
+		# 检查该位置是否可以放置导管
+		var can_place = structure_manager.can_place_conduit(neighbor_pos)
+		print("  可以放置导管：", can_place)
+		
+		if can_place:
+			_create_highlight_tile(Vector2(world_pos.x, world_pos.y))
+	
+	print("已显示", highlight_tiles.size(), "个高亮地块")
+	
+	# 开始闪烁动画
+	if highlight_tiles.size() > 0:
+		_start_highlight_animation()
+
+func _create_highlight_tile(position: Vector2) -> void:
+	"""创建高亮地块"""
+	var highlight = Sprite2D.new()
+	highlight.texture = load("res://assets/particles/rect_solid_particle.png")
+	highlight.position = position + Vector2(Constants.grid_size / 2, Constants.grid_size / 2)
+	highlight.z_index = -2
+	highlight.modulate = Color(1.0, 1.0, 1.0, 0.5)
+	
+	add_child(highlight)
+	highlight_tiles.append(highlight)
+	
+	print("创建高亮地块在位置：", position)
+
+func _start_highlight_animation() -> void:
+	"""开始高亮闪烁动画"""
+	if highlight_tween:
+		highlight_tween.kill()
+	
+	highlight_tween = create_tween()
+	highlight_tween.set_loops()
+	highlight_tween.set_parallel(true)
+	highlight_tween.set_trans(Tween.TRANS_SINE)
+	highlight_tween.set_ease(Tween.EASE_IN_OUT)
+	
+	# 循环闪烁动画：0.2 -> 0.5 -> 0.2
+	for tile in highlight_tiles:
+		if is_instance_valid(tile):
+			highlight_tween.tween_property(tile, "modulate:a", 0.5, 0.8)
+			highlight_tween.tween_property(tile, "modulate:a", 0.2, 0.8)
+	
+	print("开始高亮闪烁动画")
+
+func _stop_highlight_animation() -> void:
+	"""停止高亮闪烁动画"""
+	if highlight_tween:
+		highlight_tween.kill()
+		highlight_tween = null
+	
+	# 重置透明度
+	for tile in highlight_tiles:
+		if is_instance_valid(tile):
+			tile.modulate.a = 1.0
+
+func _clear_highlight_tiles() -> void:
+	"""清除所有高亮地块"""
+	for tile in highlight_tiles:
+		if is_instance_valid(tile):
+			tile.queue_free()
+	highlight_tiles.clear()
+
+func _on_conduit_placed(node: Node) -> void:
+	"""导管放置时的回调"""
+	if not node or not node is Conduit:
+		return
+	
+	print("检测到导管放置")
+	
+	# 检查是否在MonoCrystal旁边（只允许上下左右4个方向）
+	var conduit = node as Conduit
+	var conduit_pos = GridCoord.from_world_coord(Vector2i(conduit.global_position.x, conduit.global_position.y))
+	var crystal_pos = GridCoord.from_world_coord(Vector2i(placed_mono_crystal.global_position.x, placed_mono_crystal.global_position.y))
+	
+	# 计算两个GridCoord之间的偏移
+	var dx = conduit_pos.x - crystal_pos.x
+	var dy = conduit_pos.y - crystal_pos.y
+	
+	# 只允许上下左右4个方向（曼哈顿距离为1）
+	var is_adjacent = (abs(dx) == 1 and dy == 0) or (dx == 0 and abs(dy) == 1)
+	
+	if not is_adjacent:
+		print("导管不在MonoCrystal旁边（只允许上下左右）")
+		return
+	
+	print("导管放置在MonoCrystal旁边")
+	
+	# 清除高亮地块
+	_clear_highlight_tiles()
+	
+	# 禁用玩家操作
+	_disable_player_interaction()
+	
+	# 取消HUD选择
+	if hud:
+		hud._clear_selection()
+	
+	# 断开连接
+	if structure_manager:
+		structure_manager.child_entered_tree.disconnect(_on_conduit_placed)
+	
+	# 进入下一步
+	_start_turret_tutorial()
+
+func _start_turret_tutorial() -> void:
+	"""开始放置炮塔教学"""
+	print("步骤3：放置炮塔教学")
+	current_step = TutorialStep.STEP_3_PLACE_TURRET
 	current_state = TutorialState.COMPLETED
-	# TODO: 实现步骤2
+	# TODO: 实现步骤3

@@ -15,3 +15,7 @@ func _update_display() -> void:
 	if has_node("StepLabel"):
 		var step_label = $StepLabel
 		step_label.text = "步骤 %d: %s" % [current_step + 1, step_name]
+
+func _clear_selection() -> void:
+	"""清除选择（公共方法）"""
+	super._clear_selection()

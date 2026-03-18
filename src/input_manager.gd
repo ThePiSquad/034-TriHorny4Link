@@ -256,11 +256,9 @@ func _handle_placement_input(event: InputEvent) -> void:
 			return
 		
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			# 左键 - 选中时放置，未选中时拖动场景
-			if _is_selection_active():
-				_is_placing = event.pressed
-				if event.pressed:
-					_try_place()
+			# 左键 - 只在按下时放置一次
+			if _is_selection_active() and event.pressed:
+				_try_place()
 			else:
 				# 未选中任何建造时，左键拖动场景
 				_camera_dragging = event.pressed
@@ -295,13 +293,8 @@ func _update_placement_preview() -> void:
 		placement_preview.hide_preview()
 
 func _handle_continuous_placement(delta: float) -> void:
-	if _is_placing and _is_selection_active():
-		_place_timer += delta
-		if _place_timer >= Constants.InputConstants.PLACE_INTERVAL:
-			_place_timer = 0.0
-			_try_place()
-	else:
-		_place_timer = 0.0
+	# 禁用连续放置功能
+	_place_timer = 0.0
 	
 	if _is_removing:
 		_try_remove()
@@ -387,6 +380,8 @@ func _on_icon_selected(icon) -> void:
 			set_selected_structure_type(Enums.StructureType.CONDUIT)
 		elif icon.shape_type == ShapeIcon.ShapeType.TRIANGLE:
 			set_selected_structure_type(Enums.StructureType.TURRET)
+		# 选择形状图标时，颜色设置为白色
+		selected_color_type = Enums.ColorType.WHITE
 	elif icon is ColorCircle:
 		set_selected_structure_type(Enums.StructureType.MONO_CRYSTAL)
 		var index = icon.get_index()
