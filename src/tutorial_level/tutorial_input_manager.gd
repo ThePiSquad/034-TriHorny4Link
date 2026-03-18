@@ -81,9 +81,6 @@ func _handle_continuous_placement(delta: float) -> void:
 	if not input_enabled:
 		return
 	
-	# 禁用删除操作
-	_is_removing = false
-	
 	super._handle_continuous_placement(delta)
 
 func _try_place() -> void:
@@ -99,7 +96,7 @@ func _try_place() -> void:
 	
 	# 检查是否允许放置该类型
 	if selected_structure_type != allowed_structure_type:
-		print("教学：建筑类型不允许。当前：", selected_structure_type, "允许：", allowed_structure_type)
+		# print("教学：建筑类型不允许。当前：", selected_structure_type, "允许：", allowed_structure_type)
 		return
 	
 	# 检查颜色是否允许
@@ -107,7 +104,7 @@ func _try_place() -> void:
 		print("教学：颜色不允许。当前：", selected_color_type, "允许：", allowed_color_type)
 		return
 	
-	print("教学：尝试放置建筑，类型：", selected_structure_type, "颜色：", selected_color_type)
+	# print("教学：尝试放置建筑，类型：", selected_structure_type, "颜色：", selected_color_type)
 	super._try_place()
 
 func _on_icon_selected(icon) -> void:

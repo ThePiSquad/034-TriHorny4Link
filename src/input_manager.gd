@@ -256,9 +256,10 @@ func _handle_placement_input(event: InputEvent) -> void:
 			return
 		
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			# 左键 - 只在按下时放置一次
-			if _is_selection_active() and event.pressed:
-				_try_place()
+			if _is_selection_active():
+				_is_placing = event.pressed
+				if event.pressed:
+					_try_place()
 			else:
 				# 未选中任何建造时，左键拖动场景
 				_camera_dragging = event.pressed
@@ -293,8 +294,11 @@ func _update_placement_preview() -> void:
 		placement_preview.hide_preview()
 
 func _handle_continuous_placement(delta: float) -> void:
-	# 禁用连续放置功能
-	_place_timer = 0.0
+	if _is_placing:
+		_place_timer += delta
+		if _place_timer >= Constants.InputConstants.PLACE_INTERVAL:
+			_place_timer = 0.0
+			_try_place()
 	
 	if _is_removing:
 		_try_remove()
@@ -375,6 +379,9 @@ func _is_selection_active() -> bool:
 	return hud.is_icon_selected()
 
 func _on_icon_selected(icon) -> void:
+	_is_placing = false
+	_place_timer = 0.0
+	
 	if icon is ShapeIcon:
 		if icon.shape_type == ShapeIcon.ShapeType.RECTANGLE:
 			set_selected_structure_type(Enums.StructureType.CONDUIT)
