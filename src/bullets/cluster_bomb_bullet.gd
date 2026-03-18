@@ -84,7 +84,12 @@ func _spawn_cluster_bullets() -> void:
 		bullet.global_position = global_position
 		bullet.init(bullet_velocity, int(cluster_bullet_damage), cluster_bullet_lifetime, _bullet_type)
 		
-		get_parent().add_child(bullet)
+		# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
+		call_deferred("_add_bullet_to_scene", bullet)
+
+func _add_bullet_to_scene(bullet: Bullet) -> void:
+	"""延迟添加子弹到场景"""
+	get_parent().add_child(bullet)
 
 func set_cluster_config(count: int, angle_spread: float, bullet_damage: float, bullet_lifetime: float, bullet_speed: float) -> void:
 	cluster_count = count

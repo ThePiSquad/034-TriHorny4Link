@@ -47,10 +47,6 @@ func _initialize_shape() -> void:
 		hitbox_shape.shape.radius = enemy_size.x / 2
 	if hurtbox_shape:
 		hurtbox_shape.shape.radius = enemy_size.x / 2
-	
-	# 更新 ShapeDrawer 的 shape_size
-	if shape_drawer:
-		shape_drawer.shape_size = enemy_size
 
 func _setup_particle_texture(particle: GPUParticles2D) -> void:
 	"""设置圆形敌人的死亡粒子纹理"""
