@@ -80,9 +80,11 @@ circle_color = Color(1, 0.87, 0.27, 1)
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 script = ExtResource("3_shapeicon")
+inactive_color = Color(0.6627451, 0.6627451, 0.6627451, 1)
 
 [node name="TriangleIcon" type="Control" parent="SelectionPanel/IconsContainer" unique_id=787823645]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 script = ExtResource("3_shapeicon")
 shape_type = 1
+inactive_color = Color(0.6627451, 0.6627451, 0.6627451, 1)
