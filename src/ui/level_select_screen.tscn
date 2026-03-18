@@ -76,10 +76,26 @@ theme_override_constants/separation = 16
 theme_override_styles/separator = SubResource("StyleBoxLine_su76r")
 
 [node name="LevelButtons" type="GridContainer" parent="CanvasLayer/VBoxContainer" unique_id=2075691478]
+custom_minimum_size = Vector2(0, 350)
 layout_mode = 2
-size_flags_horizontal = 4
 theme_override_constants/h_separation = 64
 theme_override_constants/v_separation = 64
+columns = 3
+
+[node name="Level0Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=516795194]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_normal_color = Color(0.49663597, 0.74270433, 1, 1)
+theme_override_colors/icon_pressed_color = Color(0, 0.258233, 0.46509224, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.5803922, 1, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
 
 [node name="Level1Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=223076887]
 process_mode = 3
