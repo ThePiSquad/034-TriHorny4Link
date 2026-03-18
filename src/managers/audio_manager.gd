@@ -29,7 +29,7 @@ const SOUND_PATHS = {
 	"bullet_hit_purple": "res://assets/audio/etfx_explosion_plasma_0.ogg",
 	"bullet_hit_orange": "res://assets/audio/etfx_explosion_storm.ogg",
 	"enemy_hit": "res://assets/audio/怪物受击.ogg",
-	"base_attacked": "res://assets/audio/玩家受击 (猫叫）.ogg",
+	"base_attacked": "res://assets/audio/玩家受击(猫叫.ogg",
 	"base_die": "res://assets/audio/fx_effect_explosion.ogg",
 	"wave_start_normal": "res://assets/audio/fx_du.ogg",
 	"wave_start_boss": "res://assets/audio/fx_effect_explosion.ogg",
@@ -185,7 +185,7 @@ func play_bullet_hit(type: String) -> void:
 
 func play_base_attacked() -> void:
 	"""播放基地被攻击音效"""
-	play_sound("base_attacked", -3.0)
+	play_sound("base_attacked", 3.0)
 
 func play_enemy_hit() -> void:
 	"""播放敌人被攻击音效"""

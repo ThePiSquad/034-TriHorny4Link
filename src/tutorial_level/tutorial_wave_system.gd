@@ -1,1 +1,1 @@
-extends WaveSystem
+extends Node

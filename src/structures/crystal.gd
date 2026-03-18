@@ -60,7 +60,9 @@ func _end_game() -> void:
 	else:
 		push_warning("GameManager 实例不存在，无法结束游戏")
 
+func _on_hit(source: Node) -> void:
+	print("Crystal: 被打了喵，只有",current_health,"血了")
+	AudioManager.play_base_attacked()
 
 func take_damage(amount: float, source: Node = null) -> void:
 	super.take_damage(amount, source)
-	AudioManager.play_base_attacked()

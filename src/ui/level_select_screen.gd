@@ -75,10 +75,10 @@ func _check_level_availability() -> void:
 		level3_button.disabled = not FileAccess.file_exists("res://config/levels/level_3.json")
 
 func _on_level0_pressed() -> void:
-	"""选择关卡 1"""
+	"""选择教学关卡"""
 	_play_button_click_animation(level0_button)
 	await get_tree().create_timer(0.2).timeout
-	# 进入教学关卡
+	_start_tutorial_level()
 	
 
 func _on_level1_pressed() -> void:
@@ -134,3 +134,18 @@ func _start_level(level_id: String) -> void:
 		var scene_tree = get_tree()
 		if scene_tree:
 			scene_tree.change_scene_to_file("res://src/world.tscn")
+
+func _start_tutorial_level() -> void:
+	"""开始教学关卡"""
+	# 存储选中的关卡为教学关卡
+	if GameManager.instance:
+		GameManager.instance.selected_level = "tutorial"
+	
+	# 切换到教学关卡场景
+	var transition_manager = TransitionManager.instance
+	if transition_manager:
+		transition_manager.change_scene("res://src/tutorial_level/tutorial_level.tscn")
+	else:
+		var scene_tree = get_tree()
+		if scene_tree:
+			scene_tree.change_scene_to_file("res://src/tutorial_level/tutorial_level.tscn")
