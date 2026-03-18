@@ -12,6 +12,9 @@ var energy_level: EnergyLevel = EnergyLevel.new()
 
 @export var structure_type: Enums.StructureType
 
+# 是否可以被删除（用于教学模式）
+var can_be_deleted: bool = true
+
 # 是否播放音效（用于背景元素禁用音效）
 @export var play_sound: bool = true
 
@@ -232,6 +235,10 @@ func _setup_input_handling() -> void:
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			# 检查是否可以被删除
+			if not can_be_deleted:
+				print("建筑禁止删除")
+				return
 			_request_deletion()
 
 func _request_deletion() -> void:

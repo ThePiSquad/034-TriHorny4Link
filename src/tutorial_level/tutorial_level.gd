@@ -68,15 +68,30 @@ func _initialize_tutorial() -> void:
 	# 开始教学流程
 	_start_enemy_attack_demo()
 
-func _disable_player_interaction() -> void:
-	"""禁用玩家交互"""
-	if input_manager:
-		input_manager.set_input_enabled(false)
-
 func _enable_player_interaction() -> void:
 	"""启用玩家交互"""
 	if input_manager:
 		input_manager.set_input_enabled(true)
+	
+	# 教学模式下始终禁止删除建筑
+	_set_structures_deletable(false)
+
+func _disable_player_interaction() -> void:
+	"""禁用玩家交互"""
+	if input_manager:
+		input_manager.set_input_enabled(false)
+	
+	# 禁止删除建筑
+	_set_structures_deletable(false)
+
+func _set_structures_deletable(deletable: bool) -> void:
+	"""设置所有建筑是否可以被删除"""
+	if not structure_manager:
+		return
+	
+	for child in structure_manager.get_children():
+		if child is Structure:
+			child.can_be_deleted = deletable
 
 func _hide_hud() -> void:
 	"""收起HUD"""
@@ -225,11 +240,17 @@ func _on_structure_placed(node: Node) -> void:
 	# 保存放置的MonoCrystal引用
 	placed_mono_crystal = mono_crystal
 	
+	# 教学模式下禁止删除建筑
+	mono_crystal.can_be_deleted = false
+	
 	# 停止蓝色圆圈的高亮动画
 	if hud:
 		var blue_circle = hud.get_node("SelectionPanel/IconsContainer/BlueCircle")
 		if blue_circle:
 			blue_circle.highlight_animation = false
+	
+	# 立即禁用玩家交互，防止删除建筑
+	_disable_player_interaction()
 	
 	# 断开连接
 	if structure_manager:
@@ -424,6 +445,9 @@ func _on_conduit_placed(node: Node) -> void:
 	
 	print("导管放置在MonoCrystal旁边")
 	
+	# 教学模式下禁止删除建筑
+	conduit.can_be_deleted = false
+	
 	# 清除高亮地块
 	_clear_highlight_tiles()
 	
@@ -564,6 +588,9 @@ func _on_turret_placed(node: Node) -> void:
 	
 	# 保存放置的炮塔引用
 	var turret = node as Turret
+	
+	# 教学模式下禁止删除建筑
+	turret.can_be_deleted = false
 	
 	# 检查是否在Conduit旁边
 	var turret_pos = GridCoord.from_world_coord(Vector2i(turret.global_position.x, turret.global_position.y))

@@ -21,11 +21,44 @@ func _input(event: InputEvent) -> void:
 	if not input_enabled:
 		return
 	
-	super._input(event)
+	# 处理鼠标滚轮事件（任何模式下都可用）
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_zoom_camera(1.0 + _zoom_speed)
+			return
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_zoom_camera(1.0 - _zoom_speed)
+			return
+	
+	# 处理暂停菜单
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_toggle_pause()
+		return
+	
+	# 如果游戏暂停，忽略其他输入
+	if is_paused:
+		return
+	
+	if event.is_action_pressed("toggle_camera_mode"):
+		_toggle_mode()
+		return
+	
+	if current_mode == InputMode.CAMERA:
+		if event.is_action_pressed("ui_cancel"):
+			_set_mode(InputMode.PLACEMENT)
+			return
+		_handle_camera_input(event)
+	else:
+		_handle_placement_input(event)
 
 func _handle_placement_input(event: InputEvent) -> void:
 	"""重载放置输入处理函数"""
 	if not input_enabled:
+		return
+	
+	# 在教学模式下，禁止右键删除操作
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		print("教学：拦截右键删除操作")
 		return
 	
 	super._handle_placement_input(event)
@@ -36,6 +69,16 @@ func _handle_camera_input(event: InputEvent) -> void:
 		return
 	
 	super._handle_camera_input(event)
+
+func _handle_continuous_placement(delta: float) -> void:
+	"""重载连续放置处理函数，教学模式下禁止删除"""
+	if not input_enabled:
+		return
+	
+	# 禁用删除操作
+	_is_removing = false
+	
+	super._handle_continuous_placement(delta)
 
 func _try_place() -> void:
 	"""重载放置函数，添加教学限制"""

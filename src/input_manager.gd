@@ -10,7 +10,7 @@ signal mode_changed(mode: InputMode)
 
 @export var structure_manager: StructureManager
 @export var placement_preview: PlacementPreview
-@export var hud: TutorialHUD
+@export var hud: HUD
 @export var camera: Camera2D
 @export var game_resource_manager: GameResourceManager
 
