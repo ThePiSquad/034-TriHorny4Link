@@ -31,6 +31,7 @@ var current_state: TutorialState = TutorialState.WAITING
 var tutorial_timer: float = 0.0
 
 var placed_mono_crystal: MonoCrystal = null
+var placed_conduit: Conduit = null
 var highlight_tiles: Array[Node2D] = []
 var highlight_tween: Tween = null
 
@@ -404,8 +405,9 @@ func _on_conduit_placed(node: Node) -> void:
 	
 	print("检测到导管放置")
 	
-	# 检查是否在MonoCrystal旁边（只允许上下左右4个方向）
+	# 保存放置的导管引用
 	var conduit = node as Conduit
+	placed_conduit = conduit
 	var conduit_pos = GridCoord.from_world_coord(Vector2i(conduit.global_position.x, conduit.global_position.y))
 	var crystal_pos = GridCoord.from_world_coord(Vector2i(placed_mono_crystal.global_position.x, placed_mono_crystal.global_position.y))
 	
@@ -443,5 +445,219 @@ func _start_turret_tutorial() -> void:
 	"""开始放置炮塔教学"""
 	print("步骤3：放置炮塔教学")
 	current_step = TutorialStep.STEP_3_PLACE_TURRET
+	current_state = TutorialState.DEMONSTRATION
+	
+	# 禁止玩家放置任何东西
+	_disable_player_interaction()
+	
+	# 取消HUD选择
+	if hud:
+		hud._clear_selection()
+	
+	# 等待1秒
+	await get_tree().create_timer(1.0).timeout
+	
+	# 让HUD只允许选择三角形
+	_limit_selection_to_triangle()
+	
+	# 启用玩家交互
+	_enable_player_interaction()
+	
+	# 进入交互状态
+	current_state = TutorialState.INTERACTION
+	
+	# 显示Conduit周围可放置的地块
+	_show_conduit_highlight_tiles()
+	
+	# 监听炮塔放置事件
+	if structure_manager:
+		structure_manager.child_entered_tree.connect(_on_turret_placed)
+	
+	print("请玩家在Conduit旁边放置炮塔")
+
+func _limit_selection_to_triangle() -> void:
+	"""限制只能选择三角形"""
+	if not hud:
+		return
+	
+	# 获取所有图标
+	var red_circle = hud.get_node("SelectionPanel/IconsContainer/RedCircle")
+	var blue_circle = hud.get_node("SelectionPanel/IconsContainer/BlueCircle")
+	var yellow_circle = hud.get_node("SelectionPanel/IconsContainer/YellowCircle")
+	var rectangle_icon = hud.get_node("SelectionPanel/IconsContainer/RectangleIcon")
+	var triangle_icon = hud.get_node("SelectionPanel/IconsContainer/TriangleIcon")
+	
+	# 禁用所有颜色圆圈
+	if red_circle:
+		red_circle.disabled = true
+	if blue_circle:
+		blue_circle.disabled = true
+	if yellow_circle:
+		yellow_circle.disabled = true
+	
+	# 禁用矩形图标
+	if rectangle_icon:
+		rectangle_icon.disabled = true
+	
+	# 确保三角形可用
+	if triangle_icon:
+		triangle_icon.disabled = false
+	
+	# 设置输入管理器允许放置炮塔
+	if input_manager:
+		input_manager.set_allowed_structure_type(Enums.StructureType.TURRET)
+		input_manager.set_allowed_color_type(Enums.ColorType.WHITE)
+		# 显式设置当前选中的建筑类型，确保预览正确
+		input_manager.set_selected_structure_type(Enums.StructureType.TURRET)
+		# 强制设置当前颜色为白色
+		input_manager.selected_color_type = Enums.ColorType.WHITE
+	
+	print("已限制只能选择三角形")
+
+func _show_conduit_highlight_tiles() -> void:
+	"""显示Conduit周围可放置的地块"""
+	if not placed_conduit:
+		print("错误：placed_conduit为空")
+		return
+	
+	# 清除之前的高亮
+	_clear_highlight_tiles()
+	
+	# 获取Conduit的网格坐标
+	var conduit_pos = GridCoord.from_world_coord(Vector2i(placed_conduit.global_position.x, placed_conduit.global_position.y))
+	print("Conduit网格坐标：", conduit_pos)
+	
+	# 获取周围4个方向的坐标（上下左右）
+	var directions = [
+		Vector2i(0, -1),   # 上
+		Vector2i(0, 1),    # 下
+		Vector2i(-1, 0),   # 左
+		Vector2i(1, 0)     # 右
+	]
+	
+	# 创建高亮地块
+	for dir in directions:
+		var neighbor_pos = GridCoord.new(conduit_pos.x + dir.x, conduit_pos.y + dir.y)
+		var world_pos = neighbor_pos.to_world_coord()
+		
+		print("检查位置：", neighbor_pos, "世界坐标：", world_pos)
+		
+		# 检查该位置是否可以放置炮塔
+		var can_place = structure_manager.can_place_turret(neighbor_pos)
+		print("  可以放置炮塔：", can_place)
+		
+		if can_place:
+			_create_highlight_tile(Vector2(world_pos.x, world_pos.y))
+	
+	print("已显示", highlight_tiles.size(), "个高亮地块")
+	
+	# 开始闪烁动画
+	if highlight_tiles.size() > 0:
+		_start_highlight_animation()
+
+func _on_turret_placed(node: Node) -> void:
+	"""炮塔放置时的回调"""
+	if not node or not node is Turret:
+		return
+	
+	print("检测到炮塔放置")
+	
+	# 保存放置的炮塔引用
+	var turret = node as Turret
+	
+	# 检查是否在Conduit旁边
+	var turret_pos = GridCoord.from_world_coord(Vector2i(turret.global_position.x, turret.global_position.y))
+	var conduit_pos = GridCoord.from_world_coord(Vector2i(placed_conduit.global_position.x, placed_conduit.global_position.y))
+	
+	# 计算两个GridCoord之间的偏移
+	var dx = turret_pos.x - conduit_pos.x
+	var dy = turret_pos.y - conduit_pos.y
+	
+	# 只允许上下左右4个方向（曼哈顿距离为1）
+	var is_adjacent = (abs(dx) == 1 and dy == 0) or (dx == 0 and abs(dy) == 1)
+	
+	if not is_adjacent:
+		print("炮塔不在Conduit旁边（只允许上下左右）")
+		return
+	
+	print("炮塔放置在Conduit旁边")
+	
+	# 清除高亮地块
+	_clear_highlight_tiles()
+	
+	# 禁用玩家操作
+	_disable_player_interaction()
+	
+	# 取消HUD选择
+	if hud:
+		hud._clear_selection()
+	
+	# 断开连接
+	if structure_manager:
+		structure_manager.child_entered_tree.disconnect(_on_turret_placed)
+	
+	# 监听炮塔激活状态
+	turret.is_active = false  # 确保初始状态为未激活
+	turret.color_changed.connect(_on_turret_color_changed)
+	
+	# 进入等待炮塔激活状态
+	_wait_for_turret_activation(turret)
+
+func _on_turret_color_changed(new_color: Enums.ColorType) -> void:
+	"""炮塔颜色改变时的回调"""
+	print("炮塔颜色改变：", new_color)
+	
+	# 检查炮塔是否激活
+	var turret = _get_placed_turret()
+	if turret and turret.is_active:
+		print("炮塔已激活！")
+		_on_turret_activated()
+
+func _get_placed_turret() -> Turret:
+	"""获取最近放置的炮塔"""
+	if not structure_manager:
+		return null
+	
+	# 遍历所有建筑，找到最近放置的炮塔
+	for structure in structure_manager.get_children():
+		if structure is Turret:
+			return structure as Turret
+	
+	return null
+
+func _wait_for_turret_activation(turret: Turret) -> void:
+	"""等待炮塔激活"""
+	print("等待炮塔激活...")
+	current_state = TutorialState.WAITING
+	
+	# 定期检查炮塔激活状态
+	var check_timer = 0.0
+	while not turret.is_active:
+		await get_tree().process_frame
+		check_timer += get_process_delta_time()
+		
+		# 超时保护（最多等待10秒）
+		if check_timer > 10.0:
+			print("等待炮塔激活超时")
+			break
+	
+	if turret.is_active:
+		_on_turret_activated()
+
+func _on_turret_activated() -> void:
+	"""炮塔激活时的回调"""
+	print("炮塔已激活，教学完成！")
 	current_state = TutorialState.COMPLETED
-	# TODO: 实现步骤3
+	
+	# 清除高亮地块
+	_clear_highlight_tiles()
+	
+	# 禁用玩家操作
+	_disable_player_interaction()
+	
+	# 取消HUD选择
+	if hud:
+		hud._clear_selection()
+	
+	# 可以在这里添加完成教学的逻辑
+	# 例如：显示完成消息、解锁完整游戏等
