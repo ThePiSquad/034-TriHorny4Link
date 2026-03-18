@@ -686,5 +686,74 @@ func _on_turret_activated() -> void:
 	if hud:
 		hud._clear_selection()
 	
-	# 可以在这里添加完成教学的逻辑
-	# 例如：显示完成消息、解锁完整游戏等
+	# 在炮塔方向远离Crystal的地方生成敌人
+	_spawn_enemy_for_turret()
+
+func _spawn_enemy_for_turret() -> void:
+	"""在炮塔方向远离Crystal的地方生成敌人"""
+	if not crystal or not structure_manager:
+		print("错误：crystal或structure_manager不存在")
+		return
+	
+	# 获取炮塔
+	var turret = _get_placed_turret()
+	if not turret:
+		print("错误：找不到炮塔")
+		return
+	
+	# 计算从Crystal到炮塔的方向
+	var crystal_pos = crystal.global_position
+	var turret_pos = turret.global_position
+	var direction = (turret_pos - crystal_pos).normalized()
+	
+	# 计算生成位置：从炮塔位置继续沿着方向延伸
+	var spawn_distance = 450.0  # 从炮塔到敌人的距离（在炮塔检测范围内）
+	var spawn_position = turret_pos + direction * spawn_distance
+	
+	# 检查是否超过最大距离（760px）
+	var distance_from_crystal = (spawn_position - crystal_pos).length()
+	if distance_from_crystal > 760.0:
+		# 如果超过最大距离，调整到最大距离
+		spawn_position = crystal_pos + direction * 760.0
+	
+	print("生成敌人，位置：", spawn_position)
+	print("  炮塔位置：", turret_pos)
+	print("  Crystal位置：", crystal_pos)
+	print("  方向：", direction)
+	print("  距离Crystal：", (spawn_position - crystal_pos).length())
+	
+	# 生成矩形敌人
+	var rect_enemy_scene = preload("res://src/enemies/rect_enemy.tscn")
+	var enemy = rect_enemy_scene.instantiate()
+	enemy.global_position = spawn_position
+	
+	# 禁用传送效果，让敌人立即可以被锁定
+	enemy._is_teleporting = false
+	enemy.invincible = false
+	
+	print("敌人生成配置：")
+	print("  位置：", spawn_position)
+	print("  _is_teleporting：", enemy._is_teleporting)
+	print("  invincible：", enemy.invincible)
+	print("  can_be_targeted：", enemy.can_be_targeted())
+	print("  HurtboxArea collision_layer：", enemy.get_node("HurtboxArea").collision_layer)
+	print("  HurtboxArea collision_mask：", enemy.get_node("HurtboxArea").collision_mask)
+	
+	# 添加到场景
+	get_tree().current_scene.add_child(enemy)
+	
+	# 等待一帧，确保_ready()函数已经执行完毕
+	await get_tree().process_frame
+	
+	# 再次禁用传送效果，因为_ready()会重新启动传送
+	enemy._is_teleporting = false
+	enemy.invincible = false
+	if enemy.shape_drawer and enemy.shape_drawer.material:
+		enemy.shape_drawer.material = null
+	print("敌人生成后配置（在_ready()之后）：")
+	print("  _is_teleporting：", enemy._is_teleporting)
+	print("  invincible：", enemy.invincible)
+	print("  can_be_targeted：", enemy.can_be_targeted())
+	print("  shape_drawer.material：", enemy.shape_drawer.material)
+	
+	print("敌人生成成功")

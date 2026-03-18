@@ -131,6 +131,10 @@ func _ready() -> void:
 	# 连接颜色变化信号
 	color_changed.connect(_on_color_changed)
 	
+	# 连接检测区域信号
+	detection_area.area_entered.connect(_on_detection_area_area_entered)
+	detection_area.area_exited.connect(_on_detection_area_area_exited)
+	
 	# 初始颜色同步
 	_sync_visual_to_current_color()
 
@@ -219,6 +223,7 @@ func _check_activation_status() -> void:
 		is_active = true
 	
 	if was_active != is_active:
+		print("炮塔激活状态改变：", was_active, "->", is_active, "color：", color, "energy_level：", energy_level)
 		_update_activation_visual()
 
 func _update_activation_visual() -> void:
@@ -258,6 +263,7 @@ func _update_target() -> void:
 			charging_laser_current_bullet.stop_continuous()
 			charging_laser_current_bullet = null
 		return
+	
 	
 	# 如果当前目标仍然有效且可以锁定，继续锁定
 	if is_instance_valid(target) and target.can_be_targeted():
@@ -698,11 +704,16 @@ func update_energy_level() -> void:
 
 func _on_detection_area_area_entered(area: Area2D) -> void:
 	var enemy = area.get_parent()
+	print("炮塔检测到Area进入：", area, "父节点：", enemy)
 	if enemy and enemy.is_in_group("enemy"):
+		print("  是敌人，检查是否可以被索敌...")
 		# 检查敌人是否可以被索敌
 		if is_instance_valid(enemy) and enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
 			if not enemy in enemies_in_range:
 				enemies_in_range.append(enemy)
+				print("  敌人已添加到检测范围，当前范围内敌人数量：", enemies_in_range.size())
+		else:
+			print("  敌人不能被索敌，can_be_targeted：", enemy.can_be_targeted() if enemy.has_method("can_be_targeted") else "方法不存在")
 
 func _on_detection_area_area_exited(area: Area2D) -> void:
 	var enemy = area.get_parent()
