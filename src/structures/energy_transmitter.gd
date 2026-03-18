@@ -136,11 +136,14 @@ func _update_color_from_neighbors() -> void:
 	# 检查周围是否存在能量源
 	var has_energy_source = _has_energy_source_neighbor()
 	
+	# 总是更新能量等级，这样其他炮塔仍然可以从这里获取能量
+	update_energy_level()
+	
 	if has_energy_source:
-		# 存在能量源，根据能量等级更新颜色
-		update_energy_level()
+		# 存在能量源，颜色已经通过 update_energy_level() 更新
+		pass
 	else:
-		# 不存在能量源，显示为白色
+		# 不存在能量源，显示为白色（失活状态）
 		_set_color(Enums.ColorType.WHITE)
 		_energy_intensity = 0.0
 
