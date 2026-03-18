@@ -161,7 +161,6 @@ func _get_available_player() -> AudioStreamPlayer:
 	new_player.finished.connect(_on_player_finished.bind(new_player))
 	_audio_players.append(new_player)
 	
-	print("创建临时音效播放器，当前总数：", _audio_players.size())
 	return new_player
 
 func play_ui_click() -> void:

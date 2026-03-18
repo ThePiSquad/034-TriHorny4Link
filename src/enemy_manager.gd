@@ -269,11 +269,9 @@ func _on_wave_completed(wave_number: int) -> void:
 	
 	# 检查是否所有波次都已完成
 	var all_completed = wave_system.is_all_waves_completed()
-	print("DEBUG: 波次 ", wave_number, " 完成，所有波次是否完成：", all_completed)
 	
 	# 如果所有波次都已完成，启动定时器检查游戏结束
 	if all_completed:
-		print("DEBUG: 所有波次已完成，启动游戏结束检查定时器")
 		_check_game_over_timer.start()
 	else:
 		# 延迟进入下一波
@@ -291,8 +289,6 @@ func _on_all_waves_completed() -> void:
 
 func _check_game_over() -> void:
 	"""检查游戏是否结束（所有敌人被击败）"""
-	print("DEBUG: 检查游戏结束...")
-	
 	# 检查是否所有敌人都被击败
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	
@@ -302,25 +298,17 @@ func _check_game_over() -> void:
 		if not e.is_queued_for_deletion():
 			alive_enemies.append(e)
 	
-	print("DEBUG: 当前场景中敌人数量（包括已标记删除）：", enemies.size())
-	print("DEBUG: 当前场景中存活敌人数量：", alive_enemies.size())
-	
 	if alive_enemies.size() == 0:
-		print("最后一波所有敌人已被击败！游戏胜利！")
 		_check_game_over_timer.stop()
 		wave_system.all_waves_completed.emit()
 
 func _on_enemy_died(enemy: Node2D, source: Node) -> void:
 	"""敌人死亡时的处理"""
-	print("DEBUG: 敌人死亡被触发，敌人：", enemy, "，伤害来源：", source)
-	
 	if not wave_system:
-		print("DEBUG: wave_system 为空，返回")
 		return
 	
 	# 检查是否所有波次都已完成
 	var all_completed = wave_system.is_all_waves_completed()
-	print("DEBUG: 所有波次是否完成：", all_completed)
 	
 	if all_completed:
 		# 延迟一帧检查，确保敌人已经被删除
@@ -335,14 +323,8 @@ func _on_enemy_died(enemy: Node2D, source: Node) -> void:
 			if not e.is_queued_for_deletion():
 				alive_enemies.append(e)
 		
-		print("DEBUG: 当前场景中敌人数量（包括已标记删除）：", enemies.size())
-		print("DEBUG: 当前场景中存活敌人数量：", alive_enemies.size())
-		
 		if alive_enemies.size() == 0:
-			print("最后一波所有敌人已被击败！游戏胜利！")
 			wave_system.all_waves_completed.emit()
-		else:
-			print("DEBUG: 还有敌人活着，等待所有敌人被击败")
 
 func _generate_spawn_position() -> Vector2:
 	"""生成随机位置，敌人在远处生成，从四面八方涌来"""

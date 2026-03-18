@@ -163,5 +163,3 @@ func _update_navigation_mesh() -> void:
 	
 	# 通知导航区域更新
 	navigation_region.navigation_polygon = nav_poly
-	
-	print("导航网格已更新，障碍物数量：", _conduits_positions.size())
