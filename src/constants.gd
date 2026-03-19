@@ -228,7 +228,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.RED: {
 		"fire_rate": 0.75,
 		"bullet_speed": 550.0,
-		"bullet_damage": 20.0,
+		"bullet_damage": 30.0,
 		"detection_range": 12 * grid_size,
 		"bullet_lifetime": 2.0,
 		"shotgun_enabled": true,
@@ -238,14 +238,14 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.BLUE: {
 		"fire_rate": 2.0,
 		"bullet_speed": 1100.0,
-		"bullet_damage": 20.0,
+		"bullet_damage": 30.0,
 		"detection_range": 14 * grid_size,
 		"bullet_lifetime": 1.2
 	},
 	Enums.ColorType.YELLOW: {
 		"fire_rate": 1.0,
 		"bullet_speed": 800.0,
-		"bullet_damage": 22.5,
+		"bullet_damage": 28,
 		"detection_range": 18 * grid_size,
 		"bullet_lifetime": 0.5,
 		"magic_enabled": true,
@@ -255,7 +255,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.GREEN: {
 		"fire_rate": 1.5,
 		"bullet_speed": 850.0,
-		"bullet_damage": 28.0,
+		"bullet_damage": 29.0,
 		"detection_range": 17 * grid_size,
 		"bullet_lifetime": 1.6,
 		"homing_enabled": true,
@@ -265,21 +265,21 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.ORANGE: {
 		"fire_rate": 0.75,
 		"bullet_speed": 550.0,
-		"bullet_damage": 26.0,
+		"bullet_damage": 28.0,
 		"detection_range": 16 * grid_size,
-		"bullet_lifetime": 0.6,
+		"bullet_lifetime": 1.6,
 		"lightning_enabled": true,
-		"lightning_chain_range": 6 * grid_size,
-		"lightning_max_chain": 4
+		"lightning_chain_range": 16 * grid_size,
+		"lightning_max_chain": 5
 	},
 	Enums.ColorType.PURPLE: {
 		"fire_rate": 0.5,
 		"bullet_speed": 600.0,
-		"bullet_damage": 55.0,
-		"detection_range": 10 * grid_size,
+		"bullet_damage": 60.0,
+		"detection_range": 11 * grid_size,
 		"bullet_lifetime": 2.0,
 		"explosive_enabled": true,
-		"explosion_radius": 5 * grid_size,
+		"explosion_radius": 7 * grid_size,
 		"explosion_particle_duration": 1.0
 	},
 	Enums.ColorType.BLACK: {
@@ -298,9 +298,9 @@ static var TURRET_CONFIG = {
 		"splitting_homing_enabled": true,
 		"splitting_homing_detection_range": 5 * grid_size,
 		"splitting_homing_turn_speed": 7.0,
-		"splitting_count": 5,
+		"splitting_count": 3,
 		"splitting_angle_spread": 45.0,
-		"splitting_bullet_damage": 12.0,
+		"splitting_bullet_damage": 10.0,
 		"splitting_bullet_lifetime": 1.8,
 		"splitting_bullet_homing_detection_range": 6 * grid_size,
 		"splitting_bullet_homing_turn_speed": 10.0,
@@ -345,11 +345,11 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.PURPLE_RED: {
 		"fire_rate": 0.7,
 		"bullet_speed": 600.0,
-		"bullet_damage": 40.0,
+		"bullet_damage": 35.0,
 		"detection_range": 14 * grid_size,
 		"bullet_lifetime": 1.5,
 		"cluster_bomb_enabled": true,
-		"cluster_bomb_explosion_radius": 6 * grid_size,
+		"cluster_bomb_explosion_radius": 5 * grid_size,
 		"cluster_bomb_cluster_count": 4,
 		"cluster_bomb_angle_spread": 15.0,
 		"cluster_bomb_bullet_damage": 15.0,
@@ -359,7 +359,7 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.PURPLE_BLUE: {
 		"fire_rate": 1.0,
 		"bullet_speed": 700.0,
-		"bullet_damage": 35.0,
+		"bullet_damage": 40.0,
 		"detection_range": 14 * grid_size,
 		"bullet_lifetime": 1.2,
 		"continuous_explosive_enabled": true,
