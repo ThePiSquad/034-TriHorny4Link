@@ -2,6 +2,9 @@ extends CanvasLayer
 class_name PerformanceMonitor
 
 ## 性能监控器 - 用于实时显示游戏性能数据
+## 切换方式：
+## - PC：按 F11 键
+## - 安卓：点击屏幕左上角区域 3 次（隐藏区域）
 
 @onready var fps_label: Label = $FPSLabel
 @onready var memory_label: Label = $MemoryLabel
@@ -13,6 +16,12 @@ var update_interval: float = 0.5  # 更新间隔（秒）
 var update_timer: float = 0.0
 
 var show_monitor: bool = true  # 是否显示监控面板
+
+# 安卓触摸切换配置
+var _touch_click_count: int = 0
+var _touch_click_timer: float = 0.0
+var _touch_click_timeout: float = 0.5  # 点击间隔超时时间（秒）
+var _touch_area: Rect2 = Rect2(0, 0, 100, 100)  # 左上角触摸区域
 
 func _ready() -> void:
 	# 默认隐藏，按 F11 显示
@@ -26,6 +35,12 @@ func _process(delta: float) -> void:
 	if update_timer >= update_interval:
 		update_timer = 0.0
 		_update_display()
+	
+	# 更新触摸点击计时器
+	if _touch_click_timer > 0:
+		_touch_click_timer -= delta
+		if _touch_click_timer <= 0:
+			_touch_click_count = 0
 
 func _update_display() -> void:
 	"""更新显示数据"""
@@ -75,7 +90,30 @@ func toggle_monitor() -> void:
 	show_monitor = !show_monitor
 	visible = show_monitor
 
+func _handle_touch_input(touch_pos: Vector2) -> void:
+	"""处理触摸输入（安卓）"""
+	# 检查触摸是否在左上角区域
+	if not _touch_area.has_point(touch_pos):
+		return
+	
+	# 重置点击计时器
+	_touch_click_timer = _touch_click_timeout
+	
+	# 增加点击计数
+	_touch_click_count += 1
+	
+	# 如果点击达到 3 次，切换监控面板
+	if _touch_click_count >= 3:
+		toggle_monitor()
+		_touch_click_count = 0
+		_touch_click_timer = 0.0
+
 func _input(event: InputEvent) -> void:
+	# PC 键盘切换
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F11:
 			toggle_monitor()
+	
+	# 安卓触摸切换
+	if event is InputEventScreenTouch and event.pressed:
+		_handle_touch_input(event.position)
