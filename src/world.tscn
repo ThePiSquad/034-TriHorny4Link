@@ -26,6 +26,7 @@ metadata/_custom_type_script = "uid://dgi2i5s2f2xtb"
 vertices = PackedVector2Array(1995.0234, -1990.0234, 2003.9688, 1986.9609, -1981.0234, 1973.0313, -1989.9688, -1999.9688)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-1991, 1983, 2014, 1997, 2005, -2000, -2000, -2010)])
+agent_radius = 28.0
 
 [node name="World" type="Node2D" unique_id=92352676]
 script = ExtResource("1_tp5op")

@@ -81,6 +81,7 @@ move_speed = 100.0
 attack_damage = 10.0
 enemy_size = Vector2(64, 64)
 size_level = 1
+score_value = 10
 random_initial_rotation = false
 
 [node name="ShapeDrawer" type="Node2D" parent="." index="0" unique_id=590652366]
