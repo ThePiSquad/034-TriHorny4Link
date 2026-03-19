@@ -125,6 +125,10 @@ func _spawn_cluster_bullets() -> void:
 		if not bullet:
 			continue
 		
+		# 设置场景路径用于归还（对象池复用时也需要）
+		if bullet.has_method("set_scene_path"):
+			bullet.set_scene_path("res://src/bullets/bullet.tscn")
+		
 		bullet.global_position = global_position
 		bullet.init(bullet_velocity, int(cluster_bullet_damage), cluster_bullet_lifetime, _bullet_type)
 
