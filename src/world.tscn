@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="14_bg"]
 [ext_resource type="Script" uid="uid://dj73u0t4nipjs" path="res://src/managers/screen_shake_manager.gd" id="15_shake"]
 [ext_resource type="Script" uid="uid://bxfcopxexy1se" path="res://src/managers/game_resource_manager.gd" id="16_8kjpi"]
+[ext_resource type="Script" uid="uid://poolmanager123" path="res://src/utils/object_pool_manager.gd" id="18_pool_mgr"]
+[ext_resource type="PackedScene" uid="uid://perfmonitor456" path="res://src/utils/performance_monitor.tscn" id="19_perf_mon"]
 [ext_resource type="PackedScene" uid="uid://c1x3wbfpm8xbi" path="res://src/ui/ui.tscn" id="17_ui"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
@@ -81,6 +83,11 @@ game_resource_manager = NodePath("../GameResourceManager")
 
 [node name="GameResourceManager" type="Node" parent="." unique_id=1122275727]
 script = ExtResource("16_8kjpi")
+
+[node name="ObjectPoolManager" type="Node" parent="." unique_id=1999000001]
+script = ExtResource("18_pool_mgr")
+
+[node name="PerformanceMonitor" parent="." unique_id=1999000002 instance=ExtResource("19_perf_mon")]
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=357907225]
 navigation_polygon = SubResource("NavigationPolygon_a3wil")

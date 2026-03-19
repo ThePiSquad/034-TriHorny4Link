@@ -1,0 +1,55 @@
+[gd_scene load_steps=2 format=3 uid="uid://performance_monitor"]
+
+[ext_resource type="Script" path="res://src/utils/performance_monitor.gd" id="1_perf"]
+
+[node name="PerformanceMonitor" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_perf")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 220.0
+offset_bottom = 140.0
+color = Color(0, 0, 0, 0.7)
+
+[node name="FPSLabel" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 215.0
+offset_bottom = 35.0
+text = "FPS: 0"
+horizontal_alignment = 0
+
+[node name="MemoryLabel" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 40.0
+offset_right = 215.0
+offset_bottom = 60.0
+text = "内存：0.0 MB"
+horizontal_alignment = 0
+
+[node name="EnemyCountLabel" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 65.0
+offset_right = 215.0
+offset_bottom = 85.0
+text = "敌人：0"
+horizontal_alignment = 0
+
+[node name="TurretCountLabel" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 90.0
+offset_right = 215.0
+offset_bottom = 110.0
+text = "炮塔：0"
+horizontal_alignment = 0
+
+[node name="BulletCountLabel" type="Label" parent="."]
+offset_left = 15.0
+offset_top = 115.0
+offset_right = 215.0
+offset_bottom = 135.0
+text = "子弹：0"
+horizontal_alignment = 0

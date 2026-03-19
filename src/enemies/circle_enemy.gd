@@ -96,6 +96,9 @@ func _update_connections() -> void:
 	var all_enemies = get_tree().get_nodes_in_group("enemy")
 	var new_connections = []
 	
+	# 优化：预先计算距离平方，避免开方运算
+	var connection_radius_squared = connection_radius * connection_radius
+	
 	for enemy in all_enemies:
 		# 检查敌人是否仍然有效（没有被释放）
 		if not is_instance_valid(enemy) or not enemy.is_inside_tree():
@@ -105,9 +108,10 @@ func _update_connections() -> void:
 		if enemy == self or enemy is CircleEnemy:
 			continue
 		
-		# 检查距离
-		var distance = global_position.distance_to(enemy.global_position)
-		if distance <= connection_radius:
+		# 优化：使用距离平方比较，避免开方运算
+		var direction = enemy.global_position - global_position
+		var distance_squared = direction.length_squared()
+		if distance_squared <= connection_radius_squared:
 			# 添加到新连接列表
 			if not enemy in _connected_enemies:
 				# 新连接，启动淡入动画

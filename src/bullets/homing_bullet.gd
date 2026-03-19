@@ -92,6 +92,26 @@ func _find_nearest_target() -> void:
 	
 	_target = nearest_enemy
 
+func reset() -> void:
+	"""重置子弹状态用于对象池复用"""
+	super.reset()
+	_target = null
+	_retarget_timer = 0.0
+	_trail_points.clear()
+	_trail_timer = 0.0
+	_speed = 0.0
+
+func destroy() -> void:
+	# 清理拖尾效果
+	_clear_trail()
+	super.destroy()
+
+func _clear_trail() -> void:
+	"""清理拖尾效果"""
+	_trail_points.clear()
+	_trail_timer = 0.0
+	queue_redraw()
+
 func _apply_homing(delta: float) -> void:
 	if not _target or not is_instance_valid(_target):
 		return

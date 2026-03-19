@@ -122,11 +122,18 @@ var _original_stroke_color: Color = Color.WHITE
 var _enemy_cleanup_timer: float = 0.0
 var _enemy_cleanup_interval: float = 1.0  # 每秒清理一次无效敌人
 
+# 性能优化：目标更新间隔
+var _target_update_timer: float = 0.0
+var _target_update_interval: float = 0.1  # 每 0.1 秒更新一次目标
+
 func _ready() -> void:
 	super._ready()
 	structure_type = Enums.StructureType.TURRET
 	detection_shape.shape.radius = detection_range
 	_update_turret_attributes()
+	
+	# 添加到 turret 组，方便性能监控
+	add_to_group("turret")
 	
 	# 连接颜色变化信号
 	color_changed.connect(_on_color_changed)
@@ -187,7 +194,12 @@ func _process(delta: float) -> void:
 	if not is_active:
 		return
 	
-	_update_target()
+	# 优化：降低目标更新频率
+	_target_update_timer += delta
+	if _target_update_timer >= _target_update_interval:
+		_target_update_timer = 0.0
+		_update_target()
+	
 	_rotate_towards_target(delta)
 	
 	if target and can_fire:
@@ -220,6 +232,10 @@ func _check_activation_status() -> void:
 	
 	if was_active != is_active:
 		_update_activation_visual()
+		# 激活时设置火器冷却，防止立即射击
+		if is_active:
+			can_fire = false
+			fire_timer = 0.2  # 激活后 0.2 秒才能开火，避免关卡加载时误触发
 
 func _update_activation_visual() -> void:
 	"""更新激活/失活状态的视觉效果"""
@@ -369,32 +385,6 @@ func _start_firing_flash() -> void:
 	_firing_flash_tween.tween_property(shape_drawer, "fill_color", target_fill_color, _firing_flash_duration / 2.0)
 	_firing_flash_tween.tween_property(shape_drawer, "fill_color", _original_fill_color, _firing_flash_duration / 2.0)
 
-func _fire_single_bullet(angle: float) -> void:
-	var bullet: Node2D
-	
-	if homing_enabled and homing_bullet_scene:
-		bullet = homing_bullet_scene.instantiate()
-		AudioManager.play_turret_shoot("green")
-	else:
-		bullet = bullet_scene.instantiate()
-		AudioManager.play_turret_shoot("blue")
-	
-	if not bullet:
-		return
-	
-	var direction = Vector2(cos(angle), sin(angle))
-	var bullet_velocity = direction * bullet_speed
-	
-	bullet.global_position = global_position + direction * 32
-	
-	if bullet is HomingBullet:
-		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
-		bullet.set_homing_config(true, homing_detection_range, homing_turn_speed)
-	elif bullet is Bullet:
-		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
-	
-	get_parent().add_child(bullet)
-
 func _fire_shotgun(base_angle: float) -> void:
 	AudioManager.play_turret_shoot("red")
 	var angle_spread_rad = deg_to_rad(shotgun_angle_spread)
@@ -490,12 +480,62 @@ func _fire_lightning_bullet() -> void:
 	bullet.global_position = Vector2.ZERO
 	get_parent().add_child(bullet)
 
+func _fire_single_bullet(angle: float) -> void:
+	var bullet: Node2D
+	var scene_path: String = ""
+	
+	if homing_enabled and homing_bullet_scene:
+		bullet = _instantiate_bullet(homing_bullet_scene, "res://src/bullets/homing_bullet.tscn")
+		scene_path = "res://src/bullets/homing_bullet.tscn"
+		AudioManager.play_turret_shoot("green")
+	else:
+		bullet = _instantiate_bullet(bullet_scene, "res://src/bullets/bullet.tscn")
+		scene_path = "res://src/bullets/bullet.tscn"
+		AudioManager.play_turret_shoot("blue")
+	
+	if not bullet:
+		return
+	
+	var direction = Vector2(cos(angle), sin(angle))
+	var bullet_velocity = direction * bullet_speed
+	
+	bullet.global_position = global_position + direction * 32
+	
+	if bullet is HomingBullet:
+		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+		bullet.set_homing_config(true, homing_detection_range, homing_turn_speed)
+	elif bullet is Bullet:
+		bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+		# 确保子弹颜色正确设置
+		if bullet.has_method("set_bullet_type"):
+			bullet.set_bullet_type(color)
+
+func _instantiate_bullet(scene: PackedScene, scene_path: String) -> Node:
+	"""使用对象池实例化子弹"""
+	var bullet: Node = null
+	
+	# 尝试使用对象池
+	if ObjectPoolManager.instance:
+		bullet = ObjectPoolManager.instance.get_object(scene_path)
+	
+	# 如果对象池失败，使用传统方式
+	if not bullet:
+		bullet = scene.instantiate()
+		if bullet:
+			get_parent().add_child(bullet)
+	
+	# 设置场景路径用于归还
+	if bullet and bullet.has_method("set_scene_path"):
+		bullet.set_scene_path(scene_path)
+	
+	return bullet
+
 func _fire_explosive_bullet(angle: float) -> void:
 	AudioManager.play_turret_shoot("purple")
 	if not explosive_bullet_scene:
 		return
 	
-	var bullet = explosive_bullet_scene.instantiate()
+	var bullet = _instantiate_bullet(explosive_bullet_scene, "res://src/bullets/explosive_bullet.tscn")
 	if not bullet or not bullet is ExplosiveBullet:
 		return
 	
@@ -504,7 +544,6 @@ func _fire_explosive_bullet(angle: float) -> void:
 	
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
-	get_parent().add_child(bullet)
 
 func _fire_splitting_homing_bullet() -> void:
 	AudioManager.play_turret_shoot("green")
