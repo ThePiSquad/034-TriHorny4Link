@@ -11,7 +11,7 @@ var _pool_size: int = 0
 var _active_count: int = 0  # 直接计数，不使用数组
 
 # 调试日志配置
-var _enable_debug_log: bool = true  # 默认关闭调试日志
+var _enable_debug_log: bool = false  # 默认关闭调试日志
 
 func _init(scene: PackedScene, parent: Node, initial_size: int = 20) -> void:
 	_scene = scene
