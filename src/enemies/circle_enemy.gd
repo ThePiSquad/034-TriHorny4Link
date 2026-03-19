@@ -14,8 +14,16 @@ var boss_score_value: int = 1000          # Boss 击败分数
 var _connection_lines: Line2D = null
 var _connected_enemies: Array = []  # 已连接的敌人列表
 var _connection_check_timer: float = 0.0
-var _connection_check_interval: float = 0.5  # 连接检测间隔（秒）
+var _connection_check_interval: float = 1.0  # 连接检测间隔（秒）- 从0.5秒优化为1.0秒
 var _connection_animations: Dictionary = {}  # 连接动画状态 {enemy: {alpha: float, target_alpha: float, timer: float}}
+
+# 性能优化：位置缓存
+var _last_checked_position: Vector2 = Vector2.INF
+var _position_change_threshold: float = 10.0  # 位置变化阈值
+
+# 性能优化：连线渲染缓存
+var _last_line_update_time: float = 0.0
+var _line_update_interval: float = 0.1  # 连线更新间隔（秒）
 
 func _ready() -> void:
 	super._ready()
@@ -25,6 +33,9 @@ func _ready() -> void:
 	
 	# 初始化连接系统
 	_initialize_connection_system()
+	
+	# 连接死亡信号
+	died.connect(_on_circle_enemy_died)
 
 func _initialize_connection_system() -> void:
 	"""初始化连接检测系统"""
@@ -76,7 +87,12 @@ func _process(delta: float) -> void:
 	_update_connection_lines()
 
 func _update_connections() -> void:
-	"""更新连接状态"""
+	"""更新连接状态（优化版）"""
+	# 只在位置变化时更新
+	if global_position.distance_to(_last_checked_position) < _position_change_threshold:
+		return
+	_last_checked_position = global_position
+	
 	var all_enemies = get_tree().get_nodes_in_group("enemy")
 	var new_connections = []
 	
@@ -138,9 +154,15 @@ func _update_connection_animations(delta: float) -> void:
 		_connection_animations.erase(enemy)
 
 func _update_connection_lines() -> void:
-	"""更新连接线位置"""
+	"""更新连接线位置（优化版）"""
 	if not _connection_lines:
 		return
+	
+	# 降低更新频率
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - _last_line_update_time < _line_update_interval:
+		return
+	_last_line_update_time = current_time
 	
 	_connection_lines.clear_points()
 	
@@ -171,4 +193,16 @@ func take_damage(amount: float, source: Node = null) -> void:
 	
 	# 调用父类的伤害接收函数
 	super.take_damage(reduced_damage, source)
+
+func _on_circle_enemy_died(source: Node) -> void:
+	"""圆形敌人死亡时清理连接状态"""
+	_cleanup_connections()
+
+func _cleanup_connections() -> void:
+	"""清理所有连接状态"""
+	_connected_enemies.clear()
+	_connection_animations.clear()
+	
+	if _connection_lines:
+		_connection_lines.clear_points()
 	
