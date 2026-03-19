@@ -50,6 +50,10 @@ signal pause_menu_closed
 
 func _ready() -> void:
 	_update_mode()
+	
+	# 添加到input_manager组，方便其他节点查找
+	add_to_group("input_manager")
+	
 	if hud:
 		hud.icon_selected.connect(_on_icon_selected)
 		hud.selection_cleared.connect(_on_selection_cleared)

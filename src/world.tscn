@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://tbmaen6cqwmv" path="res://src/managers/background_manager.tscn" id="14_bg"]
 [ext_resource type="Script" uid="uid://dj73u0t4nipjs" path="res://src/managers/screen_shake_manager.gd" id="15_shake"]
 [ext_resource type="Script" uid="uid://bxfcopxexy1se" path="res://src/managers/game_resource_manager.gd" id="16_8kjpi"]
+[ext_resource type="PackedScene" uid="uid://c1x3wbfpm8xbi" path="res://src/ui/ui.tscn" id="17_ui"]
 
 [sub_resource type="Resource" id="Resource_0qwtu"]
 script = ExtResource("2_xlegt")
@@ -47,6 +48,10 @@ position = Vector2(576, 324)
 zoom = Vector2(0.5, 0.5)
 
 [node name="HUD" parent="." unique_id=387383325 instance=ExtResource("4_hud")]
+
+[node name="UI" parent="." unique_id=469429054 node_paths=PackedStringArray("input_manager") instance=ExtResource("17_ui")]
+process_mode = 3
+input_manager = NodePath("../InputManager")
 
 [node name="WorldPainter" type="Node2D" parent="." unique_id=997360994]
 script = ExtResource("6_usxdn")

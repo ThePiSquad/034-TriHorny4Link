@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c1x3wbfpm8xbi"]
+
+[ext_resource type="Script" uid="uid://b7dj8ntnx1u31" path="res://src/ui/ui.gd" id="1_jlntk"]
+[ext_resource type="Texture2D" uid="uid://tiqj6qqc141q" path="res://assets/ui/pause.png" id="1_sp1ie"]
+
+[node name="UI" type="CanvasLayer" unique_id=469429054]
+script = ExtResource("1_jlntk")
+
+[node name="PauseButton" type="Button" parent="." unique_id=1058349801]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -58.0
+offset_top = 11.0
+offset_right = -18.0
+offset_bottom = 51.0
+grow_horizontal = 0
+icon = ExtResource("1_sp1ie")
+
+[connection signal="pressed" from="PauseButton" to="." method="_on_pause_button_pressed"]
