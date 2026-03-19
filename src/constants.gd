@@ -25,7 +25,7 @@ class ResourceConstants:
 	const PRODUCTION_RATE: float = 1.5  # 每秒生产资源量
 	const MAX_STORAGE: int = 50  # 最大存储上限
 	const MONO_CRYSTAL_COST: int = 5  # 单色水晶消耗
-	const CONDUIT_COST: int = 2  # 导管消耗（每种颜色）
+	const CONDUIT_COST: int = 1  # 导管消耗（每种颜色）
 	const TURRET_COST: int = 2  # 炮塔消耗（每种颜色）
 
 # 相机相关常量
