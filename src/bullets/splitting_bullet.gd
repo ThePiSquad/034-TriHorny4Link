@@ -5,8 +5,16 @@ var attack_delay: float = 0.15
 var _attack_delay_timer: float = 0.0
 var _can_attack: bool = false
 
+func _ready() -> void:
+	super._ready()
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
+	_attack_delay_timer = attack_delay
+	_can_attack = false
+
+func reset() -> void:
+	super.reset()
 	_attack_delay_timer = attack_delay
 	_can_attack = false
 

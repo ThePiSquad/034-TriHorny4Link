@@ -14,6 +14,7 @@ radius = 384.0
 
 [node name="Turret" unique_id=102321888 instance=ExtResource("1_drymu")]
 script = ExtResource("1_hitdn")
+play_sound = true
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=701557668]
 shape_type = 1

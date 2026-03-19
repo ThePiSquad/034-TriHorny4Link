@@ -103,7 +103,7 @@ var continuous_explosive_fire_rate_timer: float = 0.0
 var continuous_explosive_fire_rate_reset_time: float = 3.0
 
 var target: Node2D = null
-var enemies_in_range: Array[Node2D] = []
+var enemies_in_range: Dictionary = {}  # 优化：使用 Dictionary {enemy: distance_squared}
 var can_fire: bool = true
 
 # 失活状态
@@ -124,7 +124,12 @@ var _enemy_cleanup_interval: float = 1.0  # 每秒清理一次无效敌人
 
 # 性能优化：目标更新间隔
 var _target_update_timer: float = 0.0
-var _target_update_interval: float = 0.1  # 每 0.1 秒更新一次目标
+var _target_update_interval: float = 0.15  # 优化：从 0.1 秒改为 0.15 秒
+
+# 性能优化：炮塔分组更新（分散计算负载）
+var _turret_group_id: int = 0
+var _turret_group_count: int = 3  # 将炮塔分为 3 组，每帧更新一组
+var _global_turret_counter: int = 0  # 全局计数器（由 GameManager 管理）
 
 func _ready() -> void:
 	super._ready()
@@ -140,6 +145,9 @@ func _ready() -> void:
 	
 	# 初始颜色同步
 	_sync_visual_to_current_color()
+	
+	# 分配炮塔组 ID（用于分组更新）
+	_turret_group_id = randi() % _turret_group_count
 
 func _on_color_changed(new_color: Enums.ColorType) -> void:
 	"""当颜色改变时同步视觉效果"""
@@ -194,6 +202,11 @@ func _process(delta: float) -> void:
 	if not is_active:
 		return
 	
+	# 优化：分组更新炮塔逻辑（分散计算负载）
+	# 注意：此功能需要 GameManager 支持，暂时注释
+	# if _global_turret_counter % _turret_group_count != _turret_group_id:
+	# 	return
+	
 	# 优化：降低目标更新频率
 	_target_update_timer += delta
 	if _target_update_timer >= _target_update_interval:
@@ -207,17 +220,18 @@ func _process(delta: float) -> void:
 
 func _cleanup_invalid_enemies() -> void:
 	"""清理无效的敌人引用"""
-	var cleaned_enemies = []
+	var keys_to_remove = []
 	for enemy in enemies_in_range:
-		if is_instance_valid(enemy) and enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
-			cleaned_enemies.append(enemy)
+		if not is_instance_valid(enemy) or not enemy.can_be_targeted():
+			keys_to_remove.append(enemy)
 	
-	# 只在有变化时更新数组
-	if cleaned_enemies.size() != enemies_in_range.size():
-		enemies_in_range = cleaned_enemies
-		# 如果目标失效，清除目标
-		if not is_instance_valid(target) or (target and not target.can_be_targeted()):
-			target = null
+	# 只在有变化时更新
+	for enemy in keys_to_remove:
+		enemies_in_range.erase(enemy)
+	
+	# 如果目标失效，清除目标
+	if not is_instance_valid(target) or (target and not target.can_be_targeted()):
+		target = null
 
 func _check_activation_status() -> void:
 	"""检查炮台是否处于激活状态"""
@@ -275,7 +289,6 @@ func _update_target() -> void:
 			charging_laser_current_bullet = null
 		return
 	
-	
 	# 如果当前目标仍然有效且可以锁定，继续锁定
 	if is_instance_valid(target) and target.can_be_targeted():
 		return
@@ -287,14 +300,17 @@ func _update_target() -> void:
 		charging_laser_current_bullet.stop_continuous()
 		charging_laser_current_bullet = null
 	
-	# 选择最近的敌人
-	enemies_in_range.sort_custom(_compare_distance)
-	target = enemies_in_range[0]
-
-func _compare_distance(a: Node2D, b: Node2D) -> bool:
-	var dist_a = global_position.distance_to(a.global_position)
-	var dist_b = global_position.distance_to(b.global_position)
-	return dist_a < dist_b
+	# 优化：使用线性查找替代排序，找最近的敌人
+	var min_dist = INF
+	var nearest = null
+	for enemy in enemies_in_range:
+		if is_instance_valid(enemy) and enemy.can_be_targeted():
+			var dist = enemies_in_range[enemy]
+			if dist < min_dist:
+				min_dist = dist
+				nearest = enemy
+	
+	target = nearest
 
 func _rotate_towards_target(delta: float) -> void:
 	if not target:
@@ -399,8 +415,8 @@ func _fire_magic_bullet() -> void:
 	if not target or not magic_bullet_scene:
 		return
 	
-	var bullet = magic_bullet_scene.instantiate()
-	if not bullet or not bullet is MagicBullet:
+	var bullet: MagicBullet = _instantiate_bullet(magic_bullet_scene, "res://src/bullets/magic_bullet.tscn")
+	if not bullet:
 		return
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
@@ -409,18 +425,18 @@ func _fire_magic_bullet() -> void:
 	var target_pos = target.global_position
 	
 	bullet.set_target(target, start_pos, target_pos)
+	bullet.set_magic_config(magic_beam_width, magic_beam_duration)
 	bullet.init(Vector2.ZERO, int(bullet_damage), magic_beam_duration, color)
 	
 	bullet.global_position = Vector2.ZERO
-	get_parent().add_child(bullet)
 
 func _fire_cluster_bomb_bullet() -> void:
 	AudioManager.play_turret_shoot("purple")
 	if not target or not cluster_bomb_bullet_scene:
 		return
 	
-	var bullet = cluster_bomb_bullet_scene.instantiate()
-	if not bullet or not bullet is ClusterBombBullet:
+	var bullet: ClusterBombBullet = _instantiate_bullet(cluster_bomb_bullet_scene, "res://src/bullets/cluster_bomb_bullet.tscn")
+	if not bullet:
 		return
 	
 	var direction = (target.global_position - global_position).normalized()
@@ -428,17 +444,16 @@ func _fire_cluster_bomb_bullet() -> void:
 	
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_explosion_config(cluster_bomb_explosion_radius, 1.0)
 	bullet.set_cluster_config(cluster_bomb_cluster_count, cluster_bomb_angle_spread, cluster_bomb_bullet_damage, cluster_bomb_bullet_lifetime, cluster_bomb_bullet_speed)
-	
-	get_parent().add_child(bullet)
 
 func _fire_continuous_explosive_bullet() -> void:
 	AudioManager.play_turret_shoot("purple")
 	if not target or not continuous_explosive_bullet_scene:
 		return
 	
-	var bullet = continuous_explosive_bullet_scene.instantiate()
-	if not bullet or not bullet is ContinuousExplosiveBullet:
+	var bullet: ContinuousExplosiveBullet = _instantiate_bullet(continuous_explosive_bullet_scene, "res://src/bullets/continuous_explosive_bullet.tscn")
+	if not bullet:
 		return
 	
 	var direction = (target.global_position - global_position).normalized()
@@ -446,8 +461,7 @@ func _fire_continuous_explosive_bullet() -> void:
 	
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
-	
-	get_parent().add_child(bullet)
+	bullet.set_continuous_explosive_config(continuous_explosive_explosion_radius, 1.0, continuous_explosive_slow_duration, continuous_explosive_slow_multiplier)
 
 func _boost_fire_rate() -> void:
 	fire_rate += continuous_explosive_fire_rate_boost
@@ -465,8 +479,8 @@ func _fire_lightning_bullet() -> void:
 	if not target or not lightning_bullet_scene:
 		return
 	
-	var bullet = lightning_bullet_scene.instantiate()
-	if not bullet or not bullet is LightningBullet:
+	var bullet: LightningBullet = _instantiate_bullet(lightning_bullet_scene, "res://src/bullets/lightning_bullet.tscn")
+	if not bullet:
 		return
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
@@ -475,10 +489,10 @@ func _fire_lightning_bullet() -> void:
 	var target_pos = target.global_position
 	
 	bullet.set_target(target, start_pos, target_pos)
+	bullet.set_lightning_config(lightning_chain_range, lightning_max_chain)
 	bullet.init(Vector2.ZERO, int(bullet_damage), 0.5, color)
 	
 	bullet.global_position = Vector2.ZERO
-	get_parent().add_child(bullet)
 
 func _fire_single_bullet(angle: float) -> void:
 	var bullet: Node2D
@@ -544,14 +558,15 @@ func _fire_explosive_bullet(angle: float) -> void:
 	
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
+	bullet.set_explosive_config(explosion_radius, explosion_particle_duration)
 
 func _fire_splitting_homing_bullet() -> void:
 	AudioManager.play_turret_shoot("green")
 	if not target or not splitting_homing_bullet_scene:
 		return
 	
-	var bullet = splitting_homing_bullet_scene.instantiate()
-	if not bullet or not bullet is SplittingHomingBullet:
+	var bullet: SplittingHomingBullet = _instantiate_bullet(splitting_homing_bullet_scene, "res://src/bullets/splitting_homing_bullet.tscn")
+	if not bullet:
 		return
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
@@ -567,16 +582,14 @@ func _fire_splitting_homing_bullet() -> void:
 	var splitting_bullet_homing_turn_speed = Constants.TURRET_CONFIG.get(color, {}).get("splitting_bullet_homing_turn_speed", 10.0)
 	var splitting_bullet_attack_delay = Constants.TURRET_CONFIG.get(color, {}).get("splitting_bullet_attack_delay", 0.15)
 	bullet.set_splitting_bullet_homing_config(splitting_bullet_homing_detection_range, splitting_bullet_homing_turn_speed, splitting_bullet_attack_delay)
-	
-	get_parent().add_child(bullet)
 
 func _fire_penetrating_bullet(angle: float) -> void:
 	AudioManager.play_turret_shoot("green")
 	if not penetrating_bullet_scene:
 		return
 	
-	var bullet = penetrating_bullet_scene.instantiate()
-	if not bullet or not bullet is PenetratingBullet:
+	var bullet: PenetratingBullet = _instantiate_bullet(penetrating_bullet_scene, "res://src/bullets/penetrating_bullet.tscn")
+	if not bullet:
 		return
 	
 	var direction = Vector2(cos(angle), sin(angle))
@@ -589,8 +602,6 @@ func _fire_penetrating_bullet(angle: float) -> void:
 		bullet.set_homing_config(true, penetrating_homing_detection_range, penetrating_homing_turn_speed)
 	
 	bullet.set_penetrating_config(penetrating_max_targets, penetrating_damage_decay)
-	
-	get_parent().add_child(bullet)
 
 func _fire_bouncing_lightning_bullet() -> void:
 	if not target or not bouncing_lightning_bullet_scene:
@@ -601,8 +612,8 @@ func _fire_bouncing_lightning_bullet() -> void:
 	
 	AudioManager.play_turret_shoot("orange")
 	
-	var bullet = bouncing_lightning_bullet_scene.instantiate()
-	if not bullet or not bullet is BouncingLightningBullet:
+	var bullet: BouncingLightningBullet = _instantiate_bullet(bouncing_lightning_bullet_scene, "res://src/bullets/bouncing_lightning_bullet.tscn")
+	if not bullet:
 		return
 	
 	var direction = (target.global_position - global_position).normalized()
@@ -611,8 +622,6 @@ func _fire_bouncing_lightning_bullet() -> void:
 	bullet.global_position = global_position + direction * 32
 	bullet.init(bullet_velocity, int(bullet_damage), bullet_lifetime, color)
 	bullet.set_bouncing_config(bouncing_lightning_chain_range, bouncing_lightning_max_bounces, bouncing_lightning_damage_decay)
-	
-	get_parent().add_child(bullet)
 	
 	bouncing_lightning_current_burst += 1
 	bouncing_lightning_burst_timer = bouncing_lightning_burst_delay
@@ -634,8 +643,8 @@ func _fire_charging_laser_bullet() -> void:
 	
 	AudioManager.play_turret_shoot("orange")
 	
-	var bullet = charging_laser_bullet_scene.instantiate()
-	if not bullet or not bullet is ChargingLaserBullet:
+	var bullet: ChargingLaserBullet = _instantiate_bullet(charging_laser_bullet_scene, "res://src/bullets/charging_laser_bullet.tscn")
+	if not bullet:
 		return
 	
 	var angle = _get_angle_to_target(target.global_position) - PI / 2
@@ -653,7 +662,6 @@ func _fire_charging_laser_bullet() -> void:
 	bullet.set_charging_config(charging_laser_damage_increment, charging_laser_max_damage_multiplier)
 	bullet.set_beam_width(charging_laser_beam_width)
 	bullet.global_position = Vector2.ZERO
-	get_parent().add_child(bullet)
 
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
@@ -739,17 +747,15 @@ func update_energy_level() -> void:
 func _on_detection_area_area_entered(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy and enemy.is_in_group("enemy"):
-		# 检查敌人是否可以被索敌
-		if is_instance_valid(enemy) and enemy.has_method("can_be_targeted") and enemy.can_be_targeted():
-			if not enemy in enemies_in_range:
-				enemies_in_range.append(enemy)
+		if enemy.can_be_targeted():
+			if not enemies_in_range.has(enemy):
+				var dist_sq = global_position.distance_squared_to(enemy.global_position)
+				enemies_in_range[enemy] = dist_sq
 
 func _on_detection_area_area_exited(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy and enemy.is_in_group("enemy"):
-		if enemy in enemies_in_range:
-			enemies_in_range.erase(enemy)
-		# 如果当前目标是离开的敌人，立即清除
+		enemies_in_range.erase(enemy)
 		if target == enemy:
 			target = null
 			charging_laser_last_target = null

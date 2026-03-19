@@ -14,12 +14,24 @@ var _fade_out_timer: float = 0.0
 var _fade_out_duration: float = 0.2
 var _is_fading_out: bool = false
 
+func _ready() -> void:
+	super._ready()
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
 	_current_damage = float(damage)
 	_lifetime = 10.0
 	_is_continuous = true
 	_damage_timer = damage_interval
+
+func reset() -> void:
+	super.reset()
+	_current_damage = 0.0
+	_damage_timer = 0.0
+	_is_continuous = true
+	_energy_pulse_timer = 0.0
+	_fade_out_timer = 0.0
+	_is_fading_out = false
 
 func set_target(target: Node2D, start_pos: Vector2, target_pos: Vector2, current_damage_: float = 0.0) -> void:
 	_target = target

@@ -14,12 +14,12 @@ var boss_score_value: int = 1000          # Boss 击败分数
 var _connection_lines: Line2D = null
 var _connected_enemies: Array = []  # 已连接的敌人列表
 var _connection_check_timer: float = 0.0
-var _connection_check_interval: float = 1.0  # 连接检测间隔（秒）- 从0.5秒优化为1.0秒
+var _connection_check_interval: float = 0.5  # 连接检测间隔（秒）- 从0.5秒优化为1.0秒
 var _connection_animations: Dictionary = {}  # 连接动画状态 {enemy: {alpha: float, target_alpha: float, timer: float}}
 
 # 性能优化：位置缓存
 var _last_checked_position: Vector2 = Vector2.INF
-var _position_change_threshold: float = 10.0  # 位置变化阈值
+var _position_change_threshold: float = 8.0  # 位置变化阈值
 
 # 性能优化：连线渲染缓存
 var _last_line_update_time: float = 0.0

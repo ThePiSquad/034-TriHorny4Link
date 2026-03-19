@@ -10,7 +10,7 @@ var beam_fade_out: float = 0.15
 # 连锁闪电配置
 var chain_range: float = 384.0
 var max_chain_targets: int = 3
-var damage_multipliers: Array[float] = [1.0, 0.75, 0.5, 0.25, 0.1]
+var damage_multipliers: Array[float] = [1.0, 0.9, 0.8, 0.7, 0.6]
 
 var _target: Node2D
 var _beam_timer: float = 0.0
@@ -28,6 +28,14 @@ func set_target(target: Node2D, start_pos: Vector2, target_pos: Vector2) -> void
 	_start_position = start_pos
 	_target_position = target_pos
 	_lifetime = beam_duration
+	_bullet_type = Enums.ColorType.ORANGE
+	# 闪电子弹瞬间命中并触发连锁
+	if _target and is_instance_valid(_target):
+		_trigger_chain_lightning(_target)
+
+func set_lightning_config(chain_range_: float, max_chain_targets_: int) -> void:
+	chain_range = chain_range_
+	max_chain_targets = max_chain_targets_
 
 func _process(delta: float) -> void:
 	if not _is_active:
@@ -93,6 +101,14 @@ func _ready() -> void:
 	# 闪电子弹瞬间命中并触发连锁
 	if _target and is_instance_valid(_target):
 		_trigger_chain_lightning(_target)
+
+func reset() -> void:
+	super.reset()
+	_beam_timer = 0.0
+	_chain_targets.clear()
+	_chain_damages.clear()
+	_chain_positions.clear()
+	_bullet_type = Enums.ColorType.ORANGE
 
 func _trigger_chain_lightning(first_target: Node2D) -> void:
 	if not first_target or not is_instance_valid(first_target):

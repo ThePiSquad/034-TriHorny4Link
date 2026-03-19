@@ -24,7 +24,14 @@ var _default_pool_sizes: Dictionary = {
 	"res://src/bullets/splitting_bullet.tscn": 50,
 	"res://src/particles/hit_ptc.tscn": 100,
 	"res://src/particles/broken_ptc.tscn": 50,
+	"res://src/bullets/explosive_purple_particle.tscn": 50,
+	"res://src/bullets/explosive_purple_red_particle.tscn": 50,
+	"res://src/bullets/explosive_purple_blue_particle.tscn": 50,
 }
+
+# 定期清理配置
+var _cleanup_timer: float = 0.0
+var _cleanup_interval: float = 2.0  # 每 2 秒清理一次无效对象
 
 func _ready() -> void:
 	if instance == null:
@@ -35,6 +42,18 @@ func _ready() -> void:
 	
 	# 初始化所有对象池
 	_initialize_all_pools()
+
+func _process(delta: float) -> void:
+	"""定期清理无效对象"""
+	_cleanup_timer += delta
+	if _cleanup_timer >= _cleanup_interval:
+		_cleanup_timer = 0.0
+		_cleanup_all_pools()
+
+func _cleanup_all_pools() -> void:
+	"""清理所有池中的无效对象"""
+	for pool in _pools.values():
+		pool.cleanup_invalid_objects()
 
 func _initialize_all_pools() -> void:
 	"""初始化所有对象池"""
@@ -72,14 +91,12 @@ func return_object(scene_path: String, obj: Node) -> void:
 	pool.return_object(obj)
 
 func get_pool_stats() -> Dictionary:
-	"""获取所有池的统计信息"""
+	"""获取所有池的统计信息（优化版）"""
 	var stats = {}
 	for scene_path in _pools:
 		var pool: ObjectPool = _pools[scene_path]
-		stats[scene_path] = {
-			"active": pool.get_active_count(),
-			"pooled": pool.get_pool_count()
-		}
+		# 使用公共方法获取统计信息
+		stats[scene_path] = pool.get_stats()
 	return stats
 
 func clear_all_pools() -> void:
@@ -87,3 +104,8 @@ func clear_all_pools() -> void:
 	for pool in _pools.values():
 		pool.clear_pool()
 	_pools.clear()
+
+func enable_all_debug_logs(enable: bool) -> void:
+	"""启用或禁用所有对象池的调试日志"""
+	for pool in _pools.values():
+		pool.enable_debug_log(enable)

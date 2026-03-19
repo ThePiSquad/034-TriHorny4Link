@@ -20,6 +20,15 @@ func set_target(target: Node2D, start_pos: Vector2, target_pos: Vector2) -> void
 	_start_position = start_pos
 	_target_position = target_pos
 	_lifetime = beam_duration
+	_bullet_type = Enums.ColorType.YELLOW
+	# 魔法子弹瞬间命中
+	if _target and is_instance_valid(_target):
+		if _target.has_method("take_damage"):
+			_target.take_damage(_attack_damage, self)
+
+func set_magic_config(beam_width_: float, beam_duration_: float) -> void:
+	beam_width = beam_width_
+	beam_duration = beam_duration_
 
 func _process(delta: float) -> void:
 	if not _is_active:
@@ -65,3 +74,11 @@ func _ready() -> void:
 	if _target and is_instance_valid(_target):
 		if _target.has_method("take_damage"):
 			_target.take_damage(_attack_damage, self)
+
+func reset() -> void:
+	super.reset()
+	_beam_timer = 0.0
+	_target = null
+	_start_position = Vector2.ZERO
+	_target_position = Vector2.ZERO
+	_bullet_type = Enums.ColorType.YELLOW

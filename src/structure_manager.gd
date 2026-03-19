@@ -17,33 +17,33 @@ func _ready() -> void:
 func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorType = Enums.ColorType.WHITE) -> bool:
 	var pos_key = Vector2i(pos.x, pos.y)
 	
-	print("尝试放置建筑，类型：", type, "位置：", pos, "颜色：", color_type)
+	# print("尝试放置建筑，类型：", type, "位置：", pos, "颜色：", color_type)
 	
 	# 检查是否在保留坐标中
 	for reserved in Constants.generator_reserved_coords:
 		if reserved.x == pos.x and reserved.y == pos.y:
-			print("  失败：在保留坐标中")
+			# print("  失败：在保留坐标中")
 			return false
 	
 	if structures.get(pos_key) != null:
-		print("  失败：位置已被占用")
+		# print("  失败：位置已被占用")
 		return false
 	
 	# 检查是否有敌人在目标位置附近
 	if _has_enemy_nearby(pos):
-		print("  失败：有敌人在附近")
+		# print("  失败：有敌人在附近")
 		return false
 	
 	# 检查炮塔放置限制（必须靠近conduit）
 	if type == Enums.StructureType.TURRET:
 		if not _has_nearby_conduit(pos):
-			print("  失败：炮塔必须靠近导管")
+			# print("  失败：炮塔必须靠近导管")
 			return false
 	
 	# 检查导管放置限制
 	if type == Enums.StructureType.CONDUIT:
 		if not can_place_conduit(pos):
-			print("  失败：导管放置限制")
+			# print("  失败：导管放置限制")
 			return false
 	
 	var north = structures.get(Vector2i(pos.north().x, pos.north().y))
@@ -302,22 +302,22 @@ func can_place_conduit(pos: GridCoord) -> bool:
 	"""检查是否可以在指定位置放置导管"""
 	# 检查是否有敌人在目标位置附近
 	if _has_enemy_nearby(pos):
-		print("检查导管放置：有敌人在附近")
+		# print("检查导管放置：有敌人在附近")
 		return false
 	
 	# 检查位置是否已被占用
 	var pos_key = Vector2i(pos.x, pos.y)
 	if structures.get(pos_key) != null:
-		print("检查导管放置：位置已被占用")
+		# print("检查导管放置：位置已被占用")
 		return false
 	
 	# 检查是否在保留坐标中
 	for reserved in Constants.generator_reserved_coords:
 		if reserved.x == pos.x and reserved.y == pos.y:
-			print("检查导管放置：在保留坐标中")
+			# print("检查导管放置：在保留坐标中")
 			return false
 	
-	print("检查导管放置：可以放置")
+	# print("检查导管放置：可以放置")
 	return true
 
 func _update_neighbor_connections_color(pos: GridCoord, structure: Structure) -> void:

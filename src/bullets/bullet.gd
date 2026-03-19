@@ -14,7 +14,7 @@ var _bullet_type: Enums.ColorType
 var _is_active: bool = false  # 初始为非激活状态
 var _velocity: Vector2
 var _scene_path: String = ""  # 用于归还到对象池
-var _is_returned_to_pool: bool = false  # 标记是否已归还到对象池
+var _is_being_destroyed: bool = false  # 防止重复销毁
 
 func get_attack_damage() -> int:
 	return _attack_damage
@@ -37,6 +37,22 @@ func set_bullet_type(value: Enums.ColorType) -> void:
 func set_is_active(value: bool) -> void:
 	_is_active = value
 
+func activate() -> void:
+	"""激活子弹"""
+	_is_active = true
+	set_process(true)
+	set_physics_process(true)
+	set_process_input(true)
+	visible = true
+
+func deactivate() -> void:
+	"""停用子弹"""
+	_is_active = false
+	set_process(false)
+	set_physics_process(false)
+	set_process_input(false)
+	visible = false
+
 func get_bullet_type() -> Enums.ColorType:
 	return _bullet_type
 
@@ -44,6 +60,7 @@ func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums
 	_velocity = velocity_
 	_attack_damage = damage
 	_lifetime = lifetime_
+	max_lifetime = lifetime_
 	_bullet_type = bullet_type_
 	_is_active = true
 	
@@ -81,23 +98,25 @@ func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 
 func destroy() -> void:
 	# 防止重复销毁
-	if _is_returned_to_pool:
+	if _is_being_destroyed:
 		return
 	
+	_is_being_destroyed = true
 	_is_active = false
-	_is_returned_to_pool = true
 	
 	# 使用对象池归还
 	if _scene_path != "" and ObjectPoolManager.instance:
 		ObjectPoolManager.instance.return_object(_scene_path, self)
-	else:
+	elif is_inside_tree():
 		queue_free()
 
 func reset() -> void:
 	"""重置子弹状态用于对象池复用"""
-	_is_active = false  # 重置为非激活状态
-	_is_returned_to_pool = false
+	_is_active = false
+	_is_being_destroyed = false
 	_lifetime = max_lifetime
 	_velocity = Vector2.ZERO
 	position = Vector2.ZERO
 	rotation = 0.0
+	_attack_damage = 10
+	_bullet_type = Enums.ColorType.WHITE

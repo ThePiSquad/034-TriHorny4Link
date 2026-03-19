@@ -12,7 +12,7 @@ class_name PerformanceMonitor
 @onready var turret_count_label: Label = $TurretCountLabel
 @onready var bullet_count_label: Label = $BulletCountLabel
 
-var update_interval: float = 0.5  # 更新间隔（秒）
+var update_interval: float = 1.0  # 更新间隔（秒）- 降低更新频率
 var update_timer: float = 0.0
 
 var show_monitor: bool = true  # 是否显示监控面板
@@ -23,9 +23,15 @@ var _touch_click_timer: float = 0.0
 var _touch_click_timeout: float = 0.5  # 点击间隔超时时间（秒）
 var _touch_area: Rect2 = Rect2(0, 0, 100, 100)  # 左上角触摸区域
 
+# 缓存统计结果，减少重复计算
+var _cached_bullet_stats: Dictionary = {"total": 0, "active": 0}
+var _stats_cache_timer: float = 0.0
+
 func _ready() -> void:
 	# 默认隐藏，按 F11 显示
 	visible = false
+	# 立即更新一次缓存
+	_cached_bullet_stats = _get_bullet_stats()
 
 func _process(delta: float) -> void:
 	if not show_monitor:
@@ -41,6 +47,12 @@ func _process(delta: float) -> void:
 		_touch_click_timer -= delta
 		if _touch_click_timer <= 0:
 			_touch_click_count = 0
+	
+	# 更新缓存计时器（更频繁地更新）
+	_stats_cache_timer -= delta
+	if _stats_cache_timer <= 0:
+		_cached_bullet_stats = _get_bullet_stats()
+		_stats_cache_timer = 0.2  # 0.2 秒缓存一次，更及时
 
 func _update_display() -> void:
 	"""更新显示数据"""
@@ -64,9 +76,8 @@ func _update_display() -> void:
 	var turret_count = get_tree().get_node_count_in_group("turret")
 	turret_count_label.text = "炮塔：%d" % turret_count
 	
-	# 子弹数量（估算）
-	var bullet_count = _count_bullets()
-	bullet_count_label.text = "子弹：%d" % bullet_count
+	# 子弹数量统计（使用缓存）
+	bullet_count_label.text = "子弹：%d (活跃:%d)" % [_cached_bullet_stats.total, _cached_bullet_stats.active]
 	
 	# 根据 FPS 改变颜色
 	if fps >= 55:
@@ -76,14 +87,32 @@ func _update_display() -> void:
 	else:
 		fps_label.modulate = Color.RED
 
-func _count_bullets() -> int:
-	"""统计子弹数量"""
-	var count = 0
-	var all_nodes = get_tree().get_nodes_in_group("bullet")
-	for node in all_nodes:
-		if node is Bullet:
-			count += 1
-	return count
+func _get_bullet_stats() -> Dictionary:
+	"""获取子弹统计信息（优化版）"""
+	var total_count = 0
+	var active_count = 0
+	
+	if ObjectPoolManager.instance:
+		var stats = ObjectPoolManager.instance.get_pool_stats()
+		
+		# 只统计子弹类型，减少字符串操作
+		for scene_path in stats:
+			if scene_path.begins_with("res://src/bullets/"):
+				var pool_stats = stats[scene_path]
+				var pooled = pool_stats.get("pooled", 0)
+				var active = pool_stats.get("active", 0)
+				total_count += pooled
+				active_count += active
+	else:
+		# 如果对象池管理器不存在，尝试直接统计场景中的子弹
+		var all_bullets = get_tree().get_nodes_in_group("bullet")
+		for bullet in all_bullets:
+			if is_instance_valid(bullet):
+				total_count += 1
+				if bullet.has_method("is_active") and bullet.is_active():
+					active_count += 1
+	
+	return {"total": total_count, "active": active_count}
 
 func toggle_monitor() -> void:
 	"""切换监控面板显示"""

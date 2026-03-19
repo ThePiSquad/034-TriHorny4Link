@@ -12,8 +12,15 @@ var splitting_bullet_attack_delay: float = 0.15
 
 var _has_split: bool = false
 
+func _ready() -> void:
+	super._ready()
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
+
+func reset() -> void:
+	super.reset()
+	_has_split = false
 
 func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 	if _has_split:
@@ -40,7 +47,7 @@ func _split_into_bullets() -> void:
 	var angle_spread_rad = deg_to_rad(splitting_angle_spread)
 	var base_angle = rotation
 	
-	if not valid_targets.is_empty():
+	if valid_targets.size() > 0:
 		for i in range(min(splitting_count, valid_targets.size())):
 			var target_enemy = valid_targets[i]
 			var direction = (target_enemy.global_position - global_position).normalized()
@@ -55,9 +62,24 @@ func _split_into_bullets() -> void:
 			_fire_splitting_bullet(angle, splitting_bullet_damage)
 
 func _fire_splitting_bullet(angle: float, damage: float) -> void:
-	var bullet = splitting_bullet_scene.instantiate()
+	var bullet: SplittingBullet = null
+	
+	# 尝试使用对象池
+	if ObjectPoolManager.instance:
+		bullet = ObjectPoolManager.instance.get_object("res://src/bullets/splitting_bullet.tscn") as SplittingBullet
+	
+	# 如果对象池失败，使用传统方式
+	if not bullet:
+		bullet = splitting_bullet_scene.instantiate() as SplittingBullet
+		if bullet:
+			get_parent().add_child(bullet)
+	
 	if not bullet:
 		return
+	
+	# 设置场景路径用于归还
+	if bullet.has_method("set_scene_path"):
+		bullet.set_scene_path("res://src/bullets/splitting_bullet.tscn")
 	
 	var direction = Vector2(cos(angle), sin(angle))
 	var bullet_velocity = direction * _speed
@@ -66,9 +88,6 @@ func _fire_splitting_bullet(angle: float, damage: float) -> void:
 	bullet.init(bullet_velocity, int(damage), splitting_bullet_lifetime, _bullet_type)
 	bullet.set_homing_config(true, splitting_bullet_homing_detection_range, splitting_bullet_homing_turn_speed)
 	bullet.set_attack_delay(splitting_bullet_attack_delay)
-	
-	# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
-	call_deferred("_add_bullet_to_scene", bullet)
 
 func _add_bullet_to_scene(bullet: Node) -> void:
 	"""延迟添加子弹到场景"""

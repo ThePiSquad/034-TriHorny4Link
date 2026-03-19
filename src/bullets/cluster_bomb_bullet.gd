@@ -14,9 +14,16 @@ var _exploded: bool = false
 var _cluster_bullet_scene: PackedScene = preload("res://src/bullets/bullet.tscn")
 var particle_scene: PackedScene = preload("res://src/bullets/explosive_purple_red_particle.tscn")
 
+func _ready() -> void:
+	super._ready()
+
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
 	explosion_damage = damage
+
+func reset() -> void:
+	super.reset()
+	_exploded = false
 
 func _process(delta: float) -> void:
 	if not _is_active:
@@ -25,15 +32,24 @@ func _process(delta: float) -> void:
 	position += _velocity * delta
 	_lifetime -= delta
 	
-	if _lifetime <= 0:
+	if _lifetime <= 0 and not _exploded:
 		explode()
 		destroy()
 
 func _on_hit_area_2d_area_entered(area: Area2D) -> void:
+	if _exploded:
+		return
+	
 	var body = area.get_parent()
 	if body and body.is_in_group("enemy"):
 		explode()
 		destroy()
+
+func explode_and_destroy() -> void:
+	if not _exploded:
+		return
+	explode()
+	destroy()
 
 func explode() -> void:
 	if _exploded:
@@ -62,11 +78,28 @@ func _trigger_area_damage() -> void:
 				enemy.take_damage(final_damage, self)
 
 func _create_explosion_effect() -> void:
-	var particle_system = particle_scene.instantiate()
-	particle_system.position = global_position
+	"""生成爆炸粒子效果"""
+	var particle_system: GPUParticles2D = null
 	
-	get_parent().add_child(particle_system)
-	particle_system.emitting = true
+	# 尝试使用对象池
+	if ObjectPoolManager.instance:
+		particle_system = ObjectPoolManager.instance.get_object("res://src/bullets/explosive_purple_red_particle.tscn")
+	
+	# 如果对象池失败，使用传统方式
+	if not particle_system:
+		particle_system = particle_scene.instantiate()
+		get_parent().add_child(particle_system)
+	else:
+		# 设置场景路径用于归还
+		if particle_system.has_method("set_scene_path"):
+			particle_system.set_scene_path("res://src/bullets/explosive_purple_red_particle.tscn")
+		# 手动启动销毁计时器（对象池复用时不会自动调用_ready）
+		if particle_system.has_method("start_destruction_timer"):
+			particle_system.start_destruction_timer()
+	
+	particle_system.position = global_position
+	particle_system.restart()  # 先重启
+	particle_system.emitting = true  # 再发射
 
 func _spawn_cluster_bullets() -> void:
 	var base_direction = _velocity.normalized()
@@ -77,15 +110,23 @@ func _spawn_cluster_bullets() -> void:
 		var direction = Vector2.from_angle(base_angle + offset_angle)
 		var bullet_velocity = direction * cluster_bullet_speed
 		
-		var bullet :Bullet= _cluster_bullet_scene.instantiate()
+		var bullet: Bullet = null
+		
+		# 尝试使用对象池
+		if ObjectPoolManager.instance:
+			bullet = ObjectPoolManager.instance.get_object("res://src/bullets/bullet.tscn") as Bullet
+		
+		# 如果对象池失败，使用传统方式
+		if not bullet:
+			bullet = _cluster_bullet_scene.instantiate() as Bullet
+			if bullet:
+				get_parent().add_child(bullet)
+		
 		if not bullet:
 			continue
 		
 		bullet.global_position = global_position
 		bullet.init(bullet_velocity, int(cluster_bullet_damage), cluster_bullet_lifetime, _bullet_type)
-		
-		# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
-		call_deferred("_add_bullet_to_scene", bullet)
 
 func _add_bullet_to_scene(bullet: Bullet) -> void:
 	"""延迟添加子弹到场景"""
@@ -97,3 +138,7 @@ func set_cluster_config(count: int, angle_spread: float, bullet_damage: float, b
 	cluster_bullet_damage = bullet_damage
 	cluster_bullet_lifetime = bullet_lifetime
 	cluster_bullet_speed = bullet_speed
+
+func set_explosion_config(explosion_radius_: float, explosion_particle_duration_: float) -> void:
+	explosion_radius = explosion_radius_
+	explosion_particle_duration = explosion_particle_duration_

@@ -18,6 +18,13 @@ func _ready() -> void:
 	_attack_delay_timer = 0.0
 	_can_attack = true
 
+func reset() -> void:
+	super.reset()
+	_hit_enemies.clear()
+	_bounce_count = 0
+	_attack_delay_timer = 0.0
+	_can_attack = true
+
 func _process(delta: float) -> void:
 	super._process(delta)
 	
