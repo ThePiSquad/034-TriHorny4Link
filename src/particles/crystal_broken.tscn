@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bwmk05kny410p"]
 
-[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="1_ppnw3"]
+[ext_resource type="Script" uid="uid://couur0o3oaxou" path="res://src/particles/crystal_broken.gd" id="1_ppnw3"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ppnw3"]
 load_path = "res://.godot/imported/circle_solid_particle.png-468280cee7cbdf51993f64a10fdedd82.ctex"
