@@ -27,6 +27,7 @@ scale_curve = SubResource("CurveTexture_eh8ue")
 
 [node name="HitPtc" type="GPUParticles2D" unique_id=694230983]
 emitting = false
+amount = 4
 texture = ExtResource("2_texture")
 lifetime = 0.5
 one_shot = true

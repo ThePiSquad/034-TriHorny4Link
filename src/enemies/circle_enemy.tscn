@@ -85,9 +85,8 @@ script = ExtResource("2_shxqu")
 connection_radius = 1024.0
 connection_color = Color(0.5568628, 0, 0, 0.7019608)
 move_speed = 125.0
-score_value = 10
 random_initial_rotation = true
-max_health = 120.0
+max_health = 75.0
 
 [node name="ConnectionLines" type="Line2D" parent="." index="0" unique_id=999999999]
 z_index = -1
