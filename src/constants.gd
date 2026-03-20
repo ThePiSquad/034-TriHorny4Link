@@ -237,7 +237,7 @@ static var TURRET_CONFIG = {
 	},
 	Enums.ColorType.BLUE: {
 		"fire_rate": 2.0,
-		"bullet_speed": 1100.0,
+		"bullet_speed": 1200.0,
 		"bullet_damage": 30.0,
 		"detection_range": 14 * grid_size,
 		"bullet_lifetime": 1.2
@@ -254,12 +254,12 @@ static var TURRET_CONFIG = {
 	},
 	Enums.ColorType.GREEN: {
 		"fire_rate": 1.5,
-		"bullet_speed": 850.0,
+		"bullet_speed": 1000.0,
 		"bullet_damage": 29.0,
 		"detection_range": 17 * grid_size,
 		"bullet_lifetime": 1.6,
 		"homing_enabled": true,
-		"homing_detection_range": 5 * grid_size,
+		"homing_detection_range": 8 * grid_size,
 		"homing_turn_speed": 12.0
 	},
 	Enums.ColorType.ORANGE: {
