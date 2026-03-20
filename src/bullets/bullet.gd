@@ -92,6 +92,11 @@ func _process(delta: float) -> void:
 func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 	var body = area.get_parent()
 	if body and body.is_in_group("enemy"):
+		# 检查游戏是否已结束
+		var game_manager = GameManager.instance
+		if game_manager and game_manager.current_state == GameManager.GameState.GAME_OVER:
+			return
+		
 		if body.has_method("take_damage"):
 			body.take_damage(_attack_damage, self)
 		destroy()

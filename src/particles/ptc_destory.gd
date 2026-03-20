@@ -5,6 +5,9 @@ var _is_returned_to_pool: bool = false  # 标记是否已归还到对象池
 var _destruction_timer: SceneTreeTimer = null  # 销毁计时器
 
 func _ready() -> void:
+	# 添加到 particle 组，便于管理
+	add_to_group("particle")
+	
 	# 发射粒子
 	emitting = true
 	

@@ -580,9 +580,14 @@ func _handle_attack_priority() -> void:
 		_priority_target = null
 
 func _on_hitbox_area_area_entered(area: Area2D) -> void:
-	# 获取Area2D的父节点（实际的Structure对象）
+	# 获取 Area2D 的父节点（实际的 Structure 对象）
 	var body = area.get_parent()
 	if body and body.has_method("get_structure_type"):
 		if body.get_structure_type() == Enums.StructureType.CRYSTAL:
+			# 检查游戏是否已结束
+			var game_manager = GameManager.instance
+			if game_manager and game_manager.current_state == GameManager.GameState.GAME_OVER:
+				return
+			
 			body.take_damage(attack_damage, self)
 			take_damage(max_health, self) # 自毁

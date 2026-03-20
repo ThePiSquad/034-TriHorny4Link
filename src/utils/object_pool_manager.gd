@@ -104,6 +104,8 @@ func clear_all_pools() -> void:
 	for pool in _pools.values():
 		pool.clear_pool()
 	_pools.clear()
+	
+	print("对象池已清理")
 
 func enable_all_debug_logs(enable: bool) -> void:
 	"""启用或禁用所有对象池的调试日志"""

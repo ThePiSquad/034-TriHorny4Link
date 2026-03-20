@@ -71,6 +71,8 @@ func _initialize_game_manager() -> void:
 func _on_game_over() -> void:
 	"""游戏结束时的处理"""
 	print("收到游戏结束事件，切换到结束页面")
+	# 清理所有敌人、子弹和粒子
+	_cleanup_game_objects()
 	# 延迟切换，确保粒子效果播放完成
 	await get_tree().create_timer(2.0).timeout
 	_switch_to_game_over_scene()
@@ -104,6 +106,41 @@ func _center_camera_on_crystal() -> void:
 		# 设置摄像机的位置为 Crystal 的位置
 		camera.global_position = crystal_global_position
 		print("摄像机已居中到 Crystal，位置：", crystal_global_position)
+
+func _cleanup_game_objects() -> void:
+	"""清理所有游戏对象（敌人、子弹、粒子等）"""
+	print("清理游戏对象...")
+	
+	# 停止敌人生成
+	var enemy_manager = $WorldPainter/EnemyManager
+	if enemy_manager:
+		enemy_manager.game_started = false
+		if enemy_manager.wave_system:
+			enemy_manager.wave_system.reset()
+	
+	# 清理所有敌人
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	for enemy in enemies:
+		if is_instance_valid(enemy):
+			enemy.queue_free()
+	
+	# 清理所有子弹
+	var bullets = get_tree().get_nodes_in_group("bullet")
+	for bullet in bullets:
+		if is_instance_valid(bullet):
+			bullet.queue_free()
+	
+	# 清理所有粒子（除了水晶死亡粒子）
+	var particles = get_tree().get_nodes_in_group("particle")
+	for particle in particles:
+		if is_instance_valid(particle):
+			particle.queue_free()
+	
+	# 清理对象池中的所有对象
+	if ObjectPoolManager.instance:
+		ObjectPoolManager.instance.clear_all_pools()
+	
+	print("游戏对象清理完成")
 
 func _process(delta: float) -> void:
 	# 更新导航障碍物（当 Conduit 变化时）

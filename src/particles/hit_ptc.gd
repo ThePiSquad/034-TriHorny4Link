@@ -1,6 +1,9 @@
 extends GPUParticles2D
 
 func _ready() -> void:
+	# 添加到 particle 组，便于管理
+	add_to_group("particle")
+	
 	# 发射粒子
 	emitting = true
 	

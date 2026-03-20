@@ -40,11 +40,11 @@ func _spawn_broken_particle() -> void:
 	"""播放 Crystal 被摧毁的粒子特效"""
 	if broken_particle_scene:
 		var particle :GPUParticles2D= broken_particle_scene.instantiate()
-		particle.emitting = true
 		
 		if particle:
-			get_parent().add_child(particle)
+			get_tree().current_scene.add_child(particle)
 			particle.global_position = global_position
+			particle.emitting = true
 			print("播放 Crystal 死亡粒子特效")
 
 func _end_game() -> void:

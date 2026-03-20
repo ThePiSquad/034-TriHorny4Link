@@ -75,6 +75,11 @@ func explode() -> void:
 	_create_explosion_effect()
 
 func _trigger_area_damage() -> void:
+	# 检查游戏是否已结束
+	var game_manager = GameManager.instance
+	if game_manager and game_manager.current_state == GameManager.GameState.GAME_OVER:
+		return
+	
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	
 	for enemy in enemies:
