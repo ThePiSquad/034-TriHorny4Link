@@ -131,6 +131,22 @@ var _turret_group_id: int = 0
 var _turret_group_count: int = 3  # 将炮塔分为 3 组，每帧更新一组
 var _global_turret_counter: int = 0  # 全局计数器（由 GameManager 管理）
 
+func _exit_tree() -> void:
+	update.emit()
+	# 清理蓄能激光子弹
+	_cleanup_charging_laser_bullet()
+
+func _cleanup_charging_laser_bullet() -> void:
+	"""清理蓄能激光子弹"""
+	if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
+		charging_laser_current_bullet.stop_continuous()
+		# 回收到对象池
+		charging_laser_current_bullet.destroy()
+		charging_laser_current_bullet = null
+	
+	charging_laser_last_target = null
+	charging_laser_current_damage = 0.0
+
 func _ready() -> void:
 	super._ready()
 	structure_type = Enums.StructureType.TURRET
@@ -151,6 +167,12 @@ func _ready() -> void:
 
 func _on_color_changed(new_color: Enums.ColorType) -> void:
 	"""当颜色改变时同步视觉效果"""
+	# 如果颜色从橘黄色变成其他颜色，清理橘黄色子弹
+	# 注意：此时 color 已经是新颜色了，所以判断 new_color 是否是 ORANGE_YELLOW
+	if new_color != Enums.ColorType.ORANGE_YELLOW and charging_laser_current_bullet:
+		# 只要有子弹就清理，不管之前是什么颜色
+		_cleanup_charging_laser_bullet()
+	
 	_sync_visual_to_current_color()
 
 func _sync_visual_to_current_color() -> void:
@@ -207,6 +229,9 @@ func _process(delta: float) -> void:
 	# if _global_turret_counter % _turret_group_count != _turret_group_id:
 	# 	return
 	
+	# 手动检测范围内敌人（替代 Area2D 信号）
+	_manual_detect_enemies()
+	
 	# 优化：降低目标更新频率
 	_target_update_timer += delta
 	if _target_update_timer >= _target_update_interval:
@@ -233,6 +258,31 @@ func _cleanup_invalid_enemies() -> void:
 	if not is_instance_valid(target) or (target and not target.can_be_targeted()):
 		target = null
 
+func _manual_detect_enemies() -> void:
+	"""手动检测范围内的敌人（不依赖 Area2D 信号）"""
+	# 获取所有敌人
+	var enemies = get_tree().get_nodes_in_group("enemy")
+	var detection_range_squared = detection_range * detection_range
+	
+	for enemy in enemies:
+		if not is_instance_valid(enemy):
+			continue
+		
+		if not enemy.can_be_targeted():
+			continue
+		
+		# 计算距离
+		var dist_sq = global_position.distance_squared_to(enemy.global_position)
+		
+		# 如果在范围内
+		if dist_sq <= detection_range_squared:
+			if not enemies_in_range.has(enemy):
+				enemies_in_range[enemy] = dist_sq
+		else:
+			# 如果在范围外，移除
+			if enemies_in_range.has(enemy):
+				enemies_in_range.erase(enemy)
+
 func _check_activation_status() -> void:
 	"""检查炮台是否处于激活状态"""
 	var was_active = is_active
@@ -250,6 +300,13 @@ func _check_activation_status() -> void:
 		if is_active:
 			can_fire = false
 			fire_timer = 0.2  # 激活后 0.2 秒才能开火，避免关卡加载时误触发
+	
+	# 激活状态变化时清空敌人列表，重新索敌
+	if was_active != is_active and not is_active:
+		enemies_in_range.clear()
+		target = null
+		# 清理蓄能激光子弹
+		_cleanup_charging_laser_bullet()
 
 func _update_activation_visual() -> void:
 	"""更新激活/失活状态的视觉效果"""
@@ -665,11 +722,15 @@ func _fire_charging_laser_bullet() -> void:
 
 func _update_turret_attributes() -> void:
 	var config = Constants.TURRET_CONFIG.get(color, {})
+	var old_detection_range = detection_range
 	fire_rate = config.get("fire_rate", 1.0)
 	bullet_speed = config.get("bullet_speed", 300.0)
 	bullet_damage = config.get("bullet_damage", 20.0)
 	detection_range = config.get("detection_range", 200.0)
 	bullet_lifetime = config.get("bullet_lifetime", 1.5)
+	
+	if old_detection_range != detection_range:
+		_update_detection_range()
 	
 	shotgun_enabled = config.get("shotgun_enabled", false)
 	shotgun_count = config.get("shotgun_count", 1)
@@ -744,35 +805,15 @@ func update_energy_level() -> void:
 	_update_turret_attributes()
 	_check_activation_status()
 
-func _on_detection_area_area_entered(area: Area2D) -> void:
-	var enemy = area.get_parent()
-	if enemy and enemy.is_in_group("enemy"):
-		if enemy.can_be_targeted():
-			if not enemies_in_range.has(enemy):
-				var dist_sq = global_position.distance_squared_to(enemy.global_position)
-				enemies_in_range[enemy] = dist_sq
-
-func _on_detection_area_area_exited(area: Area2D) -> void:
-	var enemy = area.get_parent()
-	if enemy and enemy.is_in_group("enemy"):
-		enemies_in_range.erase(enemy)
-		if target == enemy:
-			target = null
-			charging_laser_last_target = null
-			charging_laser_current_damage = 0.0
-			if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
-				charging_laser_current_bullet.stop_continuous()
-				charging_laser_current_bullet = null
-
 # 鼠标悬停状态追踪
 var _is_mouse_hovering: bool = false
 
 func _on_hurtbox_area_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
-	# 检查是否是鼠标左键点击
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _is_mouse_hovering:
-			_update_energy_visualization()
-
+	## 检查是否是鼠标左键点击
+	#if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		#if _is_mouse_hovering:
+			#_update_energy_visualization()
+	pass
 
 func _on_hurtbox_area_mouse_entered() -> void:
 	_is_mouse_hovering = true
