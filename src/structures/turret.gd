@@ -763,3 +763,121 @@ func _on_detection_area_area_exited(area: Area2D) -> void:
 			if charging_laser_current_bullet and is_instance_valid(charging_laser_current_bullet):
 				charging_laser_current_bullet.stop_continuous()
 				charging_laser_current_bullet = null
+
+# 鼠标悬停状态追踪
+var _is_mouse_hovering: bool = false
+
+func _on_hurtbox_area_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+	# 检查是否是鼠标左键点击
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _is_mouse_hovering:
+			_update_energy_visualization()
+
+
+func _on_hurtbox_area_mouse_entered() -> void:
+	_is_mouse_hovering = true
+
+
+func _on_hurtbox_area_mouse_exited() -> void:
+	_is_mouse_hovering = false
+
+func _update_energy_visualization() -> void:
+	"""输出详细的炮塔调试信息"""
+	print("\n")
+	print("╔════════════════════════════════════════════════════════╗")
+	print("║          Turret 炮塔调试信息                            ║")
+	print("╚════════════════════════════════════════════════════════╝")
+	
+	# 基础信息
+	print("\n【基础信息】")
+	print("  位置：", global_position)
+	print("  激活状态：", "✅ 激活" if is_active else "❌ 未激活")
+	print("  颜色类型：", color)
+	print("  能量强度：", _energy_intensity)
+	
+	# 能量详情
+	print("\n【能量详情】")
+	print("  红色能量：", energy_level.red, " (距离：", energy_level.red_source_distance, ")")
+	print("  蓝色能量：", energy_level.blue, " (距离：", energy_level.blue_source_distance, ")")
+	print("  黄色能量：", energy_level.yellow, " (距离：", energy_level.yellow_source_distance, ")")
+	print("  总能量：", energy_level.get_intensity())
+	
+	# 攻击属性
+	print("\n【攻击属性】")
+	print("  基础伤害：", bullet_damage)
+	print("  子弹速度：", bullet_speed)
+	print("  子弹寿命：", bullet_lifetime)
+	print("  攻击间隔：", fire_rate, " 秒")
+	print("  射击计时器：", fire_timer)
+	print("  能否射击：", "✅ 可以" if can_fire else "❌ 冷却中")
+	
+	# 索敌信息
+	print("\n【索敌信息】")
+	print("  索敌范围：", detection_range)
+	print("  范围内敌人数量：", enemies_in_range.size())
+	if target:
+		print("  当前目标：", target.get_class(), " (位置：", target.global_position, ")")
+		var distance = global_position.distance_to(target.global_position)
+		print("  目标距离：", distance)
+	else:
+		print("  当前目标：无")
+	
+	# 特殊配置
+	print("\n【特殊配置】")
+	var special_configs = []
+	
+	if shotgun_enabled:
+		special_configs.append("霰弹 (数量：%d, 角度：%.1f°)" % [shotgun_count, shotgun_angle_spread])
+	if homing_enabled:
+		special_configs.append("追踪 (范围：%.1f)" % [homing_detection_range])
+	if magic_enabled:
+		special_configs.append("魔法 (光束宽度：%.1f)" % [magic_beam_width])
+	if lightning_enabled:
+		special_configs.append("连锁闪电 (范围：%.1f, 最大连锁：%d)" % [lightning_chain_range, lightning_max_chain])
+	if explosive_enabled:
+		special_configs.append("爆炸 (半径：%.1f)" % [explosion_radius])
+	if splitting_homing_enabled:
+		special_configs.append("分裂追踪 (分裂数：%d, 角度：%.1f°)" % [splitting_count, splitting_angle_spread])
+	if penetrating_enabled:
+		special_configs.append("穿透 (最大目标：%d, 衰减：%.2f)" % [penetrating_max_targets, penetrating_damage_decay])
+	if bouncing_lightning_enabled:
+		special_configs.append("弹跳闪电 (最大弹跳：%d, 爆发数：%d)" % [bouncing_lightning_max_bounces, bouncing_lightning_burst_count])
+	if charging_laser_enabled:
+		special_configs.append("蓄能激光 (当前伤害：%.1f, 最大倍率：%.1f)" % [charging_laser_current_damage, charging_laser_max_damage_multiplier])
+	if cluster_bomb_enabled:
+		special_configs.append("集束炸弹 (数量：%d)" % [cluster_bomb_cluster_count])
+	if continuous_explosive_enabled:
+		special_configs.append("持续爆破 (射速提升：%.2f)" % [continuous_explosive_fire_rate_boost])
+	
+	if special_configs.is_empty():
+		print("  无特殊配置")
+	else:
+		for config in special_configs:
+			print("  - ", config)
+	
+	# 邻居信息
+	print("\n【邻居建筑】")
+	var neighbors = [north, south, west, east]
+	var directions = ["北", "南", "西", "东"]
+	for i in range(neighbors.size()):
+		var neighbor = neighbors[i]
+		var dir_name = directions[i]
+		if neighbor != null and is_instance_valid(neighbor):
+			var neighbor_type = "未知"
+			if neighbor.has_method("get_structure_type"):
+				neighbor_type = str(neighbor.get_structure_type())
+			elif neighbor.has_method("get_class"):
+				neighbor_type = neighbor.get_class()
+			print("  %s方向：%s" % [dir_name, neighbor_type])
+		else:
+			print("  %s方向：无" % dir_name)
+	
+	# 性能信息
+	print("\n【性能信息】")
+	print("  组 ID: ", _turret_group_id)
+	print("  更新间隔：", _target_update_interval, " 秒")
+	print("  敌人清理间隔：", _enemy_cleanup_interval, " 秒")
+	
+	print("\n╔════════════════════════════════════════════════════════╗")
+	print("║                  调试信息结束                           ║")
+	print("╚════════════════════════════════════════════════════════╝\n")

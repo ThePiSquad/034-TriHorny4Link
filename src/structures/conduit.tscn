@@ -49,4 +49,5 @@ shape = SubResource("RectangleShape2D_xmqai")
 vertices = PackedVector2Array(-32, 32, 32, 32, 32, -32, -32, -32)
 affect_navigation_mesh = true
 
+[connection signal="mouse_entered" from="HurtboxArea" to="." method="_on_hurtbox_area_mouse_entered"]
 [connection signal="area_entered" from="BarrierArea" to="." method="_on_barrier_area_entered"]

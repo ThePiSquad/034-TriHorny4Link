@@ -168,17 +168,15 @@ func get_max_neighbor_resource_values() -> Dictionary:
 	var neighbors = [north, south, west, east]
 	for neighbor in neighbors:
 		if neighbor != null and is_instance_valid(neighbor):
-			# 安全获取邻居的能量等级
-			if neighbor.has_method("get") and neighbor.has("energy_level"):
-				var neighbor_energy = neighbor.energy_level
-				if neighbor_energy != null:
-					# 更新各颜色的最大值
-					if neighbor_energy.red > max_red:
-						max_red = neighbor_energy.red
-					if neighbor_energy.blue > max_blue:
-						max_blue = neighbor_energy.blue
-					if neighbor_energy.yellow > max_yellow:
-						max_yellow = neighbor_energy.yellow
+			var neighbor_energy = neighbor.energy_level
+			if neighbor_energy != null:
+				# 更新各颜色的最大值
+				if neighbor_energy.red > max_red:
+					max_red = neighbor_energy.red
+				if neighbor_energy.blue > max_blue:
+					max_blue = neighbor_energy.blue
+				if neighbor_energy.yellow > max_yellow:
+					max_yellow = neighbor_energy.yellow
 	
 	# 返回包含三个颜色最大值的字典
 	return {
@@ -210,12 +208,71 @@ func _set_color(color_type: Enums.ColorType) -> void:
 	## 可视化能量效果
 	#if _energy_intensity > 0 and shape_drawer:
 		#_update_energy_visualization()
-#
-#func _update_energy_visualization() -> void:
-	#"""更新能量可视化效果"""
-	#if shape_drawer:
-		#var base_color = Constants.COLOR_MAP.get(_color, Color.WHITE)
-		## 根据能量强度和距离计算亮度
-		#var distance_factor = 1.0 - float(energy_level.source_distance) / float(Constants.MAX_ENERGY_RANGE)
-		#var brightness = 0.3 + (_energy_intensity * 0.7 * distance_factor)
-		#shape_drawer.fill_color = base_color * brightness
+
+func _update_energy_visualization() -> void:
+	"""输出详细的能量颜色等信息"""
+	print("\n========== EnergyTransmitter 调试信息 ==========")
+	print("建筑位置：", global_position)
+	print("建筑类型：", structure_type)
+	print("------------------------------------------")
+	
+	# 颜色信息
+	print("【颜色信息】")
+	print("  color: ", color, " _color: ", _color)
+	print("  当前能量颜色类型：", energy_level.get_color())
+	print("  能量强度：", _energy_intensity)
+	print("------------------------------------------")
+	
+	# 能量值详情
+	print("【能量值详情】")
+	print("  红色能量：", energy_level.red, " (距离：", energy_level.red_source_distance, ")")
+	print("  蓝色能量：", energy_level.blue, " (距离：", energy_level.blue_source_distance, ")")
+	print("  黄色能量：", energy_level.yellow, " (距离：", energy_level.yellow_source_distance, ")")
+	print("  总能量强度：", energy_level.get_intensity())
+	print("------------------------------------------")
+	
+	# 邻居能量最大值
+	print("【邻居能量最大值】")
+	var colors: Dictionary = get_max_neighbor_resource_values()
+	print("  red : blue : yellow = ", colors["red"], " : ", colors["blue"], " : ", colors["yellow"])
+	print("------------------------------------------")
+	
+	# 邻居信息
+	print("【邻居建筑信息】")
+	var neighbors = [north, south, west, east]
+	var directions = ["北", "南", "西", "东"]
+	for i in range(neighbors.size()):
+		var neighbor = neighbors[i]
+		var dir_name = directions[i]
+		if neighbor != null and is_instance_valid(neighbor):
+			var neighbor_type = neighbor.get_class()
+			if neighbor.has_method("get_structure_type"):
+				neighbor_type = str(neighbor.get_structure_type())
+			print("  ", dir_name, "方向：", neighbor_type, " (位置：", neighbor.global_position, ")")
+			if neighbor.has_method("get_energy_level") or neighbor.has_method("get_color"):
+				if neighbor.energy_level:
+					print("    能量：R=", neighbor.energy_level.red, " B=", neighbor.energy_level.blue, " Y=", neighbor.energy_level.yellow)
+		else:
+			print("  ", dir_name, "方向：无建筑")
+	print("------------------------------------------")
+	
+	# 能量源检测
+	print("【能量源检测】")
+	var has_source = _has_energy_source_neighbor()
+	print("  是否有能量源邻居：", has_source)
+	if has_source:
+		for neighbor in neighbors:
+			if neighbor != null and is_instance_valid(neighbor):
+				if neighbor is MonoCrystal:
+					print("  → 能量源：", neighbor.global_position, " (类型：MonoCrystal)")
+				elif neighbor is EnergyTransmitter and not neighbor.energy_level.is_empty():
+					print("  → 能量源：", neighbor.global_position, " (类型：EnergyTransmitter)")
+	print("------------------------------------------")
+	
+	# 连接状态
+	print("【连接状态】")
+	print("  北连接：", north != null)
+	print("  南连接：", south != null)
+	print("  西连接：", west != null)
+	print("  东连接：", east != null)
+	print("==========================================\n")
