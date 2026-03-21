@@ -55,7 +55,7 @@ func _end_game() -> void:
 		# 计算最终生存时间
 		var current_time = Time.get_ticks_msec() / 1000.0
 		game_manager.survival_time = current_time - _game_start_time
-		print("游戏结束，生存时间：", game_manager.survival_time, " 秒")
+		game_manager.is_victory = false
 		
 		# 触发游戏结束
 		game_manager.end_game()

@@ -77,6 +77,7 @@ func _on_game_over() -> void:
 	await get_tree().create_timer(2.0).timeout
 	_switch_to_game_over_scene()
 
+
 func _switch_to_game_over_scene() -> void:
 	"""切换到游戏结束场景"""
 	var transition_manager = TransitionManager.instance

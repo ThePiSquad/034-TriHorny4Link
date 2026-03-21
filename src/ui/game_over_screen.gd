@@ -13,6 +13,7 @@ var pattern_display_scene: PackedScene
 @onready var restart_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/RestartButton
 @onready var main_menu_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/MainMenuButton
 @onready var debug_score_display: VBoxContainer = $MarginContainer/VBoxContainer/DebugScoreDisplay
+@onready var title: Label = $MarginContainer/VBoxContainer/Title
 
 # 游戏数据
 var survival_time: float = 0.0
@@ -44,10 +45,10 @@ func _ready() -> void:
 		survival_time = game_manager.survival_time
 		enemy_score = game_manager.enemy_score
 		total_score = game_manager.total_score
-		# 检查是否是胜利结局（所有波次完成）
-		var enemy_manager = get_tree().get_root().get_node_or_null("World/EnemyManager")
-		if enemy_manager and enemy_manager.wave_system:
-			is_victory = enemy_manager.wave_system.is_all_waves_completed()
+		is_victory = game_manager.is_victory  # 从 GameManager 获取胜利状态
+	
+	# 显示标题（根据胜负）
+	_update_title()
 	
 	# 显示分数
 	_display_scores()
@@ -87,6 +88,16 @@ func _setup_animations() -> void:
 	tween.set_ease(Tween.EASE_OUT)
 	tween.tween_property($MarginContainer, "scale", Vector2(1.0, 1.0), 0.8)
 	tween.parallel().tween_property($MarginContainer, "modulate:a", 1.0, 0.5)
+
+func _update_title() -> void:
+	"""根据游戏结果更新标题文本"""
+	if not title:
+		return
+	
+	if is_victory:
+		title.text = "Win"
+	else:
+		title.text = "Over"
 
 func _display_scores() -> void:
 	"""显示所有分数信息"""

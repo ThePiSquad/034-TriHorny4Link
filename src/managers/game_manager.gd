@@ -19,6 +19,7 @@ var survival_time: float = 0.0  # 生存时间（秒）
 var enemy_score: int = 0  # 击败敌人累计分数
 var total_score: int = 0  # 总分数
 var selected_level: String = "level_1"  # 选中的关卡
+var is_victory: bool = false  # 是否是胜利结局
 
 # 游戏计时
 var game_timer: float = 0.0

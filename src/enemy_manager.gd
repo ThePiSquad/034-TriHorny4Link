@@ -284,7 +284,9 @@ func _on_all_waves_completed() -> void:
 	print("所有波次完成！游戏胜利！")
 	# 触发游戏胜利
 	var game_manager = GameManager.instance
+	# 将胜利状态存储到 GameManager，以便 GameOverScreen 可以访问
 	if game_manager:
+		game_manager.is_victory = true
 		game_manager.end_game()
 
 func _check_game_over() -> void:
