@@ -128,8 +128,7 @@ var _target_update_interval: float = 0.15  # 优化：从 0.1 秒改为 0.15 秒
 
 # 性能优化：炮塔分组更新（分散计算负载）
 var _turret_group_id: int = 0
-var _turret_group_count: int = 3  # 将炮塔分为 3 组，每帧更新一组
-var _global_turret_counter: int = 0  # 全局计数器（由 GameManager 管理）
+var _turret_group_count: int = 4  # 将炮塔分为 4 组，每帧更新一组
 
 func _exit_tree() -> void:
 	update.emit()
@@ -225,9 +224,9 @@ func _process(delta: float) -> void:
 		return
 	
 	# 优化：分组更新炮塔逻辑（分散计算负载）
-	# 注意：此功能需要 GameManager 支持，暂时注释
-	# if _global_turret_counter % _turret_group_count != _turret_group_id:
-	# 	return
+	# 使用 Engine 的帧计数器，确保不同炮塔在不同帧更新
+	if Engine.get_process_frames() % _turret_group_count != _turret_group_id:
+		return
 	
 	# 手动检测范围内敌人（替代 Area2D 信号）
 	_manual_detect_enemies()

@@ -141,9 +141,15 @@ func _disable_game_objects() -> void:
 	
 	print("游戏对象已禁用")
 
+var _navigation_update_timer: float = 0.0
+var _navigation_update_interval: float = 0.5  # 每 0.5 秒检查一次导航网格更新
+
 func _process(delta: float) -> void:
-	# 更新导航障碍物（当 Conduit 变化时）
-	_check_navigation_update_needed()
+	# 更新导航障碍物（当 Conduit 变化时）- 限制更新频率
+	_navigation_update_timer += delta
+	if _navigation_update_timer >= _navigation_update_interval:
+		_navigation_update_timer = 0.0
+		_check_navigation_update_needed()
 
 func _check_navigation_update_needed() -> void:
 	"""检查是否需要更新导航网格"""
