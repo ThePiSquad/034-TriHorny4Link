@@ -232,7 +232,7 @@ func _spawn_death_particle() -> void:
 	particle.process_material.scale_max = 0.35 * size_multiplier
 	particle.process_material.initial_velocity_min = 70 * size_multiplier
 	particle.process_material.initial_velocity_max = 170 * size_multiplier
-	
+	particle.process_material.color = shape_drawer.stroke_color.lightened(0.4)
 	particle.one_shot = true
 	particle.emitting = true
 	

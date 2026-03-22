@@ -10,7 +10,6 @@ func _ready() -> void:
 	
 	# 发射粒子
 	emitting = true
-	
 	# 在粒子生命周期结束后自动销毁
 	_start_destruction_timer()
 

@@ -97,9 +97,23 @@ func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 		if game_manager and game_manager.current_state == GameManager.GameState.GAME_OVER:
 			return
 		
+		# 检查是否是飞行敌人（免疫普通子弹）
+		if body is FlyTriangleEnemy:
+			var fly_enemy = body as FlyTriangleEnemy
+			# 如果子弹不是 MAGIC 类型，完全穿过飞行敌人
+			if not _is_magic_bullet() and not fly_enemy.can_be_hit_by_kinetic:
+				return
+		
 		if body.has_method("take_damage"):
 			body.take_damage(_attack_damage, self)
 		destroy()
+
+func _is_magic_bullet() -> bool:
+	"""检查子弹是否是 MAGIC 类型"""
+	for attr in attributes:
+		if attr == Enums.BulletAttributes.MAGIC:
+			return true
+	return false
 
 func destroy() -> void:
 	# 防止重复销毁

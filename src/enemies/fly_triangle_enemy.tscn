@@ -73,7 +73,7 @@ shader_parameter/shape_size = Vector2(128, 128)
 shader_parameter/progress = 0.0
 shader_parameter/noise_desnity = 60.0
 shader_parameter/beam_size = 0.15000000596046
-shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
+shader_parameter/color = Color(0.27058825, 0.4, 0.63529414, 1)
 
 [node name="FlyTriangleEnemy" unique_id=531630275 instance=ExtResource("1_vifsv")]
 script = ExtResource("2_dtf6t")
@@ -86,7 +86,7 @@ max_health = 60.0
 material = SubResource("ShaderMaterial_45akn")
 stroke_color = Color(0.27058825, 0.4, 0.63529414, 1)
 
-[node name="ShapeDrawer" type="Node2D" parent="ShapeDrawer" index="1" unique_id=969702829]
+[node name="ShapeShadowDrawer" type="Node2D" parent="ShapeDrawer" index="1" unique_id=969702829]
 z_index = -1
 position = Vector2(0, 14)
 script = ExtResource("3_45akn")

@@ -20,6 +20,9 @@ var wave_system: WaveSystem = null
 # 游戏状态
 var game_started: bool = false
 
+# 获取水晶
+var _crystal : Crystal = null
+
 func _ready() -> void:
 	# 验证敌人列表
 	if enemy_list.is_empty():
@@ -191,6 +194,7 @@ func _spawn_normal_enemy(size_level: int) -> void:
 func _find_crystal_position() -> void:
 	"""查找水晶的位置"""
 	var crystals = get_tree().get_nodes_in_group("crystal")
+	_crystal = crystals[0]
 	if crystals.size() > 0:
 		_crystal_position = crystals[0].global_position
 	else:
@@ -286,7 +290,8 @@ func _on_all_waves_completed() -> void:
 	var game_manager = GameManager.instance
 	# 将胜利状态存储到 GameManager，以便 GameOverScreen 可以访问
 	if game_manager:
-		game_manager.is_victory = true
+		if _crystal:
+			game_manager.is_victory = true
 		game_manager.end_game()
 
 func _check_game_over() -> void:
