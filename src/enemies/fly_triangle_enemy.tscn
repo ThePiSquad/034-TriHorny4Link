@@ -79,6 +79,8 @@ shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
 script = ExtResource("2_dtf6t")
 rotation_speed = 180.0
 can_be_hit_by_kinetic = false
+score_value = 15
+max_health = 60.0
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 material = SubResource("ShaderMaterial_45akn")

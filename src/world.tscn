@@ -24,6 +24,12 @@
 script = ExtResource("2_xlegt")
 metadata/_custom_type_script = "uid://dgi2i5s2f2xtb"
 
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_00gdp"]
+vertices = PackedVector2Array(1995.0234, -1990.0234, 2003.9688, 1986.9609, -1981.0234, 1973.0313, -1989.9688, -1999.9688)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1991, 1983, 2014, 1997, 2005, -2000, -2000, -2010)])
+agent_radius = 28.0
+
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_a3wil"]
 vertices = PackedVector2Array(1995.0234, -1990.0234, 2003.9688, 1986.9609, -1981.0234, 1973.0313, -1989.9688, -1999.9688)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
@@ -88,6 +94,10 @@ script = ExtResource("16_8kjpi")
 script = ExtResource("18_pool_mgr")
 
 [node name="PerformanceMonitor" parent="." unique_id=1999000002 instance=ExtResource("19_perf_mon")]
+
+[node name="SkyNavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=1814001101]
+navigation_polygon = SubResource("NavigationPolygon_00gdp")
+navigation_layers = 2
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="." unique_id=357907225]
 navigation_polygon = SubResource("NavigationPolygon_a3wil")

@@ -13,6 +13,7 @@ func _process(delta: float) -> void:
 	# 持续旋转 shape_drawer
 	if shape_drawer:
 		shape_drawer.rotation_degrees += rotation_speed * delta
+	super._process(delta)
 
 func _on_hit(source: Node) -> void:
 	# 检查攻击来源类型

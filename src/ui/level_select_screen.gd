@@ -5,6 +5,7 @@ class_name LevelSelectScreen extends Control
 @onready var level2_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level2Button
 @onready var level3_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level3Button
 @onready var back_button: Button = $CanvasLayer/VBoxContainer/BackButton
+@onready var test_button: Button = $TestButton
 
 ## 关卡选择界面
 
@@ -25,6 +26,10 @@ func _ready() -> void:
 	if level3_button:
 		level3_button.pressed.connect(_on_level3_pressed)
 		_add_hover_effect(level3_button)
+	
+	if test_button:
+		test_button.pressed.connect(_on_test_pressed)
+		_add_hover_effect(test_button)
 	
 	if back_button:
 		back_button.pressed.connect(_on_back_pressed)
@@ -98,6 +103,12 @@ func _on_level3_pressed() -> void:
 	_play_button_click_animation(level3_button)
 	await get_tree().create_timer(0.2).timeout
 	_start_level("level_3")
+
+func _on_test_pressed() -> void:
+	"""选择测试关卡"""
+	_play_button_click_animation(test_button)
+	await get_tree().create_timer(0.2).timeout
+	_start_level("level_test")
 
 func _on_back_pressed() -> void:
 	"""返回主菜单"""
