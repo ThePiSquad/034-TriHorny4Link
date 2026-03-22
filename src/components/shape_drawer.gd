@@ -7,13 +7,11 @@ extends Node2D
 @export var shape_type: Enums.ShapeType = Enums.ShapeType.CIRCLE:
 	set(s):
 		shape_type = s
-		_update_collision_shape()
 		queue_redraw()
 @export var shape_size: Vector2 = Vector2(Constants.grid_size, Constants.grid_size):
 	set(s):
 		shape_size = s
 		_update_shader_params() 
-		_update_collision_shape()
 		queue_redraw()
 
 @export var corner_radius: float = 8.0
@@ -32,51 +30,8 @@ extends Node2D
 @export var stroke_width: float = 2.0
 @export var stroke_enabled: bool = true
 
-var _input_area: Area2D
-
 func _ready() -> void:
-	_setup_input_area()
-
-func _setup_input_area() -> void:
-	_input_area = Area2D.new()
-	_input_area.name = "InputArea"
-	_input_area.input_pickable = true
-	add_child(_input_area)
-	_update_collision_shape()
-
-func _update_collision_shape() -> void:
-	if not _input_area:
-		return
-	
-	for child in _input_area.get_children():
-		child.queue_free()
-	
-	# 使用 call_deferred 避免在物理查询刷新期间改变监控状态
-	call_deferred("_add_new_collision_shape")
-
-func _add_new_collision_shape() -> void:
-	"""延迟添加新的碰撞形状"""
-	if not _input_area:
-		return
-	
-	var shape: Shape2D
-	match shape_type:
-		Enums.ShapeType.CIRCLE:
-			var circle = CircleShape2D.new()
-			circle.radius = min(shape_size.x, shape_size.y) / 2
-			shape = circle
-		Enums.ShapeType.TRIANGLE, Enums.ShapeType.RECTANGLE:
-			var rect = RectangleShape2D.new()
-			rect.size = shape_size
-			shape = rect
-		_:
-			var rect = RectangleShape2D.new()
-			rect.size = shape_size
-			shape = rect
-	
-	var collision = CollisionShape2D.new()
-	collision.shape = shape
-	_input_area.add_child(collision)
+	pass
 
 func _draw() -> void:
 	match shape_type:

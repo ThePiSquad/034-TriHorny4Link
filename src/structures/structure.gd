@@ -223,14 +223,10 @@ func _ready() -> void:
 		AudioManager.play_building_place()
 
 func _setup_input_handling() -> void:
-	if not shape_drawer:
-		return
-	
-	await get_tree().process_frame
-	
-	var input_area = shape_drawer.get_node_or_null("InputArea")
-	if input_area and input_area is Area2D:
-		input_area.input_event.connect(_on_input_event)
+	# 使用 Damageable 的 hitbox_area 来处理输入事件
+	if hitbox_area:
+		hitbox_area.input_pickable = true
+		hitbox_area.input_event.connect(_on_input_event)
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton:
