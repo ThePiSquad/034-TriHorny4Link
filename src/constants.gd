@@ -309,8 +309,8 @@ static var TURRET_CONFIG = {
 	Enums.ColorType.GREEN_YELLOW: {
 		"fire_rate": 1.3,
 		"bullet_speed": 1900.0,
-		"bullet_damage": 28.0,
-		"detection_range": 15 * grid_size,
+		"bullet_damage": 24.0,
+		"detection_range": 16 * grid_size,
 		"bullet_lifetime": 3.0,
 		"penetrating_enabled": true,
 		"penetrating_homing_enabled": true,
