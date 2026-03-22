@@ -3,6 +3,7 @@ class_name FlyTriangleEnemy extends TriangleEnemy
 # 飞行敌人特殊属性
 @export var rotation_speed: float = 180.0  # 旋转速度（度/秒）
 @export var can_be_hit_by_kinetic: bool = false  # 是否可被子弹击中（默认免疫）
+@export var is_flying: bool = true  # 是否为飞行单位（不受地面障碍阻挡）
 
 @onready var shape_shadow_drawer: ShapeDrawer = $ShapeDrawer/ShapeShadowDrawer
 
@@ -11,6 +12,10 @@ func _ready() -> void:
 	# 设置无敌状态，只接受 MAGIC 类型攻击
 	invincible = true
 	shape_shadow_drawer.shape_size = shape_drawer.shape_size
+	
+	# 飞行敌人不受 NavigationObstacle2D 影响
+	if navigation_agent:
+		navigation_agent.avoidance_enabled = false
 
 func _process(delta: float) -> void:
 	# 持续旋转 shape_drawer

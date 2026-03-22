@@ -97,3 +97,4 @@ metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
 
 [node name="NavigationAgent2D" parent="." index="3" unique_id=1874111476]
 navigation_layers = 2
+avoidance_enabled = false

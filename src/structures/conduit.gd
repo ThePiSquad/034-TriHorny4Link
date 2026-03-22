@@ -61,7 +61,13 @@ func _on_barrier_area_entered(area: Area2D) -> void:
 	if not is_barrier:
 		return
 	
-	# 获取Area2D的父节点（实际的敌人对象）
+	# 获取 Area2D 的父节点（实际的敌人对象）
 	var body = area.get_parent()
 	if body and body.has_method("on_barrier_hit"):
+		# 检查是否是飞行敌人，飞行敌人不受阻挡
+		if body is FlyTriangleEnemy:
+			var fly_enemy = body as FlyTriangleEnemy
+			if fly_enemy.is_flying:
+				return  # 飞行敌人直接穿过，不触发屏障
+		
 		body.on_barrier_hit(self)
