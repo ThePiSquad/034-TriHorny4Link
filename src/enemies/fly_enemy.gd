@@ -1,11 +1,11 @@
-class_name FlyTriangleEnemy extends TriangleEnemy
+class_name FlyEnemy extends Enemy
 
 # 飞行敌人特殊属性
 @export var rotation_speed: float = 180.0  # 旋转速度（度/秒）
 @export var can_be_hit_by_kinetic: bool = false  # 是否可被子弹击中（默认免疫）
 @export var is_flying: bool = true  # 是否为飞行单位（不受地面障碍阻挡）
 
-@onready var shape_shadow_drawer: ShapeDrawer = $ShapeDrawer/ShapeShadowDrawer
+@onready var shape_shadow_drawer: ShapeDrawer = $ShapeShadowDrawer
 
 func _ready() -> void:
 	super._ready()
@@ -21,6 +21,8 @@ func _process(delta: float) -> void:
 	# 持续旋转 shape_drawer
 	if shape_drawer:
 		shape_drawer.rotation_degrees += rotation_speed * delta
+	if shape_shadow_drawer:
+		shape_shadow_drawer.rotation_degrees += rotation_speed * delta
 	super._process(delta)
 
 func take_damage(amount: float, source: Node = null) -> void:
@@ -57,3 +59,20 @@ func _is_magic_bullet(bullet: Bullet) -> bool:
 		if attr == Enums.BulletAttributes.MAGIC:
 			return true
 	return false
+
+func _initialize_shape() -> void:
+	super._initialize_shape()
+	if hitbox_shape:
+		hitbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
+		hitbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
+		hitbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
+	if hurtbox_shape:
+		hurtbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
+		hurtbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
+		hurtbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
+
+func _setup_particle_texture(particle: GPUParticles2D) -> void:
+	"""设置飞行敌人的死亡粒子纹理"""
+	var texture = load("res://assets/particles/t_particle.png")
+	if texture:
+		particle.texture = texture

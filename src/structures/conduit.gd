@@ -65,8 +65,8 @@ func _on_barrier_area_entered(area: Area2D) -> void:
 	var body = area.get_parent()
 	if body and body.has_method("on_barrier_hit"):
 		# 检查是否是飞行敌人，飞行敌人不受阻挡
-		if body is FlyTriangleEnemy:
-			var fly_enemy = body as FlyTriangleEnemy
+		if body is FlyEnemy:
+			var fly_enemy = body as FlyEnemy
 			if fly_enemy.is_flying:
 				return  # 飞行敌人直接穿过，不触发屏障
 		

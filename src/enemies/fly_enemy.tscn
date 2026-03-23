@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cq45ea42fvvqb"]
+
+[ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_vifsv"]
+[ext_resource type="Script" uid="uid://bohiq605nbt6w" path="res://src/enemies/fly_enemy.gd" id="2_dtf6t"]
+[ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_45akn"]
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_771l1"]
+points = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_rmavl"]
+points = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="FlyEnemy" unique_id=265451698 instance=ExtResource("1_vifsv")]
+script = ExtResource("2_dtf6t")
+rotation_speed = 180.0
+can_be_hit_by_kinetic = false
+is_flying = true
+
+[node name="ShapeShadowDrawer" type="Node2D" parent="." index="0" unique_id=1124222434]
+position = Vector2(0, 17)
+script = ExtResource("3_45akn")
+shape_type = 1
+fill_color = Color(0, 0, 0, 0.49019608)
+stroke_enabled = false
+metadata/_custom_type_script = "uid://bbx5xpwg4my7w"
+
+[node name="ShapeDrawer" parent="." index="1" unique_id=590652366]
+shape_type = 1
+fill_color = Color(0.26666668, 0.26666668, 0.26666668, 1)
+stroke_color = Color(0.27058825, 0.4, 0.63529414, 1)
+stroke_enabled = true
+
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
+shape = SubResource("ConvexPolygonShape2D_771l1")
+
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("ConvexPolygonShape2D_rmavl")

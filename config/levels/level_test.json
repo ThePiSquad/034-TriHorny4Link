@@ -23,8 +23,8 @@
 			"health_multiplier": 1.0,
 			"enemies": [
 				{
-					"enemy_type": "fly_triangle_enemy",
-					"enemy_scene_path": "res://src/enemies/fly_triangle_enemy.tscn",
+					"enemy_type": "fly_enemy",
+					"enemy_scene_path": "res://src/enemies/fly_enemy.tscn",
 					"count": 10,
 					"size_level": 1,
 					"health_multiplier": 1.0,

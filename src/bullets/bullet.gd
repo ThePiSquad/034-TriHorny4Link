@@ -98,8 +98,8 @@ func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 			return
 		
 		# 检查是否是飞行敌人（免疫普通子弹）
-		if body is FlyTriangleEnemy:
-			var fly_enemy = body as FlyTriangleEnemy
+		if body is FlyEnemy:
+			var fly_enemy = body as FlyEnemy
 			# 如果子弹不是 MAGIC 类型，完全穿过飞行敌人
 			if not _is_magic_bullet() and not fly_enemy.can_be_hit_by_kinetic:
 				return
