@@ -12,6 +12,10 @@ var chain_range: float = 384.0
 var max_chain_targets: int = 3
 var damage_multipliers: Array[float] = [1.0, 0.9, 0.8, 0.7, 0.6]
 
+# 减速 debuff 配置
+var slow_debuff_duration: float = 2.0
+var slow_debuff_multiplier: float = 0.5
+
 var _target: Node2D
 var _beam_timer: float = 0.0
 var _start_position: Vector2
@@ -36,6 +40,10 @@ func set_target(target: Node2D, start_pos: Vector2, target_pos: Vector2) -> void
 func set_lightning_config(chain_range_: float, max_chain_targets_: int) -> void:
 	chain_range = chain_range_
 	max_chain_targets = max_chain_targets_
+
+func set_slow_debuff_config(duration: float, multiplier: float) -> void:
+	slow_debuff_duration = duration
+	slow_debuff_multiplier = multiplier
 
 func _process(delta: float) -> void:
 	if not _is_active:
@@ -128,6 +136,9 @@ func _trigger_chain_lightning(first_target: Node2D) -> void:
 	if first_target.has_method("take_damage"):
 		first_target.take_damage(int(_chain_damages[0]), self)
 	
+	# 应用减速 debuff
+	_apply_slow_debuff(first_target)
+	
 	# 继续连锁
 	_find_chain_targets(first_target, 1)
 
@@ -163,5 +174,15 @@ func _find_chain_targets(current_target: Node2D, chain_index: int) -> void:
 			AudioManager.play_bullet_hit("orange")
 			next_target.take_damage(int(damage), self)
 		
+		# 应用减速 debuff
+		_apply_slow_debuff(next_target)
+		
 		# 继续连锁
 		_find_chain_targets(next_target, chain_index + 1)
+
+func _apply_slow_debuff(enemy: Node2D) -> void:
+	if not is_instance_valid(enemy):
+		return
+	
+	if enemy.has_method("apply_slow_debuff"):
+		enemy.apply_slow_debuff(slow_debuff_duration, slow_debuff_multiplier)
