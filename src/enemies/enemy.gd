@@ -157,7 +157,7 @@ func _ready() -> void:
 	_initialize_teleport_effect()
 	
 	# 初始化粒子效果
-	_initialize_paticles()
+	_initialize_particles()
 	
 	# 配置导航代理
 	if navigation_agent:
@@ -170,7 +170,7 @@ func _ready() -> void:
 		navigation_agent.radius = 10.0  # 避障半径
 		navigation_agent.neighbor_distance = 50.0  # 邻居距离
 
-func _initialize_paticles() -> void:
+func _initialize_particles() -> void:
 	"""初始化粒子效果"""
 	heal_particles.process_material.emission_sphere_radius = enemy_size.x
 
