@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://b6o3mnsl2t3d1"]
+
+[ext_resource type="Texture2D" uid="uid://bx3chuthcjhdr" path="res://assets/particles/t_solid_particle.png" id="1_04e63"]
+
+[sub_resource type="Gradient" id="Gradient_yimub"]
+colors = PackedColorArray(1, 1, 1, 1, 0.54763263, 0.5476326, 0.5476326, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_y7xcv"]
+gradient = SubResource("Gradient_yimub")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6mnne"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 384.0
+angle_min = 90.000015
+angle_max = 90.000015
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 50.0
+initial_velocity_max = 50.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.39999998
+scale_max = 0.59999996
+color = Color(0.6454357, 0.84831524, 0.57664555, 1)
+color_ramp = SubResource("GradientTexture1D_y7xcv")
+
+[node name="HealEnemyPtc" type="GPUParticles2D" unique_id=1987318063]
+amount = 24
+texture = ExtResource("1_04e63")
+process_material = SubResource("ParticleProcessMaterial_6mnne")
