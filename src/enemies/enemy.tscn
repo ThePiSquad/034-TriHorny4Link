@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b8rvgajsbmod6" path="res://src/enemies/enemy.gd" id="1_a8hw6"]
 [ext_resource type="PackedScene" uid="uid://b1f2q7q2oax5c" path="res://src/components/damageable.tscn" id="2_yvjb1"]
 [ext_resource type="Script" uid="uid://bbx5xpwg4my7w" path="res://src/components/shape_drawer.gd" id="3_abny1"]
+[ext_resource type="Texture2D" uid="uid://bx3chuthcjhdr" path="res://assets/particles/t_solid_particle.png" id="4_abny1"]
 
 [sub_resource type="Shader" id="Shader_yvjb1"]
 code = "shader_type canvas_item;
@@ -69,11 +70,41 @@ void fragment() {
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_abny1"]
 shader = SubResource("Shader_yvjb1")
-shader_parameter/shape_size = Vector2(128, 128)
+shader_parameter/shape_size = Vector2(64, 64)
 shader_parameter/progress = 0.0
 shader_parameter/noise_desnity = 60.0
 shader_parameter/beam_size = 0.15000000596046
 shader_parameter/color = Color(0.99999994, 0.20066258, 0.14946952, 1)
+
+[sub_resource type="Gradient" id="Gradient_yk438"]
+colors = PackedColorArray(1, 1, 1, 1, 0.5743278, 0.5743278, 0.5743278, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mpvi4"]
+gradient = SubResource("Gradient_yk438")
+
+[sub_resource type="Curve" id="Curve_jx57g"]
+_data = [Vector2(0, 0), 0.0, 3.0401165, 0, 0, Vector2(1, 0), -4.9369164, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_ecx2o"]
+curve = SubResource("Curve_jx57g")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_k25sr"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 32.0
+angle_min = 90.000015
+angle_max = 90.000015
+direction = Vector3(0, -1, 0)
+spread = 0.0
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.14999999
+scale_max = 0.25
+scale_curve = SubResource("CurveTexture_ecx2o")
+color = Color(0, 0.8205422, 0.10043501, 1)
+color_ramp = SubResource("GradientTexture1D_mpvi4")
 
 [node name="Enemy" unique_id=265451698 groups=["enemy"] instance=ExtResource("2_yvjb1")]
 script = ExtResource("1_a8hw6")
@@ -100,5 +131,12 @@ collision_mask = 3
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="." index="3" unique_id=1874111476]
 simplify_path = true
+
+[node name="HealParticles" type="GPUParticles2D" parent="." index="4" unique_id=909308398]
+emitting = false
+texture = ExtResource("4_abny1")
+lifetime = 0.8
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_k25sr")
 
 [connection signal="area_entered" from="HitboxArea" to="." method="_on_hitbox_area_area_entered"]

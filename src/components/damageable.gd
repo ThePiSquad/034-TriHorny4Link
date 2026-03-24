@@ -32,6 +32,13 @@ var invincible: bool = false  # 无敌状态
 func _ready() -> void:
 	current_health = max_health
 	
+func heal(amount: float, _source: Node = null) -> void:
+	"""治疗生命值"""
+	if current_health <= 0.0:
+		return
+	
+	# 增加生命值，不超过最大值
+	current_health = min(current_health + amount, max_health)
 
 func take_damage(amount: float, source: Node = null) -> void:
 	# 检查无敌状态

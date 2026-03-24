@@ -3,6 +3,7 @@ extends Damageable
 
 @onready var shape_drawer: ShapeDrawer = $ShapeDrawer
 @onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
+@onready var heal_particles: GPUParticles2D = $HealParticles
 
 @export var move_speed: float = 100.0
 @export var attack_damage: float = 10.0
@@ -155,6 +156,9 @@ func _ready() -> void:
 	# 初始化传送效果
 	_initialize_teleport_effect()
 	
+	# 初始化粒子效果
+	_initialize_paticles()
+	
 	# 配置导航代理
 	if navigation_agent:
 		navigation_agent.target_position = base_position
@@ -165,6 +169,10 @@ func _ready() -> void:
 		navigation_agent.time_horizon = 0.5  # 时间视野
 		navigation_agent.radius = 10.0  # 避障半径
 		navigation_agent.neighbor_distance = 50.0  # 邻居距离
+
+func _initialize_paticles() -> void:
+	"""初始化粒子效果"""
+	heal_particles.process_material.emission_sphere_radius = enemy_size.x
 
 func _initialize_teleport_effect() -> void:
 	"""初始化传送效果"""
@@ -538,17 +546,9 @@ func _remove_slow_debuff() -> void:
 				_priority_target = null
 
 func heal(amount: float, _source: Node = null) -> void:
-	"""治疗生命值"""
-	if current_health <= 0.0:
-		return
-	
-	# 增加生命值，不超过最大值
-	var old_health = current_health
-	current_health = min(current_health + amount, max_health)
-	
-	# 如果生命值发生变化，触发信号
-	if old_health != current_health:
-		health_changed.emit(current_health, max_health)
+	super.heal(amount, _source)
+	heal_particles.one_shot = true
+	heal_particles.emitting = true
 
 func on_barrier_hit(barrier: Node2D) -> void:
 	"""被屏障阻挡时的回调"""
