@@ -513,7 +513,7 @@ func _apply_slow_multiplier() -> void:
 		navigation_agent.max_speed = move_speed
 
 func _remove_slow_debuff() -> void:
-	"""移除减速debuff"""
+	"""移除减速 debuff"""
 	_slow_debuff_active = false
 	_slow_debuff_timer = 0.0
 	
@@ -527,7 +527,7 @@ func _remove_slow_debuff() -> void:
 			_priority_target = null
 			return
 		
-		# 检查屏障是否有生命值且生命值大于0
+		# 检查屏障是否有生命值且生命值大于 0
 		if _current_barrier.has_method("get_health"):
 			if _current_barrier.get_health() <= 0:
 				# 屏障已被摧毁，恢复移动
@@ -536,6 +536,19 @@ func _remove_slow_debuff() -> void:
 				# 攻击完成后恢复正常状态
 				_attack_priority = false
 				_priority_target = null
+
+func heal(amount: float, _source: Node = null) -> void:
+	"""治疗生命值"""
+	if current_health <= 0.0:
+		return
+	
+	# 增加生命值，不超过最大值
+	var old_health = current_health
+	current_health = min(current_health + amount, max_health)
+	
+	# 如果生命值发生变化，触发信号
+	if old_health != current_health:
+		health_changed.emit(current_health, max_health)
 
 func on_barrier_hit(barrier: Node2D) -> void:
 	"""被屏障阻挡时的回调"""

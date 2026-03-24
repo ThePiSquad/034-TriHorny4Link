@@ -1,5 +1,37 @@
 [gd_scene format=3 uid="uid://d1avw80rs3l7"]
 
 [ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_bwvq6"]
+[ext_resource type="Script" uid="uid://ci8fq8lh1tbf1" path="res://src/enemies/heal_enemy.gd" id="2_om43l"]
+[ext_resource type="PackedScene" uid="uid://b6o3mnsl2t3d1" path="res://src/particles/heal_enemy_ptc.tscn" id="3_xeidm"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bwvq6"]
+radius = 30.016663
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_om43l"]
+radius = 31.016125
 
 [node name="HealEnemy" unique_id=265451698 instance=ExtResource("1_bwvq6")]
+script = ExtResource("2_om43l")
+heal_interval = 5.0
+heal_radius = 384.0
+heal_amount = 30.0
+max_heal_targets = 3
+heal_particle_scene = ExtResource("3_xeidm")
+score_value = 20
+max_health = 75.0
+
+[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
+fill_color = Color(0.26666668, 0.26666668, 0.26666668, 1)
+stroke_color = Color(0.3254902, 0.48235294, 0.27058825, 1)
+stroke_enabled = true
+
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
+shape = SubResource("CircleShape2D_bwvq6")
+
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("CircleShape2D_om43l")
+
+[node name="HealTimer" type="Timer" parent="." index="4" unique_id=1751180980]
+autostart = true
+
+[connection signal="timeout" from="HealTimer" to="." method="_on_heal_timer_timeout"]
