@@ -24,10 +24,10 @@ var is_victory: bool = false  # 是否是胜利结局（击败 Boss）
 func _ready() -> void:
 	# 连接按钮信号
 	if restart_button:
-		restart_button.pressed.connect(_on_restart_button_pressed)
+		#restart_button.pressed.connect(_on_restart_button_pressed)
 		_add_hover_effect(restart_button)
 	if main_menu_button:
-		main_menu_button.pressed.connect(_on_main_menu_button_pressed)
+		#main_menu_button.pressed.connect(_on_main_menu_button_pressed)
 		_add_hover_effect(main_menu_button)
 	
 	# 预加载图案显示场景
