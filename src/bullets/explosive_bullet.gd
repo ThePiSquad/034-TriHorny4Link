@@ -76,7 +76,9 @@ func _trigger_area_damage() -> void:
 		var distance = global_position.distance_to(enemy.global_position)
 		if distance <= explosion_radius:
 			# 伤害衰减
-			var damage_multiplier = 1.0 - (distance / explosion_radius)
+			#var damage_multiplier = 1.0 - (distance / explosion_radius)
+			# 不衰减
+			var damage_multiplier = 1.0
 			var final_damage = int(explosion_damage * damage_multiplier)
 			
 			if enemy.has_method("take_damage"):
@@ -98,11 +100,10 @@ func _create_explosion_effect() -> void:
 		# 设置场景路径用于归还
 		if particle_system.has_method("set_scene_path"):
 			particle_system.set_scene_path("res://src/bullets/explosive_purple_particle.tscn")
-		# 手动启动销毁计时器（对象池复用时不会自动调用_ready）
-		if particle_system.has_method("start_destruction_timer"):
-			particle_system.start_destruction_timer()
+		# 调用 activate 方法确保正确初始化（包括颜色重置和计时器）
+		if particle_system.has_method("activate"):
+			particle_system.activate()
 	
 	particle_system.position = global_position
-	particle_system.restart()  # 先重启
-	particle_system.emitting = true  # 再发射
+	# activate() 已经调用了 restart() 和 emitting = true，不需要重复调用
 	

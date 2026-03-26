@@ -98,13 +98,12 @@ func _create_explosion_effect() -> void:
 		# 设置场景路径用于归还
 		if particle_system.has_method("set_scene_path"):
 			particle_system.set_scene_path("res://src/bullets/explosive_purple_red_particle.tscn")
-		# 手动启动销毁计时器（对象池复用时不会自动调用_ready）
-		if particle_system.has_method("start_destruction_timer"):
-			particle_system.start_destruction_timer()
+		# 调用 activate 方法确保正确初始化（包括颜色重置和计时器）
+		if particle_system.has_method("activate"):
+			particle_system.activate()
 	
 	particle_system.position = global_position
-	particle_system.restart()  # 先重启
-	particle_system.emitting = true  # 再发射
+	# activate() 已经调用了 restart() 和 emitting = true，不需要重复调用
 
 func _spawn_cluster_bullets() -> void:
 	var base_direction = _velocity.normalized()

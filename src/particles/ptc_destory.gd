@@ -43,9 +43,8 @@ func reset() -> void:
 	emitting = false
 	visible = false
 	_destruction_timer = null
-	
-	if not emitting and process_material and process_material is ParticleProcessMaterial:
-		process_material.color = Color(0.93333334, 0.13333334, 0.13333334, 1)
+	# 注意：不再重置颜色，因为不同的粒子类型有不同的颜色
+	# 颜色应该在激活时由使用者设置，或者保持原始场景中定义的默认颜色
 
 func set_scene_path(path: String) -> void:
 	_scene_path = path
