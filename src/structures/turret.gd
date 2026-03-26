@@ -40,6 +40,8 @@ var magic_beam_duration: float = 0.2
 var lightning_enabled: bool = false
 var lightning_chain_range: float = 384.0
 var lightning_max_chain: int = 3
+var lightning_slow_duration: float = 2.0
+var lightning_slow_multiplier: float = 0.8
 
 # 爆炸子弹配置
 var explosive_enabled: bool = false
@@ -546,6 +548,7 @@ func _fire_lightning_bullet() -> void:
 	
 	bullet.set_target(target, start_pos, target_pos)
 	bullet.set_lightning_config(lightning_chain_range, lightning_max_chain)
+	bullet.set_slow_debuff_config(lightning_slow_duration, lightning_slow_multiplier)
 	bullet.init(Vector2.ZERO, int(bullet_damage), 0.5, color)
 	
 	bullet.global_position = Vector2.ZERO
@@ -746,6 +749,8 @@ func _update_turret_attributes() -> void:
 	lightning_enabled = config.get("lightning_enabled", false)
 	lightning_chain_range = config.get("lightning_chain_range", 384.0)
 	lightning_max_chain = config.get("lightning_max_chain", 3)
+	lightning_slow_duration = config.get("lightning_slow_duration", 2.0)
+	lightning_slow_multiplier = config.get("lightning_slow_multiplier", 0.8)
 	
 	explosive_enabled = config.get("explosive_enabled", false)
 	explosion_radius = config.get("explosion_radius", 200.0)

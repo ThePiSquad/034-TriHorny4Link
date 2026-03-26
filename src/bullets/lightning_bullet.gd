@@ -14,7 +14,7 @@ var damage_multipliers: Array[float] = [1.0, 0.9, 0.8, 0.7, 0.6]
 
 # 减速 debuff 配置
 var slow_debuff_duration: float = 2.0
-var slow_debuff_multiplier: float = 0.5
+var slow_debuff_multiplier: float = 0.8
 
 var _target: Node2D
 var _beam_timer: float = 0.0

@@ -270,7 +270,9 @@ static var TURRET_CONFIG = {
 		"bullet_lifetime": 1.6,
 		"lightning_enabled": true,
 		"lightning_chain_range": 16 * grid_size,
-		"lightning_max_chain": 5
+		"lightning_max_chain": 5,
+		"lightning_slow_duration": 2.0,
+		"lightning_slow_multiplier": 0.8
 	},
 	Enums.ColorType.PURPLE: {
 		"fire_rate": 0.5,
@@ -364,7 +366,7 @@ static var TURRET_CONFIG = {
 		"bullet_lifetime": 1.2,
 		"continuous_explosive_enabled": true,
 		"continuous_explosive_explosion_radius": 3 * grid_size,
-		"continuous_explosive_slow_duration": 2.0,
-		"continuous_explosive_slow_multiplier": 0.5
+		"continuous_explosive_slow_duration": 1.0,
+		"continuous_explosive_slow_multiplier": 0.8
 	}
 }
