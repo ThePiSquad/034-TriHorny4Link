@@ -202,6 +202,8 @@ func _on_damageable_died(source: Node) -> void:
 	# 只有被炮塔击败时才计分（source 不是自己）
 	if source and source != self:
 		_add_enemy_score()
+		# 归属伤害到对应颜色的炮塔
+		_attribute_damage_to_turret(source, max_health)
 	
 	# 断开屏障的死亡信号连接
 	if _current_barrier and _current_barrier.has_signal("died"):
@@ -209,6 +211,23 @@ func _on_damageable_died(source: Node) -> void:
 			_current_barrier.died.disconnect(_on_barrier_destroyed)
 	
 	queue_free()
+
+func _attribute_damage_to_turret(source: Node, damage_amount: int) -> void:
+	"""将伤害归属到对应颜色的炮塔"""
+	if not source or not source is Bullet:
+		return
+	
+	var bullet = source as Bullet
+	var bullet_color = bullet.get_bullet_type()
+	
+	# 排除非彩色炮塔（白色、黑色等）
+	if bullet_color == Enums.ColorType.WHITE or bullet_color == Enums.ColorType.BLACK:
+		return
+	
+	# 将伤害归属到 GameManager
+	var game_manager = GameManager.instance
+	if game_manager:
+		game_manager.add_damage_by_color(bullet_color, damage_amount)
 
 func _add_enemy_score() -> void:
 	"""添加敌人分数到 GameManager"""

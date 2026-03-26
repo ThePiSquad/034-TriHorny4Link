@@ -10,6 +10,7 @@ var pattern_display_scene: PackedScene
 
 # 分数显示容器
 @onready var score_container: VBoxContainer = $MarginContainer/VBoxContainer/ScoreContainer
+@onready var damage_chart: DamageChart = $MarginContainer/VBoxContainer/DamageChart
 @onready var restart_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/RestartButton
 @onready var main_menu_button: Button = $MarginContainer/VBoxContainer/ButtonContainer/MainMenuButton
 @onready var debug_score_display: VBoxContainer = $MarginContainer/VBoxContainer/DebugScoreDisplay
@@ -105,12 +106,39 @@ func _display_scores() -> void:
 	for child in score_container.get_children():
 		child.queue_free()
 	
+	# 显示 TOP3 炮塔伤害占比
+	_display_turret_damage_chart()
+	
 	# 显示总分（包含生存时间和敌人分数的汇总）
-	# 这样更简洁，避免信息冗余
-	_display_total_score()
+	#_display_total_score()
 	
 	# 添加详细信息区域（可选，显示分项明细）
 	_display_score_details()
+
+func _display_turret_damage_chart() -> void:
+	"""显示炮塔伤害占比图表（TOP3）"""
+	var game_manager = GameManager.instance
+	if not game_manager:
+		return
+	
+	var damage_data = game_manager.damage_by_color
+	
+	var valid_colors: Array = []
+	var total_damage: int = 0
+	for color in damage_data.keys():
+		var damage = damage_data[color]
+		if damage > 0:
+			valid_colors.append({"color": color, "damage": damage})
+			total_damage += damage
+	
+	if valid_colors.size() == 0:
+		damage_chart.visible = false
+		return
+	
+	valid_colors.sort_custom(func(a, b): return a.damage > b.damage)
+	var top_colors = valid_colors.slice(0, min(3, valid_colors.size()))
+	
+	damage_chart.setup(top_colors, total_damage)
 
 func _add_section_title() -> void:
 	"""添加分区标题（使用分隔线）"""

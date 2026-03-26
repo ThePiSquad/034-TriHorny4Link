@@ -21,6 +21,9 @@ var total_score: int = 0  # 总分数
 var selected_level: String = "level_1"  # 选中的关卡
 var is_victory: bool = false  # 是否是胜利结局
 
+# 按炮塔颜色统计伤害
+var damage_by_color: Dictionary = {}
+
 # 游戏计时
 var game_timer: float = 0.0
 
@@ -33,7 +36,18 @@ func start_game() -> void:
 	enemy_score = 0
 	total_score = 0
 	game_timer = 0.0
+	_initialize_damage_stats()
 	print("游戏开始")
+
+func _initialize_damage_stats() -> void:
+	damage_by_color = {}
+	for color in Enums.ColorType.keys():
+		damage_by_color[Enums.ColorType[color]] = 0
+
+func add_damage_by_color(color: Enums.ColorType, damage: int) -> void:
+	if not damage_by_color.has(color):
+		damage_by_color[color] = 0
+	damage_by_color[color] += damage
 
 func end_game() -> void:
 	if current_state == GameManager.GameState.GAME_OVER:

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://b8fxp2qwmcy5e"]
+
+[ext_resource type="Script" uid="uid://cbm5o4y0gk73n" path="res://src/ui/damage_bar.gd" id="1_script"]
+
+[node name="DamageBar" type="HBoxContainer" unique_id=378244871]
+custom_minimum_size = Vector2(320, 24)
+offset_right = 320.0
+offset_bottom = 24.0
+theme_override_constants/separation = 10
+script = ExtResource("1_script")
+
+[node name="ColorLabel" type="Label" parent="." unique_id=410547999]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "● 10000"
+vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="." unique_id=1065666844]
+custom_minimum_size = Vector2(200, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+value = 50.0
+show_percentage = false
+
+[connection signal="ready" from="." to="." method="_on_ready"]
