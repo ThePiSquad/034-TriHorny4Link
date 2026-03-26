@@ -118,6 +118,13 @@ func reset() -> void:
 	_chain_positions.clear()
 	_bullet_type = Enums.ColorType.ORANGE
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 闪电子弹在激活时立即触发连锁
+	if _target and is_instance_valid(_target):
+		_trigger_chain_lightning(_target)
+
 func _trigger_chain_lightning(first_target: Node2D) -> void:
 	if not first_target or not is_instance_valid(first_target):
 		return

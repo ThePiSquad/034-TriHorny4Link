@@ -82,3 +82,11 @@ func reset() -> void:
 	_start_position = Vector2.ZERO
 	_target_position = Vector2.ZERO
 	_bullet_type = Enums.ColorType.YELLOW
+
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 魔法子弹在激活时立即命中目标
+	if _target and is_instance_valid(_target):
+		if _target.has_method("take_damage"):
+			_target.take_damage(_attack_damage, self)

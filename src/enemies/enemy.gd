@@ -47,7 +47,7 @@ var _knockback_velocity: Vector2 = Vector2.ZERO  # 击退速度
 
 # 死亡粒子特效相关
 var death_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.tscn")
-var base_particle_amount: int = 24  # 基础粒子数量
+var base_particle_amount: int = 8  # 基础粒子数量
 var shape_influence_factor : int = 2
 
 # 受击粒子特效相关
@@ -187,7 +187,7 @@ func _initialize_teleport_effect() -> void:
 		_teleport_material.set_shader_parameter("progress", 1.0)
 		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x * 3, enemy_size.y * 3))
 		_teleport_material.set_shader_parameter("beam_size", 0.15)
-		_teleport_material.set_shader_parameter("color", shape_drawer.stroke_color.lightened(0.5))
+		_teleport_material.set_shader_parameter("color", shape_drawer.stroke_color.lightened(0.2))
 		# 应用材质到 shape_drawer
 		if shape_drawer:
 			shape_drawer.material = _teleport_material
@@ -242,11 +242,26 @@ func _add_enemy_score() -> void:
 		push_warning("GameManager 实例不存在，无法添加分数")
 
 func _spawn_death_particle() -> void:
-	"""生成死亡粒子特效"""
+	"""生成死亡粒子特效（使用对象池）"""
 	if not death_particle_scene:
 		return
 	
-	var particle : GPUParticles2D = death_particle_scene.instantiate()
+	var particle_path = "res://src/particles/broken_ptc.tscn"
+	var particle : GPUParticles2D
+	
+	# 使用对象池获取粒子
+	if ObjectPoolManager.instance:
+		particle = ObjectPoolManager.instance.get_object(particle_path) as GPUParticles2D
+		# 设置场景路径以便归还到对象池
+		if particle.has_method("set_scene_path"):
+			particle.set_scene_path(particle_path)
+		# 调用 activate 方法确保正确初始化
+		if particle.has_method("activate"):
+			particle.activate()
+	else:
+		# 对象池管理器不存在时，直接实例化
+		particle = death_particle_scene.instantiate()
+	
 	if not particle:
 		return
 	
@@ -256,20 +271,25 @@ func _spawn_death_particle() -> void:
 	# 根据敌人体型计算粒子数量
 	var size_multiplier = (enemy_size.x / Constants.grid_size) * shape_influence_factor
 	particle.amount = int(base_particle_amount * size_multiplier)
-	particle.process_material.emission_sphere_radius = 16 * size_multiplier
-	particle.process_material.scale_min = 0.05 * size_multiplier
-	particle.process_material.scale_max = 0.35 * size_multiplier
-	particle.process_material.initial_velocity_min = 70 * size_multiplier
-	particle.process_material.initial_velocity_max = 170 * size_multiplier
-	particle.process_material.color = shape_drawer.stroke_color.lightened(0.4)
-	particle.one_shot = true
-	particle.emitting = true
+	
+	# 创建新的材质实例，避免影响对象池中的其他粒子
+	if particle.process_material:
+		var new_material = particle.process_material.duplicate()
+		new_material.emission_sphere_radius = 16 * size_multiplier
+		new_material.scale_min = 0.05 * size_multiplier
+		new_material.scale_max = 0.35 * size_multiplier
+		new_material.initial_velocity_min = 70 * size_multiplier
+		new_material.initial_velocity_max = 170 * size_multiplier
+		new_material.color = shape_drawer.stroke_color.lightened(0.4)
+		particle.process_material = new_material
+	
+	# 如果不是从对象池获取的，需要手动设置
+	if not ObjectPoolManager.instance:
+		particle.one_shot = true
+		particle.emitting = true
 	
 	# 设置粒子纹理（由子类实现）
 	_setup_particle_texture(particle)
-	
-	# 添加到场景中
-	get_parent().add_child(particle)
 
 func _setup_particle_texture(particle: GPUParticles2D) -> void:
 	"""设置粒子纹理（由子类重写）"""
@@ -383,15 +403,33 @@ func _on_hit(source: Node) -> void:
 		_spawn_hit_particle(bullet)
 
 func _spawn_hit_particle(bullet: Bullet) -> void:
-	"""生成受击粒子特效"""
+	"""生成受击粒子特效（使用对象池）"""
 	if not hit_particle_scene:
 		return
 	
-	# 实例化粒子特效
-	var hit_particle = hit_particle_scene.instantiate()
+	var hit_particle_path = "res://src/particles/hit_ptc.tscn"
+	var hit_particle
+	
+	# 使用对象池获取粒子
+	if ObjectPoolManager.instance:
+		hit_particle = ObjectPoolManager.instance.get_object(hit_particle_path)
+		# 设置场景路径以便归还到对象池
+		if hit_particle.has_method("set_scene_path"):
+			hit_particle.set_scene_path(hit_particle_path)
+		# 调用 activate 方法确保正确初始化
+		if hit_particle.has_method("activate"):
+			hit_particle.activate()
+	else:
+		# 对象池管理器不存在时，直接实例化
+		hit_particle = hit_particle_scene.instantiate()
+	
 	if hit_particle:
 		# 设置粒子位置为敌人位置
 		hit_particle.global_position = global_position
+		
+		# 如果不是从对象池获取的，需要手动发射
+		if not ObjectPoolManager.instance:
+			hit_particle.emitting = true
 		
 		# 获取子弹颜色并设置粒子颜色
 		if bullet.has_method("get_bullet_type"):
@@ -400,9 +438,6 @@ func _spawn_hit_particle(bullet: Bullet) -> void:
 			
 			# 设置粒子系统的颜色
 			_set_particle_color(hit_particle, bullet_color)
-		
-		# 添加到场景中
-		get_tree().current_scene.add_child(hit_particle)
 
 func _set_particle_color(particle: Node, color: Color) -> void:
 	"""设置粒子系统的颜色"""

@@ -33,6 +33,17 @@ func reset() -> void:
 	_fade_out_timer = 0.0
 	_is_fading_out = false
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 重置状态
+	_current_damage = float(_attack_damage)
+	_damage_timer = damage_interval
+	_is_continuous = true
+	_energy_pulse_timer = 0.0
+	_fade_out_timer = 0.0
+	_is_fading_out = false
+
 func set_target(target: Node2D, start_pos: Vector2, target_pos: Vector2, current_damage_: float = 0.0) -> void:
 	_target = target
 	_start_position = start_pos

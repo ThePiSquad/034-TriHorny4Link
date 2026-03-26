@@ -19,6 +19,12 @@ func reset() -> void:
 	_hit_targets.clear()
 	current_damage = 0.0
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 重置状态
+	_hit_targets.clear()
+
 func _on_hit_area_2d_area_entered(area: Area2D) -> void:
 	var body = area.get_parent()
 	

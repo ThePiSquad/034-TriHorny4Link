@@ -18,6 +18,13 @@ func reset() -> void:
 	_attack_delay_timer = attack_delay
 	_can_attack = false
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 重置状态
+	_attack_delay_timer = attack_delay
+	_can_attack = false
+
 func _process(delta: float) -> void:
 	super._process(delta)
 	

@@ -101,6 +101,13 @@ func reset() -> void:
 	_trail_timer = 0.0
 	_speed = 0.0
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 重新计算速度
+	if _velocity.length() > 0:
+		_speed = _velocity.length()
+
 func destroy() -> void:
 	# 清理拖尾效果
 	_clear_trail()

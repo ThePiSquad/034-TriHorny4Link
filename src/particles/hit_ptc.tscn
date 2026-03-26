@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cif4jbm8x54r"]
 
-[ext_resource type="Script" uid="uid://b5yihsthihr2c" path="res://src/particles/hit_ptc.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bcwbo2njf8ion" path="res://src/particles/ptc_destory.gd" id="2_a4bk3"]
 [ext_resource type="Texture2D" uid="uid://4ylfmw2x4mgx" path="res://assets/particles/circle_solid_particle.png" id="2_texture"]
 
 [sub_resource type="Curve" id="Curve_uk8yn"]
@@ -33,4 +33,4 @@ lifetime = 0.5
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_a4bk3")
-script = ExtResource("1_script")
+script = ExtResource("2_a4bk3")

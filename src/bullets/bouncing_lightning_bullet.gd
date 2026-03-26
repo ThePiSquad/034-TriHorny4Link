@@ -25,6 +25,15 @@ func reset() -> void:
 	_attack_delay_timer = 0.0
 	_can_attack = true
 
+func activate() -> void:
+	"""激活子弹"""
+	super.activate()
+	# 重置状态
+	_hit_enemies.clear()
+	_bounce_count = 0
+	_attack_delay_timer = 0.0
+	_can_attack = true
+
 func _process(delta: float) -> void:
 	super._process(delta)
 	
