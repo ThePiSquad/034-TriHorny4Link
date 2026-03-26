@@ -1,4 +1,4 @@
-class_name FlyEnemy extends Enemy
+class_name FlyEnemy extends TriangleEnemy
 
 # 飞行敌人特殊属性
 @export var rotation_speed: float = 180.0  # 旋转速度（度/秒）
@@ -59,20 +59,3 @@ func _is_magic_bullet(bullet: Bullet) -> bool:
 		if attr == Enums.BulletAttributes.MAGIC:
 			return true
 	return false
-
-func _initialize_shape() -> void:
-	super._initialize_shape()
-	if hitbox_shape:
-		hitbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
-		hitbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
-		hitbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
-	if hurtbox_shape:
-		hurtbox_shape.shape.points[0] = Vector2(0, - enemy_size.y / 2)
-		hurtbox_shape.shape.points[1] = Vector2(- enemy_size.x / 2, enemy_size.y / 2)
-		hurtbox_shape.shape.points[2] = Vector2(enemy_size.x / 2, enemy_size.y / 2)
-
-func _setup_particle_texture(particle: GPUParticles2D) -> void:
-	"""设置飞行敌人的死亡粒子纹理"""
-	var texture = load("res://assets/particles/t_particle.png")
-	if texture:
-		particle.texture = texture
