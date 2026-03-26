@@ -149,7 +149,7 @@ func _ready() -> void:
 	
 	# 保存原始颜色
 	if shape_drawer:
-		_original_color = shape_drawer.fill_color
+		_original_color = shape_drawer.modulate
 	
 	died.connect(_on_damageable_died)
 	
@@ -185,7 +185,7 @@ func _initialize_teleport_effect() -> void:
 		_teleport_material.set_shader_parameter("progress", 1.0)
 		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x * 3, enemy_size.y * 3))
 		_teleport_material.set_shader_parameter("beam_size", 0.15)
-		_teleport_material.set_shader_parameter("color", Color.RED)
+		#_teleport_material.set_shader_parameter("color", Color.RED)
 		# 应用材质到 shape_drawer
 		if shape_drawer:
 			shape_drawer.material = _teleport_material
@@ -329,9 +329,9 @@ func _update_hit_effect(delta: float) -> void:
 	# 切换颜色（奇数次显示白色，偶数次显示原始颜色）
 	if shape_drawer:
 		if current_flash % 2 == 0:
-			shape_drawer.fill_color = Color.WHITE
+			shape_drawer.modulate = Color.RED
 		else:
-			shape_drawer.fill_color = _original_color
+			shape_drawer.modulate = _original_color
 	
 	# 应用击退效果
 	if _knockback_velocity != Vector2.ZERO:
@@ -349,7 +349,8 @@ func _on_hit(source: Node) -> void:
 	_hit_flash_count = 0
 	
 	# 立即开始闪烁
-	shape_drawer.fill_color = Color.WHITE
+	#shape_drawer.fill_color = Color.WHITE
+	shape_drawer.modulate = Color.RED
 	AudioManager.play_enemy_hit()
 	# 如果是动能子弹，添加击退效果
 	if source is Bullet:
@@ -421,7 +422,7 @@ func _finish_hit_effect() -> void:
 	
 	# 恢复原始颜色
 	if shape_drawer:
-		shape_drawer.fill_color = _original_color
+		shape_drawer.modulate = _original_color
 
 func _update_teleport(delta: float) -> void:
 	"""更新传送效果"""
