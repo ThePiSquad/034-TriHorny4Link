@@ -87,6 +87,7 @@ attack_damage = 5.0
 size_level = 3
 score_value = 16
 random_initial_rotation = true
+max_health = 80.0
 
 [node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
 material = SubResource("ShaderMaterial_2g5ha")

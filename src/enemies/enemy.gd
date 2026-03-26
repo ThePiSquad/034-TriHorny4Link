@@ -33,6 +33,7 @@ var _is_teleporting: bool = false  # 是否正在传送
 var _teleport_duration: float = 1  # 传送动画持续时间（秒）
 var _teleport_timer: float = 0.0  # 传送计时器
 var _teleport_material: ShaderMaterial  # 传送效果材质
+var _skip_teleport_on_ready: bool = false  # 是否跳过传送动画（用于分裂等特殊生成）
 
 # 受击反馈相关
 var _is_hit: bool = false  # 是否正在受击
@@ -150,11 +151,12 @@ func _ready() -> void:
 	# 保存原始颜色
 	#if shape_drawer:
 		#_original_color = shape_drawer.modulate
-	
+	shape_drawer.modulate = _original_color
 	died.connect(_on_damageable_died)
 	
-	# 初始化传送效果
-	_initialize_teleport_effect()
+	# 初始化传送效果（除非设置为跳过）
+	if not _skip_teleport_on_ready:
+		_initialize_teleport_effect()
 	
 	# 初始化粒子效果
 	_initialize_particles()
