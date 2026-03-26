@@ -294,14 +294,14 @@ static var TURRET_CONFIG = {
 		"bullet_speed": 750.0,
 		"bullet_damage": 10.0,
 		"detection_range": 15 * grid_size,
-		"bullet_lifetime": 1.8,
+		"bullet_lifetime": 2,
 		"splitting_homing_enabled": true,
 		"splitting_homing_detection_range": 5 * grid_size,
 		"splitting_homing_turn_speed": 7.0,
 		"splitting_count": 3,
 		"splitting_angle_spread": 45.0,
 		"splitting_bullet_damage": 10.0,
-		"splitting_bullet_lifetime": 1.8,
+		"splitting_bullet_lifetime": 2,
 		"splitting_bullet_homing_detection_range": 6 * grid_size,
 		"splitting_bullet_homing_turn_speed": 10.0,
 		"splitting_bullet_attack_delay": 0.15
@@ -353,7 +353,7 @@ static var TURRET_CONFIG = {
 		"cluster_bomb_cluster_count": 4,
 		"cluster_bomb_angle_spread": 15.0,
 		"cluster_bomb_bullet_damage": 15.0,
-		"cluster_bomb_bullet_lifetime": 0.8,
+		"cluster_bomb_bullet_lifetime": 1.4,
 		"cluster_bomb_bullet_speed": 600.0
 	},
 	Enums.ColorType.PURPLE_BLUE: {
