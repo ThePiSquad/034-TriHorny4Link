@@ -139,6 +139,77 @@ theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
+[node name="Level4Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=411012558]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level5Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=1843972360]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level6Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=416470641]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level7Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=2075130893]
+process_mode = 3
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
+[node name="Level8Button" type="Button" parent="CanvasLayer/VBoxContainer/LevelButtons" unique_id=19343140]
+process_mode = 3
+visible = false
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_colors/icon_pressed_color = Color(1.8049031e-06, 0.41107172, 0.18301854, 1)
+theme_override_colors/icon_hover_color = Color(0, 0.8685032, 0.41456917, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
+theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+icon = ExtResource("2_wfe3n")
+icon_alignment = 1
+
 [node name="BackButton" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1489794349]
 process_mode = 3
 custom_minimum_size = Vector2(0, 60)
@@ -155,6 +226,7 @@ vertical_icon_alignment = 2
 
 [node name="TestButton" type="Button" parent="." unique_id=1520241358]
 process_mode = 3
+visible = false
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 1
 anchors_preset = 3

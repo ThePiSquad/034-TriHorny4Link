@@ -1,11 +1,17 @@
 class_name LevelSelectScreen extends Control
 
+@onready var back_button: Button = $CanvasLayer/VBoxContainer/BackButton
+@onready var test_button: Button = $TestButton
+
 @onready var level0_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level0Button
 @onready var level1_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level1Button
 @onready var level2_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level2Button
 @onready var level3_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level3Button
-@onready var back_button: Button = $CanvasLayer/VBoxContainer/BackButton
-@onready var test_button: Button = $TestButton
+@onready var level_4_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level4Button
+@onready var level_5_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level5Button
+@onready var level_6_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level6Button
+@onready var level_7_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level7Button
+@onready var level_8_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level8Button
 
 ## 关卡选择界面
 
@@ -26,6 +32,22 @@ func _ready() -> void:
 	if level3_button:
 		level3_button.pressed.connect(_on_level3_pressed)
 		_add_hover_effect(level3_button)
+	
+	if level_4_button:
+		level_4_button.pressed.connect(_on_level4_pressed)
+		_add_hover_effect(level_4_button)
+	
+	if level_5_button:
+		level_5_button.pressed.connect(_on_level5_pressed)
+		_add_hover_effect(level_5_button)
+	
+	if level_6_button:
+		level_6_button.pressed.connect(_on_level6_pressed)
+		_add_hover_effect(level_6_button)
+	
+	if level_7_button:
+		level_7_button.pressed.connect(_on_level7_pressed)
+		_add_hover_effect(level_7_button)
 	
 	if test_button:
 		test_button.pressed.connect(_on_test_pressed)
@@ -78,6 +100,18 @@ func _check_level_availability() -> void:
 	
 	if level3_button:
 		level3_button.disabled = not FileAccess.file_exists("res://config/levels/level_3.json")
+	
+	if level_4_button:
+		level_4_button.disabled = not FileAccess.file_exists("res://config/levels/level_4.json")
+	
+	if level_5_button:
+		level_5_button.disabled = not FileAccess.file_exists("res://config/levels/level_5.json")
+	
+	if level_6_button:
+		level_6_button.disabled = not FileAccess.file_exists("res://config/levels/level_6.json")
+	
+	if level_7_button:
+		level_7_button.disabled = not FileAccess.file_exists("res://config/levels/level_7.json")
 
 func _on_level0_pressed() -> void:
 	"""选择教学关卡"""
@@ -103,6 +137,30 @@ func _on_level3_pressed() -> void:
 	_play_button_click_animation(level3_button)
 	await get_tree().create_timer(0.2).timeout
 	_start_level("level_3")
+
+func _on_level4_pressed() -> void:
+	"""选择关卡 4"""
+	_play_button_click_animation(level_4_button)
+	await get_tree().create_timer(0.2).timeout
+	_start_level("level_4")
+
+func _on_level5_pressed() -> void:
+	"""选择关卡 5"""
+	_play_button_click_animation(level_5_button)
+	await get_tree().create_timer(0.2).timeout
+	_start_level("level_5")
+
+func _on_level6_pressed() -> void:
+	"""选择关卡 6"""
+	_play_button_click_animation(level_6_button)
+	await get_tree().create_timer(0.2).timeout
+	_start_level("level_6")
+
+func _on_level7_pressed() -> void:
+	"""选择关卡 7"""
+	_play_button_click_animation(level_7_button)
+	await get_tree().create_timer(0.2).timeout
+	_start_level("level_7")
 
 func _on_test_pressed() -> void:
 	"""选择测试关卡"""
