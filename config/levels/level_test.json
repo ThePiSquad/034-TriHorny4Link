@@ -36,10 +36,10 @@
 					"is_boss": false
 				},
 				{
-					"enemy_type": "rect_enemy",
-					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"enemy_type": "splitting_enemy",
+					"enemy_scene_path": "res://src/enemies/splitting_enemy.tscn",
 					"count": 10,
-					"size_level": 2,
+					"size_level": 3,
 					"health_multiplier": 1.0,
 					"speed_multiplier": 1.0,
 					"damage_multiplier": 1.0,
@@ -80,8 +80,8 @@
 					"is_boss": false
 				},
 				{
-					"enemy_type": "rect_enemy",
-					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
+					"enemy_type": "splitting_enemy",
+					"enemy_scene_path": "res://src/enemies/splitting_enemy.tscn",
 					"count": 10,
 					"size_level": 6,
 					"health_multiplier": 1.0,

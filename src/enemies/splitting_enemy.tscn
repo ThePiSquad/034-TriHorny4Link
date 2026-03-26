@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://bvhxhtnahb6vu"]
+
+[ext_resource type="PackedScene" uid="uid://baprtpmei8ko8" path="res://src/enemies/enemy.tscn" id="1_si4oy"]
+[ext_resource type="Script" uid="uid://bpue0n1u2hdgg" path="res://src/enemies/splitting_enemy.gd" id="2_snddp"]
+
+[sub_resource type="Shader" id="Shader_yvjb1"]
+code = "shader_type canvas_item;
+
+// 新增：接收形状的大小，用于计算 UV 映射
+uniform vec2 shape_size = vec2(100.0, 100.0);
+
+uniform float progress : hint_range(0.0, 1.0);
+uniform float noise_desnity = 60.0;
+uniform float beam_size : hint_range(0.01, 0.15);
+uniform vec4 color : source_color = vec4(0.0, 1.02, 1.2, 1.0);
+
+// 用于将顶点位置从 vertex 传到 fragment
+varying vec2 v_pos;
+
+vec2 random(vec2 uv){
+    uv = vec2( dot(uv, vec2(127.1,311.7) ),
+               dot(uv, vec2(269.5,183.3) ) );
+    return -1.0 + 2.0 * fract(sin(uv) * 43758.5453123);
+}
+
+float noise(vec2 uv) {
+    vec2 uv_index = floor(uv);
+    vec2 uv_fract = fract(uv);
+    vec2 blur = smoothstep(0.0, 1.0, uv_fract);
+    return mix( mix( dot( random(uv_index + vec2(0.0,0.0) ), uv_fract - vec2(0.0,0.0) ),
+                     dot( random(uv_index + vec2(1.0,0.0) ), uv_fract - vec2(1.0,0.0) ), blur.x),
+                mix( dot( random(uv_index + vec2(0.0,1.0) ), uv_fract - vec2(0.0,1.0) ),
+                     dot( random(uv_index + vec2(1.0,1.0) ), uv_fract - vec2(1.0,1.0) ), blur.x), blur.y) * 0.5 + 0.5;
+}
+
+void vertex() {
+    // 将顶点位置传给 fragment
+    v_pos = VERTEX;
+}
+
+void fragment() {
+    // 【关键点】手动计算自定义 UV
+    // 因为 _draw() 通常以中心为 (0,0)，所以需要将坐标平移并缩放
+    // 映射范围从 [-size/2, size/2] 到 [0, 1]
+    vec2 custom_uv = (v_pos / shape_size) + vec2(0.5);
+    // 这里的 64.0 代表你想模拟的“分辨率”（比如 64x64 像素）
+    // 你也可以定义一个 uniform float pixel_size 来动态控制它
+    float pixel_grid = 64.0; 
+    custom_uv = floor(custom_uv * pixel_grid) / pixel_grid;
+    // 限制 UV 范围在 0-1 之间，防止噪点溢出
+    custom_uv = clamp(custom_uv, 0.0, 1.0);
+
+    // 使用 custom_uv 替代原先的 UV
+    float n = noise(custom_uv * noise_desnity) * custom_uv.y;
+    
+    float d1 = step(progress, n);
+    float d2 = step(progress - beam_size, n);
+    
+    vec3 beam = vec3(d2 - d1) * color.rgb;
+    
+    // 注意：手动绘制时纹理通常为空，所以直接使用顶点颜色或自定义颜色
+    vec4 tex = COLOR; // 获取来自 draw_ 函数传入的颜色
+    tex.rgb += beam;
+    tex.a *= d2;
+    
+    COLOR = tex;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2g5ha"]
+shader = SubResource("Shader_yvjb1")
+shader_parameter/shape_size = Vector2(64, 64)
+shader_parameter/progress = 0.0
+shader_parameter/noise_desnity = 60.0
+shader_parameter/beam_size = 0.15000000596046
+shader_parameter/color = Color(1, 0.2, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_snddp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2g5ha"]
+
+[node name="SplittingEnemy" unique_id=265451698 instance=ExtResource("1_si4oy")]
+script = ExtResource("2_snddp")
+split_count = 2
+split_offset_distance = 64.0
+move_speed = 85.0
+attack_damage = 5.0
+size_level = 3
+score_value = 16
+random_initial_rotation = true
+
+[node name="ShapeDrawer" parent="." index="0" unique_id=590652366]
+material = SubResource("ShaderMaterial_2g5ha")
+shape_type = 2
+corner_radius = 0.0
+fill_color = Color(0.26666668, 0.26666668, 0.26666668, 1)
+stroke_color = Color(0.48941624, 0.18687531, 0.4901362, 1)
+stroke_enabled = true
+
+[node name="CollisionShape2D" parent="HitboxArea" parent_id_path=PackedInt32Array(1114372282) index="0" unique_id=910591284]
+shape = SubResource("RectangleShape2D_snddp")
+
+[node name="CollisionShape2D" parent="HurtboxArea" parent_id_path=PackedInt32Array(1565689982) index="0" unique_id=1064559139]
+shape = SubResource("RectangleShape2D_2g5ha")

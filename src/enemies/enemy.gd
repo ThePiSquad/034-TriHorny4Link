@@ -148,8 +148,8 @@ func _ready() -> void:
 		shape_drawer.rotation_degrees = random_angle
 	
 	# 保存原始颜色
-	if shape_drawer:
-		_original_color = shape_drawer.modulate
+	#if shape_drawer:
+		#_original_color = shape_drawer.modulate
 	
 	died.connect(_on_damageable_died)
 	
@@ -185,7 +185,7 @@ func _initialize_teleport_effect() -> void:
 		_teleport_material.set_shader_parameter("progress", 1.0)
 		_teleport_material.set_shader_parameter("shape_size", Vector2(enemy_size.x * 3, enemy_size.y * 3))
 		_teleport_material.set_shader_parameter("beam_size", 0.15)
-		#_teleport_material.set_shader_parameter("color", Color.RED)
+		_teleport_material.set_shader_parameter("color", shape_drawer.stroke_color.lightened(0.5))
 		# 应用材质到 shape_drawer
 		if shape_drawer:
 			shape_drawer.material = _teleport_material
