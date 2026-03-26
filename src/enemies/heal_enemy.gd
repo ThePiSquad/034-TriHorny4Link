@@ -77,11 +77,8 @@ func _perform_healing() -> void:
 	
 	# 治疗所有目标
 	for target in _heal_targets:
-		if is_instance_valid(target) and target.has_method("heal"):
-			target.heal(heal_amount, self)
-		elif is_instance_valid(target) and target.has_method("take_damage"):
-			# 如果没有 heal 方法，使用 take_damage 的负值
-			target.take_damage(-heal_amount, self)
+		if is_instance_valid(target):
+			target.heal(heal_amount * size_level, self)
 	
 	# 治疗完成后重置状态
 	await get_tree().create_timer(0.5).timeout

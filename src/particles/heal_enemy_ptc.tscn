@@ -9,7 +9,7 @@ colors = PackedColorArray(1, 1, 1, 1, 0.54763263, 0.5476326, 0.5476326, 1)
 gradient = SubResource("Gradient_yimub")
 
 [sub_resource type="Curve" id="Curve_04e63"]
-_data = [Vector2(0, 0), 0.0, 3.2346725, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, 1.4, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_yimub"]
