@@ -55,12 +55,28 @@ func _perform_split() -> void:
 		_spawn_split_enemy(new_size_level, i)
 
 func _spawn_split_enemy(new_size_level: int, index: int) -> void:
+	# 保存父敌人的基础属性值（在 duplicate 之前）
+	var parent_base_health = _base_max_health
+	var parent_base_speed = _base_move_speed
+	var parent_base_damage = _base_attack_damage
+	
 	# 创建新的敌人实例
 	var new_enemy : SplittingEnemy = duplicate()
 	
 	# 重置基础值标记，确保 set_size_level 使用正确的初始值
 	# 这是关键修复：复制节点的 _is_base_values_set 状态是错的
 	new_enemy._is_base_values_set = false
+	
+	# 重置基础属性为父敌人的基础值（而不是复制后的当前值）
+	new_enemy._base_max_health = parent_base_health
+	new_enemy._base_move_speed = parent_base_speed
+	new_enemy._base_attack_damage = parent_base_damage
+	
+	# 重置当前属性为基础值（避免使用复制后的倍数调整值）
+	new_enemy.max_health = parent_base_health
+	new_enemy.current_health = parent_base_health
+	new_enemy.move_speed = parent_base_speed
+	new_enemy.attack_damage = parent_base_damage
 	
 	# 跳过传送动画和无敌状态，分裂后立即可交互
 	new_enemy._skip_teleport_on_ready = true
@@ -73,7 +89,7 @@ func _spawn_split_enemy(new_size_level: int, index: int) -> void:
 	# ⭐ 初始化弹出效果
 	new_enemy._initialize_pop_effect(angle)
 	
-	# 设置新的体型等级
+	# 设置新的体型等级（会基于基础值重新计算）
 	new_enemy.size_level = new_size_level
 	new_enemy.set_size_level(new_size_level)
 	
