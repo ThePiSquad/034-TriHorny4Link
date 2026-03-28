@@ -97,6 +97,8 @@ func _check_level_availability() -> void:
 	var game_manager = GameManager.instance
 	
 	var level_configs = [
+		{"button": level0_button, "level_id": "level_0", "file_check": false},
+		{"button": level1_button, "level_id": "level_1"},
 		{"button": level2_button, "level_id": "level_2"},
 		{"button": level3_button, "level_id": "level_3"},
 		{"button": level_4_button, "level_id": "level_4"},
@@ -108,10 +110,13 @@ func _check_level_availability() -> void:
 	for config in level_configs:
 		var button = config["button"]
 		var level_id = config["level_id"]
+		var check_file = config.get("file_check", true)
 		if not button:
 			continue
 		
-		var file_exists = FileAccess.file_exists("res://config/levels/" + level_id + ".json")
+		var file_exists = true
+		if check_file:
+			file_exists = FileAccess.file_exists("res://config/levels/" + level_id + ".json")
 		var is_unlocked = game_manager and game_manager.is_level_unlocked(level_id)
 		var is_completed = game_manager and game_manager.is_level_completed(level_id)
 		

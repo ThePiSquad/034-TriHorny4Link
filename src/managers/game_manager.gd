@@ -98,25 +98,17 @@ func unlock_level(level_id: String) -> void:
 		_save_progress()
 
 func complete_level(level_id: String) -> void:
-	print("complete_level called: ", level_id)
-	
 	if not level_id in completed_levels:
 		completed_levels.append(level_id)
-		print("Added to completed: ", completed_levels)
 	
 	if not level_id in unlocked_levels:
 		unlocked_levels.append(level_id)
 	
 	var level_num = _get_next_level_number(level_id)
-	print("Next level number: ", level_num)
 	if level_num > 0:
 		var next_level = "level_" + str(level_num)
-		print("Checking next level: ", next_level)
 		if not next_level in unlocked_levels:
 			unlocked_levels.append(next_level)
-			print("Unlocked levels now: ", unlocked_levels)
-		else:
-			print("Next level already unlocked")
 	
 	_save_progress()
 
