@@ -33,7 +33,60 @@ func _update_triangle_disabled_state(disabled: bool) -> void:
 
 func trigger_limit_reached_feedback() -> void:
 	if selected_icon != null:
-		_play_triangle_shake_animation()
+		_play_shake_animation_for_icon(selected_icon)
+
+func play_shake_animation_for_structure(structure_type: Enums.StructureType, color_type: Enums.ColorType = Enums.ColorType.WHITE) -> void:
+	var target_icon = _get_icon_for_structure(structure_type, color_type)
+	if target_icon:
+		_play_shake_animation_for_icon(target_icon)
+
+func _get_icon_for_structure(structure_type: Enums.StructureType, color_type: Enums.ColorType):
+	match structure_type:
+		Enums.StructureType.MONO_CRYSTAL:
+			return _get_color_circle_icon(color_type)
+		Enums.StructureType.CONDUIT:
+			return _get_shape_icon(0)  # RECTANGLE
+		Enums.StructureType.TURRET:
+			return _get_shape_icon(1)  # TRIANGLE
+	return null
+
+func _get_color_circle_icon(color_type: Enums.ColorType) -> Control:
+	for icon in icons:
+		if icon is Control and icon.get("circle_color") != null:
+			match color_type:
+				Enums.ColorType.RED:
+					if icon.circle_color == Color.RED:
+						return icon
+				Enums.ColorType.YELLOW:
+					if icon.circle_color == Color.YELLOW:
+						return icon
+				Enums.ColorType.BLUE:
+					if icon.circle_color == Color.BLUE:
+						return icon
+	return null
+
+func _get_shape_icon(shape_type_value: int) -> Control:
+	for icon in icons:
+		if icon is Control and icon.get("shape_type") != null:
+			if icon.shape_type == shape_type_value:
+				return icon
+	return null
+
+func _play_shake_animation_for_icon(icon: Control) -> void:
+	if not icon:
+		return
+	
+	icon.pivot_offset = icon.size / 2
+	
+	var tween = create_tween()
+	var shake_angle = 0.3
+	var duration = 0.08
+	
+	tween.tween_property(icon, "rotation", -shake_angle, duration)
+	tween.tween_property(icon, "rotation", shake_angle, duration)
+	tween.tween_property(icon, "rotation", -shake_angle * 0.5, duration)
+	tween.tween_property(icon, "rotation", shake_angle * 0.5, duration)
+	tween.tween_property(icon, "rotation", 0.0, duration)
 
 func _play_triangle_shake_animation() -> void:
 	# 找到三角形图标
