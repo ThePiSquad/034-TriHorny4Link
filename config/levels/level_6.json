@@ -8,7 +8,7 @@
 	"waves": [
 		{
 			"wave_index": 0,
-			"wave_name": "第一波：医护兵",
+			"wave_name": "第一波",
 			"is_boss_wave": false,
 			"preparation_time": 3.0,
 			"spawn_interval": 1.5,
@@ -23,19 +23,6 @@
 			"health_multiplier": 1.0,
 			"enemies": [
 				{
-					"enemy_type": "heal_enemy",
-					"enemy_scene_path": "res://src/enemies/heal_enemy.tscn",
-					"count": 2,
-					"size_level": 2,
-					"health_multiplier": 0.8,
-					"speed_multiplier": 1.0,
-					"damage_multiplier": 0.8,
-					"spawn_priority": 5,
-					"spawn_weight": 1.0,
-					"is_elite": false,
-					"is_boss": false
-				},
-				{
 					"enemy_type": "rect_enemy",
 					"enemy_scene_path": "res://src/enemies/rect_enemy.tscn",
 					"count": 3,
@@ -43,6 +30,19 @@
 					"health_multiplier": 1.0,
 					"speed_multiplier": 1.0,
 					"damage_multiplier": 1.0,
+					"spawn_priority": 4,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 3,
+					"size_level": 3,
+					"health_multiplier": 1.2,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.2,
 					"spawn_priority": 4,
 					"spawn_weight": 1.0,
 					"is_elite": false,
@@ -61,7 +61,7 @@
 			"min_enemies_alive": 0,
 			"spawn_center": [0, 0],
 			"min_spawn_radius": 600.0,
-			"max_spawn_radius": 1100.0,
+			"max_spawn_radius": 800.0,
 			"difficulty_multiplier": 1.1,
 			"speed_multiplier": 1.0,
 			"health_multiplier": 1.2,
@@ -69,7 +69,7 @@
 				{
 					"enemy_type": "heal_enemy",
 					"enemy_scene_path": "res://src/enemies/heal_enemy.tscn",
-					"count": 3,
+					"count": 8,
 					"size_level": 3,
 					"health_multiplier": 1.0,
 					"speed_multiplier": 1.0,
@@ -126,7 +126,7 @@
 				{
 					"enemy_type": "heal_enemy",
 					"enemy_scene_path": "res://src/enemies/heal_enemy.tscn",
-					"count": 4,
+					"count": 6,
 					"size_level_min": 3,
 					"size_level_max": 5,
 					"use_random_size": true,
@@ -147,6 +147,19 @@
 					"speed_multiplier": 0.8,
 					"damage_multiplier": 1.5,
 					"spawn_priority": 5,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 3,
+					"size_level": 3,
+					"health_multiplier": 1.2,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.2,
+					"spawn_priority": 4,
 					"spawn_weight": 1.0,
 					"is_elite": false,
 					"is_boss": false
@@ -173,7 +186,7 @@
 					"enemy_type": "heal_enemy",
 					"enemy_scene_path": "res://src/enemies/heal_enemy.tscn",
 					"count": 3,
-					"size_level": 5,
+					"size_level": 8,
 					"health_multiplier": 1.5,
 					"speed_multiplier": 1.0,
 					"damage_multiplier": 1.1,
@@ -230,7 +243,7 @@
 					"enemy_type": "heal_enemy",
 					"enemy_scene_path": "res://src/enemies/heal_enemy.tscn",
 					"count": 1,
-					"size_level": 8,
+					"size_level": 10,
 					"health_multiplier": 2.5,
 					"speed_multiplier": 1.0,
 					"damage_multiplier": 1.5,
@@ -263,6 +276,19 @@
 					"speed_multiplier": 0.8,
 					"damage_multiplier": 2.0,
 					"spawn_priority": 5,
+					"spawn_weight": 1.0,
+					"is_elite": false,
+					"is_boss": false
+				},
+				{
+					"enemy_type": "triangle_enemy",
+					"enemy_scene_path": "res://src/enemies/triangle_enemy.tscn",
+					"count": 6,
+					"size_level": 10,
+					"health_multiplier": 1.2,
+					"speed_multiplier": 1.0,
+					"damage_multiplier": 1.2,
+					"spawn_priority": 4,
 					"spawn_weight": 1.0,
 					"is_elite": false,
 					"is_boss": false
