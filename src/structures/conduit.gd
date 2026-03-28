@@ -26,10 +26,6 @@ func _ready() -> void:
 	if barrier_collision == null:
 		print("未找到Conduit的阻挡碰撞Shape")
 	
-	if barrier_area:
-		barrier_area.area_entered.connect(_on_barrier_area_entered)
-		barrier_area.area_exited.connect(_on_barrier_area_exited)
-	
 	_update_barrier_state()
 
 func _init() -> void:
@@ -80,7 +76,7 @@ func _on_barrier_area_entered(area: Area2D) -> void:
 		
 		body.on_barrier_hit(self)
 
-func _on_barrier_area_exited(area: Area2D) -> void:
+func _on_barrier_area_area_exited(area: Area2D) -> void:
 	if not is_barrier:
 		return
 	
@@ -93,7 +89,3 @@ func _on_barrier_area_exited(area: Area2D) -> void:
 func is_blocking_enemy(enemy: Node) -> bool:
 	"""检查敌人是否仍在阻挡范围内"""
 	return enemy in _blocking_enemies
-
-
-func _on_barrier_area_area_exited(area: Area2D) -> void:
-	pass # Replace with function body.

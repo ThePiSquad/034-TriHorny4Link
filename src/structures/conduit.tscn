@@ -51,3 +51,4 @@ affect_navigation_mesh = true
 
 [connection signal="mouse_entered" from="HurtboxArea" to="." method="_on_hurtbox_area_mouse_entered"]
 [connection signal="area_entered" from="BarrierArea" to="." method="_on_barrier_area_entered"]
+[connection signal="area_exited" from="BarrierArea" to="." method="_on_barrier_area_area_exited"]
