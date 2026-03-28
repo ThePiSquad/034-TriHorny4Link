@@ -2,6 +2,7 @@ class_name StructureManager extends Node2D
 
 var structures: Dictionary[Vector2i, Structure]
 var connection_manager: ConnectionManager
+var _turret_count: int = 0  # 当前炮塔数量
 
 var crystal_scene: PackedScene = preload("res://src/structures/crystal.tscn")
 var conduit_scene: PackedScene = preload("res://src/structures/conduit.tscn")
@@ -10,9 +11,20 @@ var mono_crystal_scene: PackedScene = preload("res://src/structures/mono_crystal
 
 func _ready() -> void:
 	structures = {}
-	# 创建连接管理器
 	connection_manager = ConnectionManager.new()
 	add_child(connection_manager)
+
+func get_turret_count() -> int:
+	return _turret_count
+
+func get_max_turret_count() -> int:
+	return Constants.ResourceConstants.MAX_TURRET_COUNT
+
+func can_place_more_turrets() -> bool:
+	return _turret_count < Constants.ResourceConstants.MAX_TURRET_COUNT
+
+func _notify_turret_count_changed() -> void:
+	get_tree().call_group("turret_count_observer", "_on_turret_count_changed", _turret_count, Constants.ResourceConstants.MAX_TURRET_COUNT)
 
 func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorType = Enums.ColorType.WHITE) -> bool:
 	var pos_key = Vector2i(pos.x, pos.y)
@@ -36,8 +48,9 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 	
 	# 检查炮塔放置限制（必须靠近conduit）
 	if type == Enums.StructureType.TURRET:
+		if not can_place_more_turrets():
+			return false
 		if not _has_nearby_conduit(pos):
-			# print("  失败：炮塔必须靠近导管")
 			return false
 	
 	# 检查导管放置限制
@@ -88,6 +101,11 @@ func spawn(type: Enums.StructureType, pos: GridCoord, color_type: Enums.ColorTyp
 		structures.set(pos_key, structure)
 		add_child(structure)
 		
+		# 如果是炮塔，增加计数
+		if type == Enums.StructureType.TURRET:
+			_turret_count += 1
+			_notify_turret_count_changed()
+		
 		_update_neighbor_connections(pos, structure)
 		structure.update_energy_level()
 		
@@ -126,6 +144,11 @@ func remove(pos: GridCoord) -> bool:
 	
 	# 移除相关连接
 	_remove_structure_connections(structure)
+	
+	# 如果是炮塔，减少计数
+	if structure.get_structure_type() == Enums.StructureType.TURRET:
+		_turret_count = max(0, _turret_count - 1)
+		_notify_turret_count_changed()
 	
 	structure.destroyed.emit()
 	structures.erase(pos_key)

@@ -9,10 +9,56 @@ var animation_enabled = true  # 动效开关
 
 @onready var icons_container: HBoxContainer = $SelectionPanel/IconsContainer
 
+var _max_turrets: int = 0
+
 func _ready() -> void:
 	if icons_container:
 		for child in icons_container.get_children():
 			icons.append(child)
+	
+	add_to_group("turret_count_observer")
+
+func _on_turret_count_changed(current_count: int, max_count: int) -> void:
+	_max_turrets = max_count
+	_update_triangle_disabled_state(current_count >= max_count)
+	if current_count >= max_count and selected_icon != null:
+		_play_triangle_shake_animation()
+
+func _update_triangle_disabled_state(disabled: bool) -> void:
+	for icon in icons:
+		if icon is Control and icon.get("shape_type") != null:
+			if icon.shape_type == 1:  # TRIANGLE
+				icon.disabled = disabled
+				break
+
+func trigger_limit_reached_feedback() -> void:
+	if selected_icon != null:
+		_play_triangle_shake_animation()
+
+func _play_triangle_shake_animation() -> void:
+	# 找到三角形图标
+	var triangle_icon = null
+	for icon in icons:
+		if icon is Control and icon.get("shape_type") != null:
+			if icon.shape_type == 1:  # TRIANGLE
+				triangle_icon = icon
+				break
+	
+	if triangle_icon:
+		# 设置旋转轴心为节点中心
+		var original_pivot = triangle_icon.pivot_offset
+		triangle_icon.pivot_offset = triangle_icon.size / 2
+		
+		var tween = create_tween()
+		var shake_angle = 0.3
+		var duration = 0.08
+		
+		# 摇头动画：左-右-左-右-回中
+		tween.tween_property(triangle_icon, "rotation", -shake_angle, duration)
+		tween.tween_property(triangle_icon, "rotation", shake_angle, duration)
+		tween.tween_property(triangle_icon, "rotation", -shake_angle * 0.5, duration)
+		tween.tween_property(triangle_icon, "rotation", shake_angle * 0.5, duration)
+		tween.tween_property(triangle_icon, "rotation", 0.0, duration)
 
 
 func select_icon(_selected_icon) -> void:

@@ -27,6 +27,7 @@ class ResourceConstants:
 	const MONO_CRYSTAL_COST: int = 5  # 单色水晶消耗
 	const CONDUIT_COST: int = 1  # 导管消耗（每种颜色）
 	const TURRET_COST: int = 2  # 炮塔消耗（每种颜色）
+	const MAX_TURRET_COUNT: int = 49  # 炮塔放置上限
 
 # 相机相关常量
 class CameraConstants:

@@ -317,6 +317,12 @@ func _try_place() -> void:
 	var mouse_pos = get_global_mouse_position()
 	var grid_coord = GridCoord.from_world_coord(Vector2i(mouse_pos))
 	
+	if selected_structure_type == Enums.StructureType.TURRET:
+		if not structure_manager.can_place_more_turrets():
+			if hud:
+				hud.trigger_limit_reached_feedback()
+			return
+	
 	if structure_manager.spawn(selected_structure_type, grid_coord, selected_color_type):
 		_consume_resources()
 

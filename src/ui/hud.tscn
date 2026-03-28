@@ -55,6 +55,7 @@ offset_right = 250.0
 offset_bottom = 32.0
 grow_horizontal = 2
 grow_vertical = 2
+pivot_offset = Vector2(250, 31)
 theme_override_constants/separation = 20
 alignment = 1
 
