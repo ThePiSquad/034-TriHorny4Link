@@ -85,6 +85,14 @@ func _find_nearest_target() -> void:
 		if not is_instance_valid(enemy):
 			continue
 		
+		# 排除飞行敌人（kinetic子弹无法有效击中）
+		if enemy.has_method("get_can_be_hit_by_kinetic"):
+			if not enemy.get_can_be_hit_by_kinetic():
+				continue
+		elif enemy.get("can_be_hit_by_kinetic") != null:
+			if not enemy.can_be_hit_by_kinetic:
+				continue
+		
 		var distance = global_position.distance_to(enemy.global_position)
 		if distance < nearest_distance:
 			nearest_distance = distance

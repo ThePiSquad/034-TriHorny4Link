@@ -40,6 +40,14 @@ func _split_into_bullets() -> void:
 		if enemy == _target:
 			continue
 		
+		# 排除飞行敌人（kinetic子弹无法有效击中）
+		if enemy.has_method("get_can_be_hit_by_kinetic"):
+			if not enemy.get_can_be_hit_by_kinetic():
+				continue
+		elif enemy.get("can_be_hit_by_kinetic") != null:
+			if not enemy.can_be_hit_by_kinetic:
+				continue
+		
 		var distance = global_position.distance_to(enemy.global_position)
 		if distance <= detection_range:
 			valid_targets.append(enemy)
