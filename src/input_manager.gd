@@ -313,7 +313,11 @@ func _try_place() -> void:
 	
 	if not _can_afford_structure():
 		if hud:
-			hud.play_shake_animation_for_structure(selected_structure_type, selected_color_type)
+			hud.play_loop_shake_animation_for_structure(
+				selected_structure_type, 
+				selected_color_type,
+				func(): return _is_placing and not _can_afford_structure()
+			)
 		return
 	
 	var mouse_pos = get_global_mouse_position()

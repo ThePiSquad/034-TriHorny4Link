@@ -10,6 +10,7 @@ var animation_enabled = true  # 动效开关
 @onready var icons_container: HBoxContainer = $SelectionPanel/IconsContainer
 
 var _max_turrets: int = 0
+var _loop_anim_icons: Array[Control] = []
 
 func _ready() -> void:
 	if icons_container:
@@ -22,7 +23,9 @@ func _on_turret_count_changed(current_count: int, max_count: int) -> void:
 	_max_turrets = max_count
 	_update_triangle_disabled_state(current_count >= max_count)
 	if current_count >= max_count and selected_icon != null:
-		_play_triangle_shake_animation()
+		var triangle_icon = _get_shape_icon(1)
+		if triangle_icon:
+			_play_shake_animation_for_icon(triangle_icon)
 
 func _update_triangle_disabled_state(disabled: bool) -> void:
 	for icon in icons:
@@ -39,6 +42,11 @@ func play_shake_animation_for_structure(structure_type: Enums.StructureType, col
 	var target_icon = _get_icon_for_structure(structure_type, color_type)
 	if target_icon:
 		_play_shake_animation_for_icon(target_icon)
+
+func play_loop_shake_animation_for_structure(structure_type: Enums.StructureType, color_type: Enums.ColorType, should_continue: Callable) -> void:
+	var target_icon = _get_icon_for_structure(structure_type, color_type)
+	if target_icon:
+		_play_loop_shake_animation(target_icon, should_continue)
 
 func _get_icon_for_structure(structure_type: Enums.StructureType, color_type: Enums.ColorType):
 	match structure_type:
@@ -88,31 +96,31 @@ func _play_shake_animation_for_icon(icon: Control) -> void:
 	tween.tween_property(icon, "rotation", shake_angle * 0.5, duration)
 	tween.tween_property(icon, "rotation", 0.0, duration)
 
-func _play_triangle_shake_animation() -> void:
-	# 找到三角形图标
-	var triangle_icon = null
-	for icon in icons:
-		if icon is Control and icon.get("shape_type") != null:
-			if icon.shape_type == 1:  # TRIANGLE
-				triangle_icon = icon
-				break
+func _play_loop_shake_animation(icon: Control, should_continue: Callable) -> void:
+	if not icon:
+		return
 	
-	if triangle_icon:
-		# 设置旋转轴心为节点中心
-		var original_pivot = triangle_icon.pivot_offset
-		triangle_icon.pivot_offset = triangle_icon.size / 2
-		
-		var tween = create_tween()
-		var shake_angle = 0.3
-		var duration = 0.08
-		
-		# 摇头动画：左-右-左-右-回中
-		tween.tween_property(triangle_icon, "rotation", -shake_angle, duration)
-		tween.tween_property(triangle_icon, "rotation", shake_angle, duration)
-		tween.tween_property(triangle_icon, "rotation", -shake_angle * 0.5, duration)
-		tween.tween_property(triangle_icon, "rotation", shake_angle * 0.5, duration)
-		tween.tween_property(triangle_icon, "rotation", 0.0, duration)
-
+	if icon in _loop_anim_icons:
+		return
+	
+	_loop_anim_icons.append(icon)
+	icon.pivot_offset = icon.size / 2
+	
+	var tween = create_tween()
+	var shake_angle = 0.3
+	var duration = 0.08
+	
+	tween.tween_property(icon, "rotation", -shake_angle, duration)
+	tween.tween_property(icon, "rotation", shake_angle, duration)
+	tween.tween_property(icon, "rotation", -shake_angle * 0.5, duration)
+	tween.tween_property(icon, "rotation", shake_angle * 0.5, duration)
+	tween.tween_property(icon, "rotation", 0.0, duration)
+	
+	tween.finished.connect(func(): 
+		_loop_anim_icons.erase(icon)
+		if should_continue.call():
+			_play_loop_shake_animation(icon, should_continue)
+	)
 
 func select_icon(_selected_icon) -> void:
 	AudioManager.play_ui_click()
