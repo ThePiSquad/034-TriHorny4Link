@@ -318,6 +318,9 @@ func _physics_process(delta: float) -> void:
 	if _is_teleporting:
 		return
 	
+	# 检查屏障是否仍有有效的碰撞
+	_check_barrier_collision()
+	
 	# 攻击优先处理
 	_handle_attack_priority()
 	
@@ -349,6 +352,61 @@ func _physics_process(delta: float) -> void:
 		# 没有导航代理时直接移动
 		var move_direction = (base_position - global_position).normalized()
 		global_position += move_direction * move_speed * delta
+
+func _check_barrier_collision() -> void:
+	"""检查当前屏障是否仍有有效的碰撞"""
+	if not _current_barrier:
+		return
+	
+	if not is_instance_valid(_current_barrier):
+		_clear_barrier_state()
+		return
+	
+	# 检查敌人是否仍在屏障的碰撞范围内
+	if _current_barrier.has_method("is_blocking_enemy"):
+		if not _current_barrier.is_blocking_enemy(self):
+			_clear_barrier_state()
+			return
+	
+	# 检查是否有到达 Crystal 的可行路径
+	if _has_valid_path_to_crystal():
+		_clear_barrier_state()
+
+func _has_valid_path_to_crystal() -> bool:
+	"""检查是否有到达 Crystal 的可行路径"""
+	if not navigation_agent:
+		return false
+	
+	var map = get_tree().get_first_node_in_group("navigation_map")
+	if not map:
+		return false
+	
+	var crystal = get_tree().get_first_node_in_group("crystal")
+	if not crystal:
+		return false
+	
+	var crystal_pos = crystal.global_position
+	
+	navigation_agent.target_position = crystal_pos
+	
+	if navigation_agent.is_navigation_finished():
+		return false
+	
+	var path = navigation_agent.get_current_path()
+	if path.size() < 2:
+		return false
+	
+	return true
+
+func _clear_barrier_state() -> void:
+	"""清除屏障状态"""
+	if _current_barrier:
+		if _current_barrier.has_signal("died") and _current_barrier.died.is_connected(_on_barrier_destroyed):
+			_current_barrier.died.disconnect(_on_barrier_destroyed)
+	_current_barrier = null
+	_blocked_by_barrier = false
+	_attack_priority = false
+	_priority_target = null
 
 func _update_hit_effect(delta: float) -> void:
 	"""更新受击效果"""
@@ -612,18 +670,26 @@ func on_barrier_hit(barrier: Node2D) -> void:
 	if _barrier_hit_cooldown > 0:
 		return
 	
-	#print("敌人被屏障阻挡")
 	_blocked_by_barrier = true
 	_current_barrier = barrier
 	_barrier_hit_cooldown = 0.5  # 冷却时间0.5秒
 	_attack_timer = 0.0  # 重置攻击计时器
 	
-	# 连接屏障的死亡信号
 	if barrier.has_signal("died") and not barrier.died.is_connected(_on_barrier_destroyed):
 		barrier.died.connect(_on_barrier_destroyed)
 	
-	# 立即进行第一次攻击
 	_attack_barrier(barrier)
+
+func on_barrier_exit(barrier: Node2D) -> void:
+	"""脱离屏障碰撞范围时的回调"""
+	if _current_barrier == barrier:
+		_current_barrier = null
+		_blocked_by_barrier = false
+		_attack_priority = false
+		_priority_target = null
+		
+		if barrier.has_signal("died") and barrier.died.is_connected(_on_barrier_destroyed):
+			barrier.died.disconnect(_on_barrier_destroyed)
 
 func _on_barrier_destroyed(source: Node) -> void:
 	"""屏障被摧毁时的回调"""
