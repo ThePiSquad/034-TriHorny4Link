@@ -65,6 +65,13 @@ func _initialize_game_manager() -> void:
 func _on_game_over() -> void:
 	"""游戏结束时的处理"""
 	print("收到游戏结束事件，切换到结束页面")
+	
+	var game_manager = GameManager.instance
+	if game_manager and game_manager.is_victory:
+		game_manager.complete_level("tutorial")
+	elif game_manager and not game_manager.is_victory:
+		print("教学关失败，不标记为完成")
+	
 	# 禁用所有敌人和子弹的行为，但不删除它们
 	_disable_game_objects()
 	# 延迟切换，确保粒子效果播放完成

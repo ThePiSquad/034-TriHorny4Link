@@ -413,10 +413,10 @@ func _on_main_menu_button_pressed() -> void:
 	# 切换到主菜单场景
 	var transition_manager = TransitionManager.instance
 	if transition_manager:
-		transition_manager.change_scene("res://src/main_menu.tscn")
+		transition_manager.change_scene("res://src/ui/level_select_screen.tscn")
 	else:
 		# 如果管理器不存在，直接切换
-		get_tree().change_scene_to_file("res://src/main_menu.tscn")
+		get_tree().change_scene_to_file("res://src/ui/level_select_screen.tscn")
 
 func _play_button_click_animation(button: Button) -> void:
 	"""播放按钮点击动画"""

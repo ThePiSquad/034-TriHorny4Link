@@ -78,7 +78,7 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="DamageChart" parent="MarginContainer/VBoxContainer" instance=ExtResource("4_dmgch")]
+[node name="DamageChart" parent="MarginContainer/VBoxContainer" unique_id=869900257 instance=ExtResource("4_dmgch")]
 layout_mode = 2
 
 [node name="ScoreContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1450512521]

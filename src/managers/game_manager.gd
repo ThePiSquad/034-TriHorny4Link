@@ -27,8 +27,15 @@ var damage_by_color: Dictionary = {}
 # 游戏计时
 var game_timer: float = 0.0
 
+# 关卡进度
+var unlocked_levels: Array[String] = ["tutorial", "level_0", "level_1"]
+var completed_levels: Array[String] = []
+
+const SAVE_FILE_PATH = "user://game_progress.cfg"
+
 func _ready() -> void:
 	instance = self
+	_load_progress()
 
 func start_game() -> void:
 	current_state = GameManager.GameState.PLAYING
@@ -84,3 +91,70 @@ func get_score_data() -> Dictionary:
 		"enemy_score": enemy_score,
 		"total_score": total_score
 	}
+
+func unlock_level(level_id: String) -> void:
+	if not level_id in unlocked_levels:
+		unlocked_levels.append(level_id)
+		_save_progress()
+
+func complete_level(level_id: String) -> void:
+	print("complete_level called: ", level_id)
+	
+	if not level_id in completed_levels:
+		completed_levels.append(level_id)
+		print("Added to completed: ", completed_levels)
+	
+	if not level_id in unlocked_levels:
+		unlocked_levels.append(level_id)
+	
+	var level_num = _get_next_level_number(level_id)
+	print("Next level number: ", level_num)
+	if level_num > 0:
+		var next_level = "level_" + str(level_num)
+		print("Checking next level: ", next_level)
+		if not next_level in unlocked_levels:
+			unlocked_levels.append(next_level)
+			print("Unlocked levels now: ", unlocked_levels)
+		else:
+			print("Next level already unlocked")
+	
+	_save_progress()
+
+func _get_next_level_number(level_id: String) -> int:
+	if level_id == "tutorial":
+		return 0
+	if level_id == "level_0":
+		return 1
+	var regex = RegEx.new()
+	regex.compile("level_(\\d+)")
+	var result = regex.search(level_id)
+	if result:
+		return result.get_string(1).to_int() + 1
+	return -1
+
+func is_level_unlocked(level_id: String) -> bool:
+	return level_id in unlocked_levels
+
+func is_level_completed(level_id: String) -> bool:
+	return level_id in completed_levels
+
+func _save_progress() -> void:
+	var config = ConfigFile.new()
+	config.set_value("progress", "unlocked_levels", unlocked_levels)
+	config.set_value("progress", "completed_levels", completed_levels)
+	var err = config.save(SAVE_FILE_PATH)
+	if err != OK:
+		print("保存进度失败: ", err)
+	else:
+		print("进度已保存")
+
+func _load_progress() -> void:
+	var config = ConfigFile.new()
+	var err = config.load(SAVE_FILE_PATH)
+	if err != OK:
+		print("加载进度失败或文件不存在，使用默认进度")
+		return
+	
+	unlocked_levels = config.get_value("progress", "unlocked_levels", ["tutorial", "level_0", "level_1"])
+	completed_levels = config.get_value("progress", "completed_levels", [])
+	print("进度已加载: 已解锁=", unlocked_levels, " 已完成=", completed_levels)

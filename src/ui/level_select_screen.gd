@@ -94,24 +94,41 @@ func _setup_animations() -> void:
 	tween.parallel().tween_property($CanvasLayer, "modulate:a", 1.0, 0.5)
 
 func _check_level_availability() -> void:
-	# 检查关卡配置文件是否存在
-	if level2_button:
-		level2_button.disabled = not FileAccess.file_exists("res://config/levels/level_2.json")
+	var game_manager = GameManager.instance
 	
-	if level3_button:
-		level3_button.disabled = not FileAccess.file_exists("res://config/levels/level_3.json")
+	var level_configs = [
+		{"button": level2_button, "level_id": "level_2"},
+		{"button": level3_button, "level_id": "level_3"},
+		{"button": level_4_button, "level_id": "level_4"},
+		{"button": level_5_button, "level_id": "level_5"},
+		{"button": level_6_button, "level_id": "level_6"},
+		{"button": level_7_button, "level_id": "level_7"},
+	]
 	
-	if level_4_button:
-		level_4_button.disabled = not FileAccess.file_exists("res://config/levels/level_4.json")
+	for config in level_configs:
+		var button = config["button"]
+		var level_id = config["level_id"]
+		if not button:
+			continue
+		
+		var file_exists = FileAccess.file_exists("res://config/levels/" + level_id + ".json")
+		var is_unlocked = game_manager and game_manager.is_level_unlocked(level_id)
+		var is_completed = game_manager and game_manager.is_level_completed(level_id)
+		
+		button.disabled = not file_exists or not is_unlocked
+		
+		_update_button_visual_state(button, is_unlocked, is_completed)
+
+func _update_button_visual_state(button: Button, is_unlocked: bool, is_completed: bool) -> void:
+	if not button:
+		return
 	
-	if level_5_button:
-		level_5_button.disabled = not FileAccess.file_exists("res://config/levels/level_5.json")
-	
-	if level_6_button:
-		level_6_button.disabled = not FileAccess.file_exists("res://config/levels/level_6.json")
-	
-	if level_7_button:
-		level_7_button.disabled = not FileAccess.file_exists("res://config/levels/level_7.json")
+	if not is_unlocked:
+		button.modulate = Color(0.3, 0.3, 0.3, 0.8)
+	elif is_completed:
+		button.modulate = Color(0.5, 1.0, 0.5, 1.0)
+	else:
+		button.modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 func _on_level0_pressed() -> void:
 	"""选择教学关卡"""

@@ -303,8 +303,10 @@ func _on_all_waves_completed() -> void:
 	print("所有波次完成！游戏胜利！")
 	# 触发游戏胜利
 	var game_manager = GameManager.instance
-	# 将胜利状态存储到 GameManager，以便 GameOverScreen 可以访问
 	if game_manager:
+		if game_manager.selected_level:
+			print("标记关卡完成: ", game_manager.selected_level)
+			game_manager.complete_level(game_manager.selected_level)
 		if _crystal:
 			game_manager.is_victory = true
 		game_manager.end_game()

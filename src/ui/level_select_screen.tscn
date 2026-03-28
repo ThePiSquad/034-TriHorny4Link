@@ -18,6 +18,18 @@ vertical = true
 thickness = 0
 vertical = true
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ebab3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kpifv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kixcd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w75ke"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_af257"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f0o16"]
+
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_su76r"]
 load_path = "res://.godot/imported/t_solid_left.png-335bd535e1b7e5af94fc5db7d2c4b964.ctex"
 
@@ -122,6 +134,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_ebab3")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
@@ -136,6 +149,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_kpifv")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
@@ -150,6 +164,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_kixcd")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
@@ -164,6 +179,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_w75ke")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
@@ -178,6 +194,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_af257")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
@@ -192,6 +209,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxLine_w7ph5")
 theme_override_styles/pressed = SubResource("StyleBoxEmpty_su76r")
 theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_f0o16")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
