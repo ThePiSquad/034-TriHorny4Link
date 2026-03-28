@@ -131,20 +131,26 @@ func _spawn_normal_enemy(size_level: int) -> void:
 	var wave_info = wave_system.get_current_wave_info()
 	var enemy_configs = wave_info.get("enemy_configs", [])
 	
+	# 筛选出还有剩余数量的配置
+	var available_configs: Array[EnemySpawnConfig] = []
+	for config in enemy_configs:
+		if config.has_remaining():
+			available_configs.append(config)
+	
 	# 选择敌人场景和配置
 	var enemy_scene = null
 	var enemy_config = null
 	
-	if not enemy_configs.is_empty():
-		# 根据权重选择敌人类型
+	if not available_configs.is_empty():
+		# 根据权重从可用的配置中选择
 		var total_weight = 0.0
-		for config in enemy_configs:
+		for config in available_configs:
 			total_weight += config.spawn_weight
 		
 		var random_value = randf() * total_weight
 		var current_weight = 0.0
 		
-		for config in enemy_configs:
+		for config in available_configs:
 			current_weight += config.spawn_weight
 			if random_value <= current_weight:
 				enemy_config = config
@@ -153,10 +159,19 @@ func _spawn_normal_enemy(size_level: int) -> void:
 					enemy_scene = scene
 					break
 		
-		# 如果没有找到合适的场景，使用默认列表
-		if not enemy_scene:
-			var enemy_index = randi() % enemy_list.size()
-			enemy_scene = enemy_list[enemy_index]
+		# 如果没有找到合适的场景，尝试从剩余配置中找
+		if not enemy_scene and not available_configs.is_empty():
+			enemy_config = available_configs[randi() % available_configs.size()]
+			if enemy_config:
+				enemy_scene = enemy_config.load_enemy_scene()
+		
+		# 如果找到配置，标记已生成
+		if enemy_config:
+			enemy_config.increment_spawned_count()
+	elif not enemy_configs.is_empty():
+		push_warning("EnemyManager: 所有敌人配置已用完，但仍需生成敌人")
+		var enemy_index = randi() % enemy_list.size()
+		enemy_scene = enemy_list[enemy_index]
 	else:
 		# 没有配置，使用默认列表
 		var enemy_index = randi() % enemy_list.size()

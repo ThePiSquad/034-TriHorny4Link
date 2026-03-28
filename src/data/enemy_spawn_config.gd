@@ -31,6 +31,25 @@ class_name EnemySpawnConfig extends Resource
 @export var is_elite: bool = false  ## 是否是精英敌人
 @export var is_boss: bool = false  ## 是否是 Boss
 
+## 运行时状态（不持久化）
+var spawned_count: int = 0  ## 已生成的敌人数量
+
+## 重置生成计数
+func reset_spawned_count() -> void:
+	spawned_count = 0
+
+## 检查是否还有未生成的敌人
+func has_remaining() -> bool:
+	return spawned_count < get_actual_count()
+
+## 获取剩余可生成数量
+func get_remaining_count() -> int:
+	return get_actual_count() - spawned_count
+
+## 标记已生成一个敌人
+func increment_spawned_count() -> void:
+	spawned_count += 1
+
 ## 计算实际生成的敌人数量
 func get_actual_count() -> int:
 	if use_random_count:

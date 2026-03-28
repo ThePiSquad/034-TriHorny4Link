@@ -68,7 +68,7 @@ func load_level(level_id: String) -> bool:
 		push_error("ResourceManager 实例不存在")
 		return false
 	
-	var level_data = ResourceManager.instance.load_level(level_id)
+	var level_data = ResourceManager.instance.load_level(level_id, true)
 	print("level_data 是否为空：", level_data == null)
 	
 	if not level_data:
@@ -106,6 +106,9 @@ func advance_to_next_wave() -> bool:
 		preparation_timer = 0.0
 		current_wave_progress = 0
 		
+		# 重置敌人生成配置计数
+		_reset_wave_enemy_configs()
+		
 		# 发射准备信号
 		wave_preparing.emit(current_preparing_wave)
 		
@@ -128,6 +131,9 @@ func advance_to_next_wave() -> bool:
 		current_state = WaveState.PREPARING
 		preparation_timer = 0.0
 		current_wave_progress = 0
+		
+		# 重置敌人生成配置计数
+		_reset_wave_enemy_configs()
 		
 		# 发射准备信号
 		wave_preparing.emit(current_preparing_wave)
@@ -203,6 +209,16 @@ func _get_wave_size_level(wave_data: WaveData) -> int:
 	if first_config.use_random_size:
 		return first_config.size_level_max
 	return first_config.size_level
+
+## 重置波次敌人生成配置计数
+func _reset_wave_enemy_configs() -> void:
+	if not current_level_data:
+		return
+	
+	var wave_data = current_level_data.get_wave(current_preparing_wave)
+	if wave_data:
+		for config in wave_data.enemy_configs:
+			config.reset_spawned_count()
 
 ## 更新波次系统
 func update(delta: float) -> void:
