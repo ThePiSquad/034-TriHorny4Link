@@ -30,7 +30,7 @@ alpha_curve = SubResource("CurveTexture_uir4w")
 
 [node name="BrokenPtc" type="GPUParticles2D" unique_id=676788154]
 texture = ExtResource("1_f87rr")
-lifetime = 0.5
+lifetime = 0.8
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_byfkj")
 script = ExtResource("2_u6wyu")
