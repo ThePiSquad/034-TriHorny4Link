@@ -88,6 +88,8 @@ heal_radius = 384.0
 heal_amount = 80.0
 max_heal_targets = 3
 heal_particle_scene = ExtResource("3_xeidm")
+connection_color = Color(0.2, 0.9, 0.4, 0.7)
+connection_line_width = 4.0
 score_value = 20
 max_health = 75.0
 
