@@ -228,10 +228,18 @@ theme_override_styles/hover = SubResource("StyleBoxLine_ebab3")
 icon = ExtResource("2_wfe3n")
 icon_alignment = 1
 
-[node name="BackButton" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1489794349]
+[node name="BackButton" type="Button" parent="." unique_id=1489794349]
 process_mode = 3
 custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 137.0
+offset_top = -108.0
+offset_right = 189.0
+offset_bottom = -48.0
+grow_vertical = 0
 theme_override_colors/font_hover_color = Color(1, 0.5019608, 0.5019608, 1)
 theme_override_colors/icon_pressed_color = Color(0.73333335, 0, 0.16470589, 1)
 theme_override_colors/icon_hover_color = Color(1, 0.5019608, 0.5019608, 1)

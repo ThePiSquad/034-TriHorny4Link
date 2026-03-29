@@ -1,7 +1,7 @@
 class_name LevelSelectScreen extends Control
 
-@onready var back_button: Button = $CanvasLayer/VBoxContainer/BackButton
 @onready var test_button: Button = $TestButton
+@onready var back_button: Button = $BackButton
 
 @onready var level0_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level0Button
 @onready var level1_button: Button = $CanvasLayer/VBoxContainer/LevelButtons/Level1Button
