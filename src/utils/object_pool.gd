@@ -48,19 +48,16 @@ func get_object() -> Node:
 	
 	if _pool.size() > 0:
 		obj = _pool.pop_back()
-		# 验证对象是否有效
 		if not is_instance_valid(obj):
-			# 对象无效，减少计数（因为这个对象之前被计为活跃）
 			_active_count = max(0, _active_count - 1)
-			obj = _create_new_object()
+			return get_object()
 	else:
 		obj = _create_new_object()
 	
 	if obj and is_instance_valid(obj):
-		_set_object_active(obj, true)
+		_set_object_active_deferred(obj, true)
 		_active_count += 1
 		
-		# 仅在启用调试日志时输出
 		if _enable_debug_log:
 			var timestamp = Time.get_datetime_string_from_system()
 			print("[对象池][%s] 借出：%s 实例ID:%d 活跃数=%d" % [timestamp, _scene.resource_path.get_file(), obj.get_instance_id(), _active_count])
@@ -82,32 +79,37 @@ func _create_new_object() -> Node:
 	"""创建新对象并添加到场景树"""
 	var obj = _scene.instantiate()
 	_parent.add_child(obj)
-	_set_object_active(obj, true)
+	_set_object_active_deferred(obj, true)
 	_active_count += 1
 	return obj
+
+func _set_object_active_deferred(obj: Node, active: bool) -> void:
+	"""延迟设置对象激活状态，避免在物理查询期间改变状态"""
+	if obj.has_method("activate") and active:
+		obj.call_deferred("activate")
+	elif obj.has_method("deactivate") and not active:
+		obj.call_deferred("deactivate")
+	else:
+		obj.call_deferred("set_visible", active)
 
 func return_object(obj: Node) -> void:
 	"""归还对象到池中"""
 	if not is_instance_valid(obj):
-		# 对象已无效，直接返回并减少计数
 		_active_count = max(0, _active_count - 1)
 		if _enable_debug_log:
 			var timestamp = Time.get_datetime_string_from_system()
 			print("[对象池][%s] 归还：无效对象 活跃数=%d" % [timestamp, _active_count])
 		return
 	
-	# 重置对象状态
 	if obj.has_method("reset"):
-		obj.reset()
+		obj.call_deferred("reset")
 	
-	# 设置为非激活状态
-	_set_object_active(obj, false)
-	obj.position = Vector2(-10000, -10000)
+	_set_object_active_deferred(obj, false)
+	obj.call_deferred("set_position", Vector2(-10000, -10000))
 	
 	_pool.append(obj)
 	_active_count = max(0, _active_count - 1)
 	
-	# 仅在启用调试日志时输出
 	if _enable_debug_log:
 		var timestamp = Time.get_datetime_string_from_system()
 		print("[对象池][%s] 归还：%s 实例ID:%d 活跃数=%d" % [timestamp, _scene.resource_path.get_file(), obj.get_instance_id(), _active_count])

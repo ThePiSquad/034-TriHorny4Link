@@ -45,6 +45,10 @@ var _original_color: Color = Color.WHITE  # 原始颜色
 var _knockback_force: float = 200.0  # 击退力度
 var _knockback_velocity: Vector2 = Vector2.ZERO  # 击退速度
 
+# 路径检查优化
+var _path_check_cooldown: float = 0.5  # 路径检查冷却时间
+var _last_path_check_time: float = -1.0  # 上次路径检查时间
+
 # 死亡粒子特效相关
 var death_particle_scene: PackedScene = preload("res://src/particles/broken_ptc.tscn")
 var base_particle_amount: int = 8  # 基础粒子数量
@@ -374,6 +378,12 @@ func _check_barrier_collision() -> void:
 
 func _has_valid_path_to_crystal() -> bool:
 	"""检查是否有到达 Crystal 的可行路径"""
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - _last_path_check_time < _path_check_cooldown:
+		return false
+	
+	_last_path_check_time = current_time
+	
 	if not navigation_agent:
 		return false
 	

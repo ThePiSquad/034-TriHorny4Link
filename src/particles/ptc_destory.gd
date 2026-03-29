@@ -34,9 +34,13 @@ func destroy() -> void:
 	_is_returned_to_pool = true
 	
 	if _scene_path != "" and ObjectPoolManager.instance:
-		ObjectPoolManager.instance.return_object(_scene_path, self)
+		call_deferred("_return_to_pool")
 	else:
 		queue_free()
+
+func _return_to_pool() -> void:
+	if ObjectPoolManager.instance and is_instance_valid(self):
+		ObjectPoolManager.instance.return_object(_scene_path, self)
 
 func reset() -> void:
 	_is_returned_to_pool = false

@@ -116,18 +116,20 @@ func _is_magic_bullet() -> bool:
 	return false
 
 func destroy() -> void:
-	# 防止重复销毁
 	if _is_being_destroyed:
 		return
 	
 	_is_being_destroyed = true
 	_is_active = false
 	
-	# 使用对象池归还
 	if _scene_path != "" and ObjectPoolManager.instance:
-		ObjectPoolManager.instance.return_object(_scene_path, self)
+		call_deferred("_return_to_pool")
 	elif is_inside_tree():
 		queue_free()
+
+func _return_to_pool() -> void:
+	if ObjectPoolManager.instance and is_instance_valid(self):
+		ObjectPoolManager.instance.return_object(_scene_path, self)
 
 func reset() -> void:
 	"""重置子弹状态用于对象池复用"""
