@@ -17,6 +17,11 @@ const MONO_CRYSTAL_BASE_ENERGY: int = 10
 # 能量每格衰减值
 const ENERGY_DECAY_PER_TILE: int = 1
 
+# 能量衰减参数
+const ENERGY_DECAY_DISTANCE_BASE: int = 6  # 距离衰减基数（每10格子）
+const ENERGY_DECAY_RATE: int = 1  # 能量衰减系数（1能量/10格子）
+const ENERGY_MIN_THRESHOLD: int = 3  # 最低能量阈值
+
 # 最大能量传播距离
 const MAX_ENERGY_RANGE: int = 10
 
