@@ -81,9 +81,7 @@ func add_enemy_score(score: int) -> void:
 	enemy_score += score
 
 func _on_game_over() -> void:
-	# 游戏结束后的处理逻辑
-	# 停止 BGM
-	AudioManager.stop_bgm()
+	pass
 
 func get_score_data() -> Dictionary:
 	return {
