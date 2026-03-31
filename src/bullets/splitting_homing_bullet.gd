@@ -76,7 +76,7 @@ func _fire_splitting_bullet(angle: float, damage: float) -> void:
 	if not bullet:
 		bullet = splitting_bullet_scene.instantiate() as SplittingBullet
 		if bullet:
-			get_parent().add_child(bullet)
+			get_parent().call_deferred("add_child", bullet)
 	
 	if not bullet:
 		return
@@ -95,7 +95,7 @@ func _fire_splitting_bullet(angle: float, damage: float) -> void:
 
 func _add_bullet_to_scene(bullet: Node) -> void:
 	"""延迟添加子弹到场景"""
-	get_tree().current_scene.add_child(bullet)
+	get_tree().current_scene.call_deferred("add_child", bullet)
 
 func set_splitting_config(count: int, angle_spread: float, damage: float, lifetime: float) -> void:
 	splitting_count = count

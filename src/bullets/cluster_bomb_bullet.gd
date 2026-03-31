@@ -93,7 +93,7 @@ func _create_explosion_effect() -> void:
 	# 如果对象池失败，使用传统方式
 	if not particle_system:
 		particle_system = particle_scene.instantiate()
-		get_parent().add_child(particle_system)
+		get_parent().call_deferred("add_child", particle_system)
 	else:
 		# 设置场景路径用于归还
 		if particle_system.has_method("set_scene_path"):
@@ -124,7 +124,7 @@ func _spawn_cluster_bullets() -> void:
 		if not bullet:
 			bullet = _cluster_bullet_scene.instantiate() as Bullet
 			if bullet:
-				get_parent().add_child(bullet)
+				get_parent().call_deferred("add_child", bullet)
 		
 		if not bullet:
 			continue
@@ -138,7 +138,7 @@ func _spawn_cluster_bullets() -> void:
 
 func _add_bullet_to_scene(bullet: Bullet) -> void:
 	"""延迟添加子弹到场景"""
-	get_parent().add_child(bullet)
+	get_parent().call_deferred("add_child", bullet)
 
 func set_cluster_config(count: int, angle_spread: float, bullet_damage: float, bullet_lifetime: float, bullet_speed: float) -> void:
 	cluster_count = count

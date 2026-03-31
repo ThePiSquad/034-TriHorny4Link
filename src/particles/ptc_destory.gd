@@ -11,6 +11,9 @@ func _ready() -> void:
 	_start_destruction_timer()
 
 func _start_destruction_timer() -> void:
+	if not get_tree():
+		return
+	
 	# 断开旧连接
 	if _timer_connection.is_valid() and _destruction_timer and _destruction_timer.timeout.is_connected(_timer_connection):
 		_destruction_timer.timeout.disconnect(_timer_connection)
@@ -59,4 +62,4 @@ func activate() -> void:
 	one_shot = true
 	emitting = true
 	restart()
-	_start_destruction_timer()
+	call_deferred("_start_destruction_timer")

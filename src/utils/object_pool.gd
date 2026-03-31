@@ -76,9 +76,9 @@ func cleanup_invalid_objects() -> void:
 	_pool = valid_objects
 
 func _create_new_object() -> Node:
-	"""创建新对象并添加到场景树"""
+	"""创建新对象并添加到场景树（延迟添加避免物理冲突）"""
 	var obj = _scene.instantiate()
-	_parent.add_child(obj)
+	_parent.call_deferred("add_child", obj)
 	_set_object_active_deferred(obj, true)
 	_active_count += 1
 	return obj

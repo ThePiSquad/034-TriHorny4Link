@@ -95,7 +95,7 @@ func _create_explosion_effect() -> void:
 	# 如果对象池失败，使用传统方式
 	if not particle_system:
 		particle_system = particle_scene.instantiate()
-		get_parent().add_child(particle_system)
+		get_parent().call_deferred("add_child", particle_system)
 	else:
 		# 设置场景路径用于归还
 		if particle_system.has_method("set_scene_path"):

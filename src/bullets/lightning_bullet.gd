@@ -23,6 +23,9 @@ var _target_position: Vector2
 var _chain_targets: Array[Node2D] = []
 var _chain_damages: Array[float] = []
 var _chain_positions: Array[Vector2] = []
+var _cached_lightning_points: Array[PackedVector2Array] = []
+var _lightning_cache_valid: bool = false
+var _lightning_segments: int = 8
 
 func init(velocity_: Vector2, damage: int, lifetime_: float, bullet_type_: Enums.ColorType):
 	super.init(velocity_, damage, lifetime_, bullet_type_)
@@ -54,11 +57,37 @@ func _process(delta: float) -> void:
 	
 	if _target and is_instance_valid(_target):
 		_target_position = _target.global_position
+		_lightning_cache_valid = false
+	
+	if _chain_positions.size() > 1:
+		if not _lightning_cache_valid:
+			_update_lightning_cache()
 	
 	queue_redraw()
 	
 	if _lifetime <= 0:
 		destroy()
+
+func _update_lightning_cache() -> void:
+	_cached_lightning_points.clear()
+	for i in range(_chain_positions.size() - 1):
+		_cached_lightning_points.append(_generate_lightning_points(_chain_positions[i], _chain_positions[i + 1]))
+	_lightning_cache_valid = true
+
+func _generate_lightning_points(start: Vector2, end: Vector2) -> PackedVector2Array:
+	var points = PackedVector2Array()
+	var distance = start.distance_to(end)
+	var segments = _lightning_segments
+	
+	points.append(start)
+	for i in range(1, segments):
+		var t = float(i) / float(segments)
+		var point = start.lerp(end, t)
+		var offset = Vector2(randf_range(-10, 10), randf_range(-10, 10)) * (1.0 - t)
+		points.append(point + offset)
+	points.append(end)
+	
+	return points
 
 func _draw() -> void:
 	if not _is_active:
@@ -85,23 +114,18 @@ func _draw() -> void:
 	# 绘制连锁闪电
 	if _chain_positions.size() > 1:
 		for i in range(_chain_positions.size() - 1):
-			_draw_lightning_bolt(_chain_positions[i], _chain_positions[i + 1], color)
+			if i < _cached_lightning_points.size():
+				_draw_cached_lightning(_cached_lightning_points[i], color)
+			else:
+				_draw_lightning_bolt(_chain_positions[i], _chain_positions[i + 1], color)
 
-func _draw_lightning_bolt(start: Vector2, end: Vector2, color: Color) -> void:
-	var distance = start.distance_to(end)
-	var segments = max(3, int(distance / 32))
-	var points = [start]
-	
-	for i in range(1, segments):
-		var t = float(i) / float(segments)
-		var point = start.lerp(end, t)
-		var offset = Vector2(randf_range(-10, 10), randf_range(-10, 10)) * (1.0 - t)
-		points.append(point + offset)
-	
-	points.append(end)
-	
+func _draw_cached_lightning(points: PackedVector2Array, color: Color) -> void:
 	for i in range(points.size() - 1):
 		draw_line(points[i], points[i + 1], color, beam_width, true)
+
+func _draw_lightning_bolt(start: Vector2, end: Vector2, color: Color) -> void:
+	var points = _generate_lightning_points(start, end)
+	_draw_cached_lightning(points, color)
 
 func _ready() -> void:
 	super._ready()
@@ -116,6 +140,8 @@ func reset() -> void:
 	_chain_targets.clear()
 	_chain_damages.clear()
 	_chain_positions.clear()
+	_cached_lightning_points.clear()
+	_lightning_cache_valid = false
 	_bullet_type = Enums.ColorType.ORANGE
 
 func activate() -> void:
